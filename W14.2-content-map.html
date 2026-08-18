@@ -650,9 +650,8 @@ body {
 
     <div class="card">
       <p class="section-label">What you'll do</p>
-      <p style="font-size:13px;color:#333;line-height:1.65;"><strong>Step 1 (~10 min):</strong> Each person picks one E, and creates a real content piece — a specific title, media type, and trust rationale. Go deep on your one piece.</p>
-      <p style="font-size:13px;color:#333;line-height:1.65;margin-top:8px;"><strong>Step 2 (~3 min):</strong> Stop gate — share your piece with your group out loud. Push each other on specificity.</p>
-      <p style="font-size:13px;color:#333;line-height:1.65;margin-top:8px;"><strong>Step 3 (~12 min):</strong> As a group, assemble the full 4E content map — one piece per E — then write a Content Trust Statement that ties the whole strategy together.</p>
+      <p style="font-size:13px;color:#333;line-height:1.65;"><strong>Phase 1 (~10 min):</strong> Each person picks one E, and creates a real content piece — a specific title, media type, and trust rationale. Go deep on your one piece.</p>
+      <p style="font-size:13px;color:#333;line-height:1.65;margin-top:8px;"><strong>Phase 2 (~15 min):</strong> Share pieces with your group out loud. Push each other on specificity. Then assemble the full 4E content map — one piece per E — and write a Content Trust Statement that ties the whole strategy together.</p>
     </div>
 
     <button class="btn btn-taya" onclick="show('e-pick-screen')">Continue — Pick Your E →</button>
@@ -722,6 +721,7 @@ body {
       <div class="field">
         <label>Content Title — what would you actually call this piece? (5 words minimum)</label>
         <input type="text" id="i-title" placeholder='e.g., "How Much Does a Gym Membership Actually Cost? (No Hidden Fees)"' oninput="onIndInput()">
+        <div class="char-count" id="title-count">0 / 5 words minimum</div>
         <p class="field-hint">Be specific. A real title that a first-time gym member would click on. Not "gym content idea."</p>
       </div>
 
@@ -752,9 +752,9 @@ body {
       </div>
 
       <div class="field">
-        <label>Trust Rationale — why does publishing this build trust? (50 char minimum)</label>
+        <label>Trust Rationale — why does publishing this build trust? (120 char minimum)</label>
         <textarea id="i-trust" rows="3" placeholder='e.g., "It shows we have nothing to hide about our pricing — most gyms bury their fees. Answering honestly makes us credible before they walk in."' oninput="onIndInput()"></textarea>
-        <div class="char-count" id="trust-count">0 / 50 minimum</div>
+        <div class="char-count" id="trust-count">0 / 120 minimum</div>
         <p class="field-hint">Connect it to TAYA: what fear, question, or objection does this content answer? Why does answering it publicly build credibility?</p>
       </div>
     </div>
@@ -948,12 +948,12 @@ function cc(id, val, min, suffix) {
 
 /* ── STATE ── */
 let state = {
-  name: '', email: '', group: '',
+  name: '', email: '', groupNum: '',
   ePick: '',
   ind: { title: '', media: '', channel: '', trust: '' },
   gateAcked: false,
   gateFeedback: '',
-  group: {
+  groupMap: {
     exciteTitle: '', exciteMedia: '',
     educateTitle: '', educateMedia: '',
     experienceTitle: '', experienceMedia: '',
@@ -986,7 +986,7 @@ function onJoin() {
   document.getElementById('join-btn').disabled = !(name && emailOk && group);
   if (name)  state.name  = name;
   if (email) state.email = email;
-  if (group) state.group = group;
+  if (group) state.groupNum = group;
 }
 
 /* ── E PICK ── */
@@ -1012,7 +1012,7 @@ function onEnterIndividual() {
   hdr.className = 'e-header ' + state.ePick;
   document.getElementById('ind-e-name').textContent = d.name;
   document.getElementById('ind-e-hint').textContent = d.hint;
-  checkIndGate();
+  onIndInput();
 }
 
 function onIndInput() {
@@ -1021,10 +1021,14 @@ function onIndInput() {
   const channel = document.getElementById('i-channel').value;
   const trust   = document.getElementById('i-trust').value.trim();
 
-  cc('trust-count', trust.length, 50);
-
   const titleWords = title.split(/\s+/).filter(Boolean).length;
-  const allDone = titleWords >= 5 && media && channel && trust.length >= 50;
+  const titleEl = document.getElementById('title-count');
+  titleEl.textContent = titleWords < 5 ? titleWords + ' / 5 words minimum' : titleWords + ' words ✓';
+  titleEl.classList.toggle('ok', titleWords >= 5);
+
+  cc('trust-count', trust.length, 120);
+
+  const allDone = titleWords >= 5 && media && channel && trust.length >= 120;
 
   state.ind = { title, media, channel, trust };
 
@@ -1058,7 +1062,7 @@ function ackGate() {
   const channel = document.getElementById('i-channel').value;
   const trust   = document.getElementById('i-trust').value.trim();
   const titleWords = title.split(/\s+/).filter(Boolean).length;
-  const allDone = titleWords >= 5 && media && channel && trust.length >= 50;
+  const allDone = titleWords >= 5 && media && channel && trust.length >= 120;
   document.getElementById('ind-continue-btn').disabled = !allDone;
 }
 
@@ -1080,7 +1084,7 @@ function onGroupInput() {
 
   cc('cts-count', cts.length, 60);
 
-  state.group = {
+  state.groupMap = {
     exciteTitle: et, exciteMedia: em,
     educateTitle: edt, educateMedia: edm,
     experienceTitle: ext, experienceMedia: exm,
@@ -1102,7 +1106,7 @@ async function submitAll() {
     exercise: 'W14.2',
     name: state.name,
     email: state.email,
-    group: state.group,
+    group: state.groupNum,
     individual: {
       ePick: state.ePick,
       title: state.ind.title,
@@ -1112,12 +1116,12 @@ async function submitAll() {
       gateFeedback: state.gateFeedback
     },
     groupMap: {
-      excite:     { title: state.group.exciteTitle,     media: state.group.exciteMedia },
-      educate:    { title: state.group.educateTitle,    media: state.group.educateMedia },
-      experience: { title: state.group.experienceTitle, media: state.group.experienceMedia },
-      engage:     { title: state.group.engageTitle,     media: state.group.engageMedia }
+      excite:     { title: state.groupMap.exciteTitle,     media: state.groupMap.exciteMedia },
+      educate:    { title: state.groupMap.educateTitle,    media: state.groupMap.educateMedia },
+      experience: { title: state.groupMap.experienceTitle, media: state.groupMap.experienceMedia },
+      engage:     { title: state.groupMap.engageTitle,     media: state.groupMap.engageMedia }
     },
-    contentTrustStatement: state.group.trustStatement,
+    contentTrustStatement: state.groupMap.trustStatement,
     timestamp: new Date().toISOString()
   };
 
@@ -1144,13 +1148,9 @@ const MEDIA_LABELS = {
 const CHANNEL_LABELS = {
   owned: 'Owned media', earned: 'Earned media', paid: 'Paid media'
 };
-const E_COLORS = {
-  excite: 'excite', educate: 'educate', experience: 'experience', engage: 'engage'
-};
-
 function buildSummary() {
   document.getElementById('student-tag').textContent =
-    state.name + ' · Group ' + state.group + ' · ' + state.email;
+    state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
 
   // Individual card
   const eData = E_DATA[state.ePick];
@@ -1166,7 +1166,7 @@ function buildSummary() {
     </div>`;
 
   // Group 4E map
-  const g = state.group;
+  const g = state.groupMap;
   const mapEs = [
     { key: 'excite',     label: 'Excite',     title: g.exciteTitle,     media: g.exciteMedia },
     { key: 'educate',    label: 'Educate',    title: g.educateTitle,    media: g.educateMedia },
@@ -1192,9 +1192,6 @@ function buildSummary() {
     </div>`;
 }
 
-/* ── INIT ── */
-document.getElementById('j-name').addEventListener('input', onJoin);
-document.getElementById('j-email').addEventListener('input', onJoin);
 </script>
 </body>
 </html>

@@ -19,8 +19,8 @@
   /* Company colors */
   --apple:    #2B5F8E;
   --apple-lt: #e8f0f9;
-  --ticket:   #7B3F8C;
-  --ticket-lt:#f3ebf7;
+  --nike:     #F26522;
+  --nike-lt:  #fef0e6;
   --subway:   #C49A00;
   --subway-lt:#fdf9e6;
   --deere:    #2D7A35;
@@ -206,7 +206,7 @@ body {
 
 .round-pip.done { background: #1a1d23; }
 .round-pip.active-apple   { background: var(--apple); }
-.round-pip.active-ticket  { background: var(--ticket); }
+.round-pip.active-nike  { background: var(--nike); }
 .round-pip.active-subway  { background: var(--subway); }
 .round-pip.active-deere   { background: var(--deere); }
 
@@ -241,7 +241,7 @@ body {
 }
 
 .ch-apple   { background: var(--apple); }
-.ch-ticket  { background: var(--ticket); }
+.ch-nike  { background: var(--nike); }
 .ch-subway  { background: var(--subway); color: #1a1d23; }
 .ch-deere   { background: var(--deere); }
 
@@ -294,7 +294,7 @@ body {
 
 .concept-opt:hover { border-color: #aaa; }
 .concept-opt.selected { border-color: var(--apple); background: var(--apple-lt); }
-.concept-opt.selected-ticket { border-color: var(--ticket); background: var(--ticket-lt); }
+.concept-opt.selected-nike { border-color: var(--nike); background: var(--nike-lt); }
 .concept-opt.selected-subway { border-color: var(--subway); background: var(--subway-lt); }
 .concept-opt.selected-deere  { border-color: var(--deere);  background: var(--deere-lt); }
 
@@ -309,7 +309,7 @@ body {
 }
 
 .concept-opt.selected .concept-radio,
-.concept-opt.selected-ticket .concept-radio,
+.concept-opt.selected-nike .concept-radio,
 .concept-opt.selected-subway .concept-radio,
 .concept-opt.selected-deere .concept-radio {
   background: #1a1d23;
@@ -488,7 +488,7 @@ body {
 }
 
 .ct-apple   { background: var(--apple-lt); color: var(--apple); }
-.ct-ticket  { background: var(--ticket-lt); color: var(--ticket); }
+.ct-nike  { background: var(--nike-lt); color: var(--nike); }
 .ct-subway  { background: var(--subway-lt); color: var(--subway); }
 .ct-deere   { background: var(--deere-lt); color: var(--deere); }
 
@@ -602,9 +602,9 @@ body {
           <div style="font-size:11px;font-weight:800;color:var(--apple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Round 1</div>
           <div style="font-size:14px;font-weight:700;">Apple App Store</div>
         </div>
-        <div style="background:#f4eef8;border-radius:8px;padding:12px;">
-          <div style="font-size:11px;font-weight:800;color:var(--ticket);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Round 2</div>
-          <div style="font-size:14px;font-weight:700;">Ticketmaster</div>
+        <div style="background:#fef0e6;border-radius:8px;padding:12px;">
+          <div style="font-size:11px;font-weight:800;color:var(--nike);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Round 2</div>
+          <div style="font-size:14px;font-weight:700;">Nike Retailers</div>
         </div>
         <div style="background:#fdf9e6;border-radius:8px;padding:12px;">
           <div style="font-size:11px;font-weight:800;color:var(--subway);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Round 3</div>
@@ -690,9 +690,9 @@ body {
       <div class="section-label">Step 4 — Your group's verdict</div>
       <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Agree on one answer before anyone clicks.</p>
       <div class="verdict-opts">
-        <button class="verdict-btn" id="v-def" onclick="pickVerdict('defensible')">✓ Defensible</button>
-        <button class="verdict-btn" id="v-not" onclick="pickVerdict('not-defensible')">✗ Not Defensible</button>
-        <button class="verdict-btn" id="v-dep" onclick="pickVerdict('it-depends')">~ It Depends</button>
+        <button class="verdict-btn" id="v-def" onclick="pickVerdict('legitimate')">✓ Legitimate</button>
+        <button class="verdict-btn" id="v-not" onclick="pickVerdict('not-legitimate')">✗ Not Legitimate</button>
+        <button class="verdict-btn" id="v-dep" onclick="pickVerdict('gray-area')">~ Gray Area</button>
       </div>
     </div>
 
@@ -716,22 +716,22 @@ body {
     <div id="summary-body"></div>
 
     <div class="debrief-box">
-      <h3>Debrief: The Framework in Four Companies</h3>
+      <h3>Debrief: The Concepts Behind Each Company</h3>
       <div class="debrief-company">
         <strong>Apple — Coercive Channel Power</strong>
-        <p>Apple doesn't just participate in a channel — it built the channel and then locked the door. The App Store is coercive because developers have no alternative route to iPhone users. The 30% fee, the review process, and the no-sideloading rule all flow from that single chokehold. The question isn't whether Apple provides value — it does. The question is whether any company should have that kind of unilateral power over a $2 trillion ecosystem.</p>
+        <p>The App Store is the only way to reach iPhone users. No alternative path exists. Apple forces compliance by threatening removal — that's coercive power. The 30% fee exists because developers have no other option.</p>
       </div>
       <div class="debrief-company">
-        <strong>Ticketmaster — Coercive Channel Power + Vertical Conflict</strong>
-        <p>Ticketmaster controls access to the venue, which is the only legal channel to the fan. The venue signs an exclusive contract; the fan has no choice. When Ticketmaster also owns the promoter (Live Nation), vertical conflict is built into the business model — the same company is competing with itself at every level. The Taylor Swift collapse wasn't a technology failure. It was a channel power failure.</p>
+        <strong>Nike — Horizontal Channel Conflict</strong>
+        <p>Two retailers at the same level of Nike's channel competing for the same customers. Foot Locker's clearance sale hurts the local shop — not because Nike told them to, but because Nike authorized too many retailers in the same area. The conflict is retailer vs. retailer, not Nike vs. retailer.</p>
       </div>
       <div class="debrief-company">
         <strong>Subway — Vertical Channel Conflict + Contractual Control</strong>
-        <p>The $5 Footlong was a marketing win at the corporate level and a financial loss at the franchisee level. Corporate sets the price; franchisees pay the cost. That's textbook vertical channel conflict — two different levels of the channel with opposite incentives. Franchise contracts give Subway the legal right to enforce pricing. But legal authority and smart channel management are not the same thing.</p>
+        <p>Corporate sets the price. Franchisees pay the cost. Two different levels of the channel with opposite incentives — that's vertical conflict. The franchise contract gives Subway the legal right to enforce it — that's contractual control.</p>
       </div>
       <div class="debrief-company">
         <strong>John Deere — Vertical Channel Conflict + Coercive Power</strong>
-        <p>John Deere extended its channel control past the point of sale and into the customer's barn — years after the transaction. The software lock isn't a safety feature. It's a mechanism for routing service revenue through authorized dealers indefinitely. Farmers who are locked out of their own equipment during harvest season have zero negotiating power. That's coercive channel power operating through product design rather than a contract.</p>
+        <p>The software lock routes all repair revenue through authorized dealers — extending channel control past the point of sale. Farmers with broken equipment during harvest have zero negotiating power. That's coercive power operating through product design.</p>
       </div>
     </div>
   </div>
@@ -764,29 +764,29 @@ const ROUNDS = [
     gateText: 'Share your concept pick with your group. Does everyone agree? If not — take 90 seconds and argue. Then keep going.',
     typed2Label: 'Step 3 — After discussing with your group: Who benefits most from Apple\'s channel control, and who pays the highest price for it?',
     typed2Placeholder: 'Think about developers, consumers, Apple itself, and competitors...',
-    verdictPrompt: 'Is Apple\'s channel control defensible?',
+    verdictPrompt: 'Is Apple\'s channel power legitimate?',
   },
   {
     id: 2,
-    company: 'Ticketmaster',
-    colorClass: 'ch-ticket',
-    accentVar: '--ticket',
-    accentLtVar: '--ticket-lt',
-    conceptSelectedClass: 'selected-ticket',
-    ctClass: 'ct-ticket',
+    company: 'Nike Authorized Retailers',
+    colorClass: 'ch-nike',
+    accentVar: '--nike',
+    accentLtVar: '--nike-lt',
+    conceptSelectedClass: 'selected-nike',
+    ctClass: 'ct-nike',
     shClass: '',
-    pipActive: 'active-ticket',
-    frame: '"Channel control always creates brand risk."',
+    pipActive: 'active-nike',
+    frame: '"When channel members at the same level compete, the brand gets caught in the middle."',
     context: `
-      <p class="context-p">Ticketmaster is the largest ticket-selling platform in the United States. It handles events for major arenas, professional sports leagues, and touring concert acts. Most large venues have exclusive contracts with Ticketmaster — which means if you want to see a show at that venue, Ticketmaster is the only official place to buy your ticket. There is no competing platform. There is no other option. You pay Ticketmaster's fees, or you don't go.</p>
-      <p class="context-p">And the fees are significant. Ticketmaster adds service charges, facility charges, and order processing fees that can push the final price 20–30% above the face value printed on the ticket. Some of that money goes back to the venue; most of it stays with Ticketmaster. Because venues are locked into exclusive contracts, they have little incentive to negotiate fee structures on behalf of fans. In 2022, when Taylor Swift announced the Eras Tour, demand crashed Ticketmaster's website and millions of verified fans were locked out. Tickets that sold for $49 on Ticketmaster appeared on resale sites for over $5,000 within minutes. The public backlash was enormous.</p>
-      <p class="context-p">After the Swift debacle, Congress held hearings. Several states passed or considered laws limiting Ticketmaster's market power. What made the situation worse was the structure of Ticketmaster's parent company, Live Nation: it is simultaneously one of the largest concert promoters in the country. This means Live Nation often controls the artist's tour deal, the venue's booking contract, and the fan's only ticket-buying channel — all at once. Critics say this is vertical integration used as a weapon. Ticketmaster says it's efficiency. The Senate Judiciary Committee was not convinced.</p>`,
-    typed1Label: 'Step 2 — In one sentence, explain why you chose that concept for Ticketmaster.',
-    typed1Placeholder: 'e.g., Ticketmaster uses coercive power because fans and venues have no realistic alternative...',
-    gateText: 'Share your concept pick with your group. You might disagree — especially between coercive power and vertical conflict. Figure out which fits better and why.',
-    typed2Label: 'Step 3 — After discussing with your group: If Ticketmaster lost its exclusive venue contracts tomorrow, what would actually change for fans?',
-    typed2Placeholder: 'Would prices drop? Would a competitor appear? Would venues behave differently?...',
-    verdictPrompt: 'Is Ticketmaster\'s channel control defensible?',
+      <p class="context-p">Nike sells its shoes and apparel through a network of authorized retailers. If you walk into a Foot Locker, a Dick's Sporting Goods, or a local running shop, they all carry Nike products. Each retailer signed an agreement with Nike to sell the brand. Each one buys inventory from Nike at wholesale, marks it up, and sells it to customers. They are all at the same level of Nike's distribution channel — they are all retailers.</p>
+      <p class="context-p">Here's the problem. A Foot Locker and a local running shop sit three blocks apart in the same shopping district. Both carry the same Nike Air Max 90. Foot Locker launches a 40% off clearance sale on Nike products to drive foot traffic during a slow month. The local shop can't match that price — their margins are already thin, and they don't have Foot Locker's volume to absorb the loss. Customers walk past the local shop and buy the same shoe at Foot Locker for $40 less. Within a month, the local shop stops reordering Nike products altogether. Nike didn't set the sale price. Nike didn't tell Foot Locker to discount. But Nike authorized both stores to carry the same product in the same area — and now one of them is gone.</p>
+      <p class="context-p">This pattern repeats across Nike's retail network. When too many authorized retailers compete in the same territory, price wars break out. Retailers start undercutting each other to move inventory. The brand's perceived value drops — customers start waiting for sales instead of paying full price. Nike has tried to address this by reducing its number of retail partners (cutting about 50% of its wholesale accounts since 2017) and pushing more sales through its own Nike.com and Nike stores. But the damage from years of over-distribution — too many retailers selling the same products — still affects how customers think about the brand.</p>`,
+    typed1Label: 'Step 2 — In one sentence, explain why you chose that concept for Nike.',
+    typed1Placeholder: 'e.g., Nike\'s authorized retailers are in horizontal conflict because two stores at the same channel level are competing for the same customers...',
+    gateText: 'Share your concept pick with your group. This one is different from Round 1. Think about WHO is in conflict — is it Nike vs. the retailers, or the retailers vs. each other?',
+    typed2Label: 'Step 3 — After discussing with your group: Whose job is it to fix this — Nike\'s or the retailers\'? Why?',
+    typed2Placeholder: 'Who created the situation? Who has the power to change it? Are those the same person?...',
+    verdictPrompt: 'Is Nike\'s channel structure legitimate?',
   },
   {
     id: 3,
@@ -808,7 +808,7 @@ const ROUNDS = [
     gateText: 'Share your pick with your group. Subway is tricky — it could be contractual control OR vertical conflict. The distinction matters. Figure it out.',
     typed2Label: 'Step 3 — After discussing with your group: Whose problem is the $5 Footlong conflict to fix — Subway corporate or the franchisee? Why?',
     typed2Placeholder: 'Who has the power to change this? Who has the incentive? Are those the same person?...',
-    verdictPrompt: 'Is Subway\'s channel control defensible?',
+    verdictPrompt: 'Is Subway\'s channel power legitimate?',
   },
   {
     id: 4,
@@ -830,7 +830,7 @@ const ROUNDS = [
     gateText: 'Share your concept pick with your group. John Deere could fit multiple concepts — narrow it to the one that best explains the core mechanism of control.',
     typed2Label: 'Step 3 — After discussing with your group: Is John Deere\'s repair lockout a channel decision or a product design decision? Does the difference matter?',
     typed2Placeholder: 'If it\'s product design, who\'s responsible? If it\'s a channel decision, can it be changed without redesigning the product?...',
-    verdictPrompt: 'Is John Deere\'s channel control defensible?',
+    verdictPrompt: 'Is John Deere\'s channel power legitimate?',
   }
 ];
 
@@ -975,9 +975,9 @@ function renderRound(n) {
   // Verdict
   document.getElementById('verdict-section').className = 'verdict-section' + (rs.typed2.trim().length >= 30 ? '' : ' locked');
   ['v-def', 'v-not', 'v-dep'].forEach(id => document.getElementById(id).className = 'verdict-btn');
-  if (rs.verdict === 'defensible')    document.getElementById('v-def').classList.add('v-def');
-  if (rs.verdict === 'not-defensible') document.getElementById('v-not').classList.add('v-not');
-  if (rs.verdict === 'it-depends')    document.getElementById('v-dep').classList.add('v-dep');
+  if (rs.verdict === 'legitimate')     document.getElementById('v-def').classList.add('v-def');
+  if (rs.verdict === 'not-legitimate') document.getElementById('v-not').classList.add('v-not');
+  if (rs.verdict === 'gray-area')     document.getElementById('v-dep').classList.add('v-dep');
 
   // Next button
   const nextBtn = document.getElementById('next-round-btn');
@@ -1030,9 +1030,9 @@ function onTyped2() {
 function pickVerdict(v) {
   state.rounds[state.currentRound].verdict = v;
   ['v-def', 'v-not', 'v-dep'].forEach(id => document.getElementById(id).className = 'verdict-btn');
-  if (v === 'defensible')    { document.getElementById('v-def').classList.add('v-def'); }
-  if (v === 'not-defensible'){ document.getElementById('v-not').classList.add('v-not'); }
-  if (v === 'it-depends')    { document.getElementById('v-dep').classList.add('v-dep'); }
+  if (v === 'legitimate')     { document.getElementById('v-def').classList.add('v-def'); }
+  if (v === 'not-legitimate') { document.getElementById('v-not').classList.add('v-not'); }
+  if (v === 'gray-area')      { document.getElementById('v-dep').classList.add('v-dep'); }
   document.getElementById('next-round-btn').disabled = false;
 }
 
@@ -1075,9 +1075,9 @@ function renderSummary() {
     `${state.name} · Group ${state.group}`;
 
   const verdictLabel = {
-    'defensible': '✓ Defensible',
-    'not-defensible': '✗ Not Defensible',
-    'it-depends': '~ It Depends',
+    'legitimate': '✓ Legitimate',
+    'not-legitimate': '✗ Not Legitimate',
+    'gray-area': '~ Gray Area',
   };
 
   const conceptName = id => (CONCEPTS.find(c => c.id === id) || { name: '—' }).name;

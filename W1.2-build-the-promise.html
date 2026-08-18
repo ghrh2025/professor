@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W1.2 — Build the Promise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Liquid Death palette */
+  --ld-black:  #141414;
+  --ld-ink:    #0A0A0A;
+  --ld-green:  #B4E600;
+  --ld-green-d:#8FB800;
+
+  --bg:      #F4F5F0;
+  --surface: #FFFFFF;
+  --border:  #E3E5DE;
+  --text:    #1A1A1A;
+  --muted:   #6B7280;
+  --radius:  10px;
+  --shadow:  0 2px 14px rgba(0,0,0,0.08);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── SCREENS — CRITICAL: ID specificity keeps pw centered without breaking others ── */
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:820px;margin:0 auto;padding:22px 20px 90px}
+
+.week-tag{
+  font-family:'Space Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;color:var(--ld-green-d);
+}
+.screen-title{font-size:29px;font-weight:900;line-height:1.15;margin-bottom:6px}
+.screen-sub{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:4px;background:transparent;
+  border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-radius:6px;
+  cursor:pointer;margin-bottom:16px;transition:all .15s;
+}
+.back-btn:hover{border-color:var(--ld-black);color:var(--ld-black)}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* ── PRIMARY BUTTON ── */
+.btn{
+  display:inline-block;width:100%;border:none;border-radius:9px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:.3px;
+  padding:15px 20px;transition:transform .08s, box-shadow .15s, opacity .15s;
+}
+.btn-go{background:var(--ld-green);color:var(--ld-ink)}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(180,230,0,.45);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── PASSWORD SCREEN ── */
+.pw-box{
+  background:var(--ld-black);color:#fff;border-radius:16px;
+  border-bottom:6px solid var(--ld-green);
+  padding:40px 34px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:var(--ld-green);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.pw-box h1 .g{color:var(--ld-green)}
+.pw-box p{font-size:14px;color:#B8BBB2;margin-bottom:22px;line-height:1.5}
+.pw-input{
+  width:100%;background:#1F1F1F;border:2px solid #333;border-radius:10px;
+  color:#fff;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;
+  letter-spacing:3px;text-align:center;text-transform:uppercase;padding:14px;margin-bottom:6px;
+  outline:none;transition:border-color .15s;
+}
+.pw-input:focus{border-color:var(--ld-green)}
+.pw-input::placeholder{color:#555;letter-spacing:2px}
+.pw-err{color:#FCA5A5;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field select{
+  width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:12px 13px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--ld-green-d)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ── TEMPLATE BANNER ── */
+.template{
+  background:var(--ld-black);color:#fff;border-radius:12px;padding:20px 22px;
+  border-left:5px solid var(--ld-green);font-size:16px;line-height:1.65;margin-bottom:8px;
+}
+.template .blank{color:var(--ld-green);font-weight:700}
+
+.mission{background:#FAFBF6;border:1px solid var(--border);border-left:4px solid var(--ld-green);
+  border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;margin:14px 0}
+.mission b{color:var(--ld-black)}
+
+/* ── SLOT BUILDER ── */
+.slot{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);margin-bottom:14px}
+.slot-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.slot-num{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1px;color:var(--ld-green-d);text-transform:uppercase}
+.slot-name{font-size:17px;font-weight:800}
+.slot-sub{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.slot-sub .lead{font-family:'Space Mono',monospace;color:var(--ld-black);font-weight:700}
+.opt{
+  display:block;width:100%;text-align:left;background:#fff;
+  border:1.5px solid var(--border);border-radius:9px;padding:12px 14px;margin:8px 0;
+  font-family:'Inter',sans-serif;font-size:14.5px;line-height:1.45;color:var(--text);
+  cursor:pointer;transition:all .12s;
+}
+.opt:hover{border-color:var(--ld-green-d);background:#FCFDF7}
+.opt.picked{background:var(--ld-black);color:#fff;border-color:var(--ld-black)}
+.opt.picked::before{content:"✓ ";color:var(--ld-green);font-weight:800}
+
+/* ── LIVE ASSEMBLED SENTENCE ── */
+.assembled{
+  background:var(--ld-black);color:#fff;border-radius:12px;
+  border-top:4px solid var(--ld-green);padding:18px 20px;margin-top:18px;
+  box-shadow:var(--shadow);
+}
+.assembled .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--ld-green);margin-bottom:8px}
+.assembled .sentence{font-size:16px;line-height:1.7}
+.assembled .fill{color:var(--ld-green);font-weight:700}
+.assembled .empty{color:#6B6B6B;font-style:italic;border-bottom:1px dashed #555;padding:0 4px}
+
+/* ── STRESS TEST ── */
+.stress-q{background:#FAFBF6;border:1px solid var(--border);border-left:4px solid var(--ld-green);
+  border-radius:10px;padding:18px 20px;font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px}
+.vp-recall{background:var(--ld-black);color:#fff;border-radius:10px;padding:15px 18px;
+  font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.vp-recall .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--ld-green);display:block;margin-bottom:6px}
+textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;color:var(--text);
+  padding:14px;outline:none;resize:vertical;min-height:120px;transition:border-color .15s;
+}
+textarea:focus{border-color:var(--ld-green-d)}
+.char-count{font-size:12px;color:var(--muted);margin-top:6px;text-align:right}
+.char-count.ok{color:var(--ld-green-d);font-weight:700}
+.submit-note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+
+/* ── SUMMARY ── */
+.confirm-pill{display:inline-block;background:#EAF7C8;color:#3F5300;border:1px solid var(--ld-green);
+  font-size:13px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:20px;margin-bottom:16px}
+.student-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.section-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--ld-green-d);margin-bottom:8px}
+.vp-final{background:var(--ld-black);color:#fff;border-radius:12px;border-left:5px solid var(--ld-green);
+  padding:20px 22px;font-size:17px;line-height:1.7;margin-bottom:18px}
+.vp-final .fill{color:var(--ld-green);font-weight:700}
+.stress-final{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:15px 18px;font-size:14.5px;line-height:1.6;margin-bottom:20px}
+.debrief-box{background:#FAFBF6;border:1px solid var(--border);border-top:4px solid var(--ld-green);
+  border-radius:12px;padding:20px 22px;margin-top:8px}
+.debrief-box h3{font-size:16px;font-weight:800;margin-bottom:12px}
+.debrief-box ol{margin:0 0 0 20px}
+.debrief-box li{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+
+@media(max-width:680px){
+  .screen-title{font-size:24px}
+  .template,.assembled .sentence,.vp-final{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 1.2</div>
+    <h1>Build the <span class="g">Promise</span></h1>
+    <p>Enter today's password to join. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <div class="week-tag">Week 1.2 · Liquid Death</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">You and your group are Liquid Death's brand team. Your job today: build the one-sentence promise that makes people pay $2 for water.</div>
+    <div class="card">
+      <div class="field">
+        <label for="j-name">Your name</label>
+        <input id="j-name" type="text" placeholder="First and last" autocomplete="off" oninput="onJoin()">
+      </div>
+      <div class="field">
+        <label for="j-email">UC email</label>
+        <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
+        <div class="hint">Use your @mail.uc.edu (or @uc.edu) address — this is how credit is matched.</div>
+      </div>
+      <div class="field">
+        <label for="j-group">Your group</label>
+        <select id="j-group" onchange="onJoin()">
+          <option value="">Pick your group…</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+        </select>
+      </div>
+      <button class="btn btn-go" id="join-btn" onclick="show('brief-screen')" disabled>Let's go →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BRIEF ═══════════════════════ -->
+<div id="brief-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Week 1.2 · The Template</div>
+    <div class="screen-title">One promise, five pieces</div>
+    <div class="screen-sub">On Monday you met the five ingredients of a value proposition. A slogan ("Murder Your Thirst") is not one. A value proposition names who it's for and what it promises. Here's the template you'll fill in:</div>
+
+    <div class="template">
+      For <span class="blank">[who it's for]</span> who <span class="blank">[their problem]</span>,
+      we offer <span class="blank">[what we give them]</span>
+      so they can <span class="blank">[the job it does]</span>
+      — unlike <span class="blank">[the alternative]</span>.
+    </div>
+
+    <div class="mission">
+      <b>Work as a group.</b> Split the five slots across your team — each person champions at least one and has to defend their pick out loud before the group locks it in. There's a strong answer for each slot and two that miss. Argue it out.
+    </div>
+
+    <button class="btn btn-go" onclick="show('build-screen')">Start building →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BUILD ═══════════════════════ -->
+<div id="build-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('brief-screen')">← Back to the template</button>
+    <div class="week-tag">Week 1.2 · Build</div>
+    <div class="screen-title">Fill the five slots</div>
+    <div class="screen-sub">Pick the best fit for each slot. Watch the promise assemble at the bottom as you go.</div>
+
+    <div id="slots"></div>
+
+    <div class="assembled">
+      <div class="cap">Your promise so far</div>
+      <div class="sentence" id="live-sentence"></div>
+    </div>
+
+    <button class="btn btn-go" id="build-continue-btn" onclick="show('stress-screen');onEnterStress()" disabled style="margin-top:16px;">
+      Lock it in → Stress test
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ STRESS TEST ═══════════════════════ -->
+<div id="stress-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('build-screen')">← Back to the builder</button>
+    <div class="week-tag">Week 1.2 · Stress Test</div>
+    <div class="screen-title">Now try to break it</div>
+    <div class="screen-sub">A promise that only works in one place is fragile. Test yours.</div>
+
+    <div class="vp-recall">
+      <span class="cap">The promise you built</span>
+      <span id="stress-vp"></span>
+    </div>
+
+    <div class="stress-q">Would this promise still hold if you could buy Liquid Death in every gas station and Walmart? Why or why not?</div>
+
+    <textarea id="stress-input" placeholder="Type your group's answer… (a couple of sentences)" oninput="onStressInput()"></textarea>
+    <div class="char-count" id="stress-count">0 / 80 minimum</div>
+
+    <p class="submit-note">Submitting records your participation and your group's work for today's class.</p>
+    <button class="btn btn-go" id="submit-btn" onclick="submitAll()" disabled style="margin-top:6px;">
+      Submit &amp; Record Participation →
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="summary-screen" class="screen">
+  <div class="page-wrap">
+    <div class="week-tag">Week 1.2 — Summary</div>
+    <div class="screen-title">You built the promise</div>
+    <div class="confirm-pill">✓ Participation recorded — you're all set</div>
+    <div id="student-tag" class="student-tag"></div>
+
+    <p class="section-label">Your group's value proposition</p>
+    <div class="vp-final" id="sum-vp"></div>
+
+    <p class="section-label">Your stress-test answer</p>
+    <div class="stress-final" id="sum-stress"></div>
+
+    <div class="debrief-box">
+      <h3>Bring to the debrief</h3>
+      <ol>
+        <li>Which slot did your group argue about most — and why?</li>
+        <li>Read your "unlike" out loud. Whose is sharpest?</li>
+        <li>If Liquid Death cut its price in half, which parts of your promise break?</li>
+        <li>So — what is a value proposition, in one line?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
+<script>
+const PW = 'THEPROMISE';
+
+/* ── PARTICIPATION CREDIT ─────────────────────────────────────────────────
+   On submit, the student's completion is POSTed as JSON to an HTTP-triggered
+   flow that records credit in Canvas.
+
+   TO GO LIVE: paste your Azure Logic App "When a HTTP request is received"
+   trigger URL into CREDIT_ENDPOINT below. That one line is the ONLY thing to
+   change — the JSON payload posts to the Logic App exactly as-is.
+
+   Until a real https URL is set, submit still works end-to-end (students reach
+   the summary and see "recorded"); it simply doesn't post anywhere yet. */
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── participation confirmation (Logic App contract) ─────────────────── */
+async function postForCredit(payload){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  const set = (bg,bd,fg,html)=>{
+    let el = document.getElementById('credit-status');
+    if(!el){
+      el = document.createElement('div');
+      el.id = 'credit-status';
+      (document.querySelector('.screen.active') || document.body).appendChild(el);
+    }
+    el.style.cssText = 'margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML = html;
+  };
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res = await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d = await res.json();
+    if(d.accepted){
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
+
+/* ── SLOT DEFINITIONS (options sourced from the case; order varied, nothing marked) ── */
+const SLOTS = [
+  { key:'target', lead:'For', num:'Slot 1', name:"Who it's for", sub:'the target customer',
+    options:[
+      'pretty much everyone who drinks water',
+      'bold, anti-corporate young people',
+      'health-conscious athletes tracking hydration'
+    ]},
+  { key:'constraint', lead:'who', num:'Slot 2', name:'Their problem', sub:'the constraint',
+    options:[
+      'find bottled water too expensive',
+      "worry their water isn't healthy enough",
+      'think plain water is boring and "healthy" brands feel corporate or uncool'
+    ]},
+  { key:'offering', lead:'we offer', num:'Slot 3', name:'What we give them', sub:'the offering',
+    options:[
+      'cleaner, healthier water',
+      'water in an outrageous, recyclable, beer-style can',
+      'cheaper water'
+    ]},
+  { key:'job', lead:'so they can', num:'Slot 4', name:'The job it does', sub:'the job-to-be-done',
+    options:[
+      'just stay hydrated',
+      'save money',
+      'stay hydrated and make a statement'
+    ]},
+  { key:'unlike', lead:'unlike', num:'Slot 5', name:"What they didn't grab", sub:'the alternative',
+    options:[
+      'boring bottled water and sugary energy drinks',
+      'tap water',
+      'soda'
+    ]},
+];
+
+/* ── STATE ── */
+let state = {
+  name:'', email:'', groupNum:'',
+  vp:{ target:'', constraint:'', offering:'', job:'', unlike:'' },
+  stress:''
+};
+
+/* ── UTILS ── */
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ── PASSWORD ── */
+function checkPw(){
+  const val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val === PW){
+    document.getElementById('pw-err').textContent = '';
+    show('join-screen');
+  } else {
+    const box = document.querySelector('.pw-box');
+    box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+    document.getElementById('pw-err').textContent = 'Wrong password — try again.';
+  }
+}
+
+/* ── JOIN ── */
+function onJoin(){
+  const name  = document.getElementById('j-name').value.trim();
+  const email = document.getElementById('j-email').value.trim();
+  const group = document.getElementById('j-group').value;
+  const emailOk = /^[^\s@]+@(mail\.uc\.edu|uc\.edu)$/i.test(email);
+  state.name = name; state.email = email; state.groupNum = group;
+  document.getElementById('join-btn').disabled = !(name && emailOk && group);
+}
+
+/* ── BUILD: render slots ── */
+function renderSlots(){
+  const wrap = document.getElementById('slots');
+  wrap.innerHTML = SLOTS.map(slot => `
+    <div class="slot">
+      <div class="slot-head">
+        <span class="slot-num">${slot.num}</span>
+        <span class="slot-name">${slot.name}</span>
+      </div>
+      <div class="slot-sub">fills <span class="lead">"${slot.lead} ___"</span> — ${slot.sub}</div>
+      ${slot.options.map(opt => `
+        <button class="opt" data-slot="${slot.key}" onclick="pickSlot('${slot.key}', this)">${opt}</button>
+      `).join('')}
+    </div>
+  `).join('');
+  updateLive();
+}
+
+function pickSlot(key, btn){
+  // clear siblings for this slot, mark chosen
+  document.querySelectorAll('.opt[data-slot="'+key+'"]').forEach(b=>b.classList.remove('picked'));
+  btn.classList.add('picked');
+  state.vp[key] = btn.textContent.trim();
+  updateLive();
+}
+
+function slotSpan(key){
+  const v = state.vp[key];
+  return v ? `<span class="fill">${v}</span>` : `<span class="empty">${labelFor(key)}</span>`;
+}
+function labelFor(key){
+  const map = {target:"who it's for", constraint:'their problem', offering:'what we give them',
+    job:'the job it does', unlike:'the alternative'};
+  return map[key];
+}
+
+function updateLive(){
+  document.getElementById('live-sentence').innerHTML =
+    `For ${slotSpan('target')} who ${slotSpan('constraint')}, we offer ${slotSpan('offering')} `
+    + `so they can ${slotSpan('job')} — unlike ${slotSpan('unlike')}.`;
+  const done = state.vp.target && state.vp.constraint && state.vp.offering && state.vp.job && state.vp.unlike;
+  document.getElementById('build-continue-btn').disabled = !done;
+}
+
+/* ── STRESS ── */
+function assembledPlain(){
+  const s = state.vp;
+  return `For ${s.target} who ${s.constraint}, we offer ${s.offering} so they can ${s.job} — unlike ${s.unlike}.`;
+}
+function assembledHTML(){
+  const s = state.vp;
+  const f = t => `<span class="fill">${t}</span>`;
+  return `For ${f(s.target)} who ${f(s.constraint)}, we offer ${f(s.offering)} so they can ${f(s.job)} — unlike ${f(s.unlike)}.`;
+}
+function onEnterStress(){
+  document.getElementById('stress-vp').innerHTML = assembledHTML();
+  onStressInput();
+}
+function onStressInput(){
+  const val = document.getElementById('stress-input').value.trim();
+  state.stress = val;
+  const el = document.getElementById('stress-count');
+  el.textContent = val.length < 80 ? val.length + ' / 80 minimum' : val.length + ' characters ✓';
+  el.classList.toggle('ok', val.length >= 80);
+  document.getElementById('submit-btn').disabled = val.length < 80;
+}
+
+/* ── SUBMIT ── */
+async function submitAll(){
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  const payload = {
+    email: state.email, name: state.name,
+    week: 1, session: 2,
+    exerciseId: 'W01b-build-the-promise',
+    password: PW,
+    group: String(state.groupNum||''),
+    points: 12,
+    answers: [assembledPlain(), state.stress||''].filter(Boolean),
+    exercise: 'W1.2',
+    name: state.name,
+    email: state.email,
+    group: state.groupNum,
+    valueProposition: {
+      target: state.vp.target,
+      constraint: state.vp.constraint,
+      offering: state.vp.offering,
+      job: state.vp.job,
+      unlike: state.vp.unlike,
+      assembled: assembledPlain()
+    },
+    stressTest: state.stress,
+    timestamp: new Date().toISOString()
+  };
+
+  try{
+    await postForCredit(payload);
+  }catch(e){
+    console.warn('Credit POST error (non-blocking):', e);
+  }
+
+  buildSummary();
+  show('summary-screen');
+}
+
+/* ── SUMMARY ── */
+function buildSummary(){
+  document.getElementById('student-tag').textContent =
+    state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
+  document.getElementById('sum-vp').innerHTML = assembledHTML();
+  document.getElementById('sum-stress').textContent = state.stress;
+}
+
+/* ── INIT ── */
+renderSlots();
+</script>
+</body>
+</html>

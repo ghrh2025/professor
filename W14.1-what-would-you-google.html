@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>W14.1 — What Would You Google?</title>
+<title>W14.1 — What Would You Search?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -681,7 +681,7 @@ body {
 <div id="pw-screen" class="screen active">
   <div class="pw-box">
     <div class="week-tag">Week 14 · Exercise 1</div>
-    <div class="screen-title" style="margin-top:4px;">What Would You Google?</div>
+    <div class="screen-title" style="margin-top:4px;">What Would You Search?</div>
     <p class="pw-tagline">10 questions. One framework. A roofing company that made $14M by answering what customers were afraid to ask.</p>
     <div class="pw-input-wrap">
       <input type="text" id="pw-input" maxlength="10" placeholder="CLASS PASSWORD" autocomplete="off"
@@ -698,7 +698,7 @@ body {
   <div class="page-wrap">
     <div class="week-tag">Week 14 · Exercise 1</div>
     <div class="screen-title">Get set up</div>
-    <div class="screen-sub">You'll classify 10 pieces of content — some are questions homeowners Google, some are content the company built. Figure out which ones matter most and why.</div>
+    <div class="screen-sub">You'll classify 10 pieces of content — some are questions homeowners search before hiring a roofer, some are content the company built. Figure out which ones matter most and why.</div>
     <div class="card">
       <div class="field">
         <label>Your First Name</label>
@@ -737,7 +737,7 @@ body {
 
     <div class="card">
       <p class="section-label">What they did</p>
-      <p style="font-size:14px;line-height:1.75;color:#333;margin-bottom:12px;">They published blog posts answering the exact questions homeowners were Googling. Pricing. Timelines. Comparisons. Even "how to spot a bad contractor." Within three years, their website was the most-visited roofing site in the world. They closed $14 million in sales — mostly from people who found their content before ever talking to a salesperson.</p>
+      <p style="font-size:14px;line-height:1.75;color:#333;margin-bottom:12px;">They published blog posts answering the exact questions homeowners were searching. Pricing. Timelines. Comparisons. Even "how to spot a bad contractor." Within three years, their website was the most-visited roofing site in the world. They closed $14 million in sales — mostly from people who found their content before ever talking to a salesperson.</p>
       <p style="font-size:14px;line-height:1.75;color:#333;">Your job today: figure out which questions they had to answer, what content they built — and why it worked.</p>
     </div>
 
@@ -765,7 +765,7 @@ body {
 
     <div class="card">
       <p class="section-label">How this works</p>
-      <p style="font-size:14px;line-height:1.75;color:#333;margin-bottom:10px;"><strong>Block 1 (~8 min):</strong> Classify 6 questions customers actually Google. For each: pick the E it maps to, pick the best content type, and write one sentence explaining why answering it builds trust.</p>
+      <p style="font-size:14px;line-height:1.75;color:#333;margin-bottom:10px;"><strong>Block 1 (~8 min):</strong> Classify 6 questions customers actually search. For each: pick the E it maps to, pick the best content type, and write one sentence explaining why answering it builds trust.</p>
       <p style="font-size:14px;line-height:1.75;color:#333;margin-bottom:10px;"><strong>Stop gate:</strong> Compare your E classifications with your group. You'll need to tell us what you disagreed on before you can continue.</p>
       <p style="font-size:14px;line-height:1.75;color:#333;margin-bottom:10px;"><strong>Block 2 (~5 min):</strong> Classify 4 pieces of content the company built in response. Same process — E, content type, trust rationale.</p>
       <p style="font-size:14px;line-height:1.75;color:#333;"><strong>Group decision (~5 min):</strong> Pick the 2 pieces of content the company should prioritize first — and write your shared rationale.</p>
@@ -789,7 +789,7 @@ body {
         <span class="q-num-badge" id="q-badge">Q1 of 10</span>
         <div>
           <div class="q-google-text" id="q-text"></div>
-          <div class="q-google-icon">— a real homeowner, Googling right now</div>
+          <div class="q-google-icon" id="q-tagline">— a real homeowner, searching right now</div>
         </div>
       </div>
       <div class="q-card-body">
@@ -839,7 +839,7 @@ body {
       <div class="stop-tag">Stop · Group Discussion</div>
       <h3>Compare your E classifications with your group</h3>
       <p>Go around. Share which E you picked for each question — especially the ones where you weren't sure. Find the disagreements. The questions your group argues about most are the most interesting ones.</p>
-      <p style="margin-top:8px;">You've just classified 6 questions customers Google out of fear and confusion. The next 4 are different — they're content the company <em>chose</em> to create. Notice the shift.</p>
+      <p style="margin-top:8px;">You've just classified 6 questions customers search out of fear and confusion. The next 4 are different — they're content the company <em>chose</em> to create. Notice the shift.</p>
       <div class="trust-field-wrap" style="margin-top:12px;background:#2a2d33;border-color:#444;">
         <div class="trust-field-label" style="color:var(--taya-amber);">What's one question your group disagreed on? What was the debate?</div>
         <textarea id="gate-response" rows="2" placeholder="Be specific — which question, and what did each side argue?" oninput="onGateInput()" style="background:#1a1d23;color:white;border-color:#444;"></textarea>
@@ -904,6 +904,31 @@ body {
               <option value="">— pick one —</option>
             </select>
           </div>
+          <div class="select-row" style="margin-bottom:12px;">
+            <div class="select-block">
+              <div class="select-label">Which E does this map to?</div>
+              <select class="styled-select" id="p1-e" onchange="onPriorityESelect('p1-e'); onPriorityInput()">
+                <option value="">— pick one —</option>
+                <option value="excite">Excite — creates attention/buzz</option>
+                <option value="educate">Educate — removes confusion/fear</option>
+                <option value="experience">Experience — lets them picture it</option>
+                <option value="engage">Engage — builds ongoing relationship</option>
+              </select>
+            </div>
+            <div class="select-block">
+              <div class="select-label">Best content type</div>
+              <select class="styled-select" id="p1-content" onchange="onPriorityInput()">
+                <option value="">— pick one —</option>
+                <option value="blog">Blog post</option>
+                <option value="faq">FAQ page</option>
+                <option value="comparison">Comparison guide</option>
+                <option value="video">Video</option>
+                <option value="checklist">Checklist / Download</option>
+                <option value="review">Review / Testimonial</option>
+                <option value="social">Social post</option>
+              </select>
+            </div>
+          </div>
           <div class="trust-field-wrap">
             <div class="trust-field-label">Group rationale — why first? (50 char min)</div>
             <div class="trust-field-hint">What fear does this remove, and why does that fear matter most to a homeowner?</div>
@@ -921,6 +946,31 @@ body {
             <select id="p2-q" class="styled-select" onchange="onPriorityInput()">
               <option value="">— pick one —</option>
             </select>
+          </div>
+          <div class="select-row" style="margin-bottom:12px;">
+            <div class="select-block">
+              <div class="select-label">Which E does this map to?</div>
+              <select class="styled-select" id="p2-e" onchange="onPriorityESelect('p2-e'); onPriorityInput()">
+                <option value="">— pick one —</option>
+                <option value="excite">Excite — creates attention/buzz</option>
+                <option value="educate">Educate — removes confusion/fear</option>
+                <option value="experience">Experience — lets them picture it</option>
+                <option value="engage">Engage — builds ongoing relationship</option>
+              </select>
+            </div>
+            <div class="select-block">
+              <div class="select-label">Best content type</div>
+              <select class="styled-select" id="p2-content" onchange="onPriorityInput()">
+                <option value="">— pick one —</option>
+                <option value="blog">Blog post</option>
+                <option value="faq">FAQ page</option>
+                <option value="comparison">Comparison guide</option>
+                <option value="video">Video</option>
+                <option value="checklist">Checklist / Download</option>
+                <option value="review">Review / Testimonial</option>
+                <option value="social">Social post</option>
+              </select>
+            </div>
           </div>
           <div class="trust-field-wrap">
             <div class="trust-field-label">Group rationale — why second? (50 char min)</div>
@@ -1002,7 +1052,7 @@ const state = {
   midGateAcked: false,
   gateResponse: '',
   answers: {},  // keyed by question id: { e, content, trust }
-  priorities: { q1: '', why1: '', q2: '', why2: '' }
+  priorities: { q1: '', e1: '', content1: '', why1: '', q2: '', e2: '', content2: '', why2: '' }
 };
 
 // Initialize answers
@@ -1081,6 +1131,12 @@ function renderQuestion(n) {
   // Badge + text
   document.getElementById('q-badge').textContent = `Q${n} of 10`;
   document.getElementById('q-text').textContent   = q.text;
+
+  // Block-aware tagline
+  const tagline = document.getElementById('q-tagline');
+  tagline.textContent = q.block === 1
+    ? '— a real homeowner, searching right now'
+    : '— content the company chose to build';
 
   // Progress bar
   const bar = document.getElementById('q-progress');
@@ -1255,19 +1311,33 @@ function goToPriority() {
   show('priority-screen');
 }
 
+function onPriorityESelect(id) {
+  const el = document.getElementById(id);
+  el.className = 'styled-select';
+  if (el.value) el.classList.add(`selected-${el.value}`);
+}
+
 function onPriorityInput() {
-  state.priorities.q1   = document.getElementById('p1-q').value;
-  state.priorities.why1 = document.getElementById('p1-why').value;
-  state.priorities.q2   = document.getElementById('p2-q').value;
-  state.priorities.why2 = document.getElementById('p2-why').value;
+  state.priorities.q1      = document.getElementById('p1-q').value;
+  state.priorities.e1      = document.getElementById('p1-e').value;
+  state.priorities.content1= document.getElementById('p1-content').value;
+  state.priorities.why1    = document.getElementById('p1-why').value;
+  state.priorities.q2      = document.getElementById('p2-q').value;
+  state.priorities.e2      = document.getElementById('p2-e').value;
+  state.priorities.content2= document.getElementById('p2-content').value;
+  state.priorities.why2    = document.getElementById('p2-why').value;
 
   updateCount('p1-why', 'p1-count', 50);
   updateCount('p2-why', 'p2-count', 50);
 
   const ready =
     state.priorities.q1 &&
+    state.priorities.e1 &&
+    state.priorities.content1 &&
     state.priorities.why1.trim().length >= 50 &&
     state.priorities.q2 &&
+    state.priorities.e2 &&
+    state.priorities.content2 &&
     state.priorities.why2.trim().length >= 50 &&
     state.priorities.q1 !== state.priorities.q2;
 
@@ -1290,8 +1360,8 @@ function submitAll() {
     })),
     gate_response: state.gateResponse,
     priorities: {
-      first:  { question_id: state.priorities.q1, rationale: state.priorities.why1 },
-      second: { question_id: state.priorities.q2, rationale: state.priorities.why2 }
+      first:  { question_id: state.priorities.q1, e_category: state.priorities.e1, content_type: state.priorities.content1, rationale: state.priorities.why1 },
+      second: { question_id: state.priorities.q2, e_category: state.priorities.e2, content_type: state.priorities.content2, rationale: state.priorities.why2 }
     },
     timestamp: new Date().toISOString()
   };
@@ -1338,6 +1408,8 @@ function renderSummary() {
   // Priorities
   const q1 = QUESTIONS.find(q => q.id == state.priorities.q1);
   const q2 = QUESTIONS.find(q => q.id == state.priorities.q2);
+  const e1Class = state.priorities.e1 || 'educate';
+  const e2Class = state.priorities.e2 || 'educate';
   document.getElementById('sum-priorities').innerHTML = `
     <div class="sum-q-card">
       <div class="sum-q-header" style="background:#1a1d23;">
@@ -1345,6 +1417,8 @@ function renderSummary() {
         <span class="sum-q-text">${q1 ? q1.text : '—'}</span>
       </div>
       <div class="sum-q-body">
+        <span class="sum-pill ${e1Class}">${E_LABELS[state.priorities.e1] || '—'}</span>
+        <span class="sum-pill" style="background:#F3F4F6;color:#374151;">${CONTENT_LABELS[state.priorities.content1] || '—'}</span>
         <div class="sum-trust">${escHtml(state.priorities.why1) || '—'}</div>
       </div>
     </div>
@@ -1354,6 +1428,8 @@ function renderSummary() {
         <span class="sum-q-text">${q2 ? q2.text : '—'}</span>
       </div>
       <div class="sum-q-body">
+        <span class="sum-pill ${e2Class}">${E_LABELS[state.priorities.e2] || '—'}</span>
+        <span class="sum-pill" style="background:#F3F4F6;color:#374151;">${CONTENT_LABELS[state.priorities.content2] || '—'}</span>
         <div class="sum-trust">${escHtml(state.priorities.why2) || '—'}</div>
       </div>
     </div>`;

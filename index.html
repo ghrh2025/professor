@@ -1,354 +1,421 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MKTG 2080 — Prof. Hudnall</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #f8f8f8; color: #333333; min-height: 100vh; }
-
-    /* ── HEADER ── */
-    .header { background: #E00122; color: #fff; padding: 3rem 1.5rem 2.5rem; }
-    .header-inner {
-      max-width: 760px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .header-left h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.02em; }
-    .header-left p { font-size: 1rem; font-weight: 400; opacity: 0.85; margin-top: 0.2rem; }
-    .header-right { text-align: right; }
-    .header-right .school { font-size: 1.1rem; font-weight: 600; }
-    .header-right .semester { font-size: 0.9rem; font-weight: 400; opacity: 0.8; }
-
-    /* ── HERO (current day) ── */
-    .hero { max-width: 760px; margin: 1.5rem auto 0; padding: 0 1rem; position: relative; z-index: 2; }
-    .hero-card {
-      background: #fff; border: 2px solid #E00122; border-radius: 14px;
-      padding: 1.5rem 1.75rem; box-shadow: 0 8px 28px rgba(0,0,0,0.10);
-      display: flex; align-items: center; gap: 1.25rem;
-      text-decoration: none; color: inherit;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .hero-card[href]:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(0,0,0,0.14); cursor: pointer; }
-    .hero-card.no-active { border-color: #ccc; }
-    .hero-badge {
-      background: #E00122; color: #fff; font-size: 0.7rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.08em;
-      padding: 0.25rem 0.6rem; border-radius: 5px; white-space: nowrap;
-    }
-    .hero-icon { font-size: 2.5rem; flex-shrink: 0; width: 52px; text-align: center; }
-    .hero-text { flex: 1; }
-    .hero-text .week-label { font-size: 0.75rem; font-weight: 600; color: #E00122; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
-    .hero-text h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
-    .hero-text .concept { font-size: 0.9rem; color: #666; }
-    .hero-arrow { font-size: 1.5rem; color: #E00122; flex-shrink: 0; }
-
-    /* ── WEEK GROUP ── */
-    .timeline { max-width: 760px; margin: 2rem auto 3rem; padding: 0 1rem; }
-    .timeline-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #999; margin-bottom: 1rem; padding-left: 2rem; }
-    .timeline-list { list-style: none; position: relative; padding-left: 2rem; }
-    .timeline-list::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: #ddd; }
-
-    /* ── WEEK HEADER ── */
-    .week-group { position: relative; margin-bottom: 0.5rem; }
-    .week-group::before {
-      content: ''; position: absolute; left: -25px; top: 1rem;
-      width: 12px; height: 12px; border-radius: 50%;
-      background: #ddd; border: 2px solid #f8f8f8; z-index: 1;
-    }
-    .week-group.past::before { background: #E00122; }
-    .week-group.current::before { background: #E00122; box-shadow: 0 0 0 4px rgba(224,1,34,0.2); }
-    .week-group.future::before { background: #ccc; }
-
-    .week-header {
-      font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.05em; color: #999; padding: 0.5rem 0 0.4rem;
-    }
-    .week-group.current .week-header { color: #E00122; }
-
-    /* ── DAY CARDS (side by side) ── */
-    .day-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1.25rem; }
-    .day-card {
-      background: #fff; border-radius: 10px; padding: 0.9rem 1rem;
-      display: flex; flex-direction: column; gap: 0.4rem;
-      text-decoration: none; color: inherit;
-      transition: transform 0.12s, box-shadow 0.12s;
-      border: 1px solid #e8e8e8;
-      position: relative;
-    }
-    .week-group.past .day-card[href] { cursor: pointer; }
-    .week-group.past .day-card[href]:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
-    .week-group.current .day-card { border-color: #f0c0c8; }
-    .week-group.current .day-card[href] { cursor: pointer; border-color: #E00122; }
-    .week-group.current .day-card[href]:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(224,1,34,0.10); }
-    .week-group.future .day-card { opacity: 0.4; cursor: default; }
-
-    .day-top { display: flex; align-items: center; justify-content: space-between; }
-    .day-tag {
-      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.05em; color: #fff; background: #bbb;
-      padding: 0.2rem 0.5rem; border-radius: 4px;
-    }
-    .week-group.current .day-tag { background: #E00122; }
-    .week-group.past .day-tag { background: #999; }
-    .day-date { font-size: 0.65rem; color: #aaa; font-weight: 500; }
-
-    .card-body { flex: 1; }
-    .card-body h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.1rem; line-height: 1.3; }
-    .card-body .card-focus { font-size: 0.8rem; color: #777; }
-    .card-status { font-size: 0.8rem; }
-    .card-status .arrow { color: #E00122; font-size: 1.1rem; }
-    .card-status .lock { color: #bbb; font-size: 0.9rem; }
-
-    /* ── FOOTER ── */
-    .footer { text-align: center; padding: 1.5rem 1rem 2rem; font-size: 0.7rem; color: #aaa; line-height: 1.6; }
-
-    /* ── MOBILE ── */
-    @media (max-width: 560px) {
-      .header { padding: 2rem 1rem 1.75rem; }
-      .header-inner { flex-direction: column; text-align: center; gap: 0.25rem; }
-      .header-right { text-align: center; }
-      .header-left h1 { font-size: 1.8rem; }
-      .hero-card { flex-wrap: wrap; gap: 0.65rem; padding: 1.1rem; }
-      .hero-icon { width: 40px; font-size: 2rem; }
-      .day-cards { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MKTG 2080 — Prof. Greg Hudnall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f8f8f8;color:#333;min-height:100vh}
+.header{background:#E00122;color:#fff;padding:3rem 1.5rem 2.5rem}
+.header-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.header-left h1{font-size:2.5rem;font-weight:800;letter-spacing:-.02em}
+.header-left p{font-size:1rem;opacity:.85;margin-top:.2rem}
+.header-right{text-align:right}
+.header-right .school{font-size:1.1rem;font-weight:600}
+.header-right .semester{font-size:.9rem;opacity:.8}
+.hero{max-width:760px;margin:1.5rem auto 0;padding:0 1rem;position:relative;z-index:2}
+.hero-card{background:#fff;border:2px solid #E00122;border-radius:14px;padding:1.5rem 1.75rem;
+ box-shadow:0 8px 28px rgba(0,0,0,.1);display:flex;align-items:center;gap:1.25rem;
+ text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}
+.hero-card[href]:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,0,0,.14);cursor:pointer}
+.hero-card.no-active{border-color:#ccc}
+.hero-badge{background:#E00122;color:#fff;font-size:.7rem;font-weight:700;text-transform:uppercase;
+ letter-spacing:.08em;padding:.25rem .6rem;border-radius:5px;white-space:nowrap}
+.hero-icon{font-size:2.5rem;flex-shrink:0;width:52px;text-align:center}
+.hero-text{flex:1}
+.hero-text .week-label{font-size:.75rem;font-weight:600;color:#E00122;text-transform:uppercase;
+ letter-spacing:.06em;margin-bottom:.5rem}
+.hero-text h2{font-size:1.25rem;font-weight:700;margin-bottom:.25rem}
+.hero-text .concept{font-size:.9rem;color:#666}
+.hero-arrow{font-size:1.5rem;color:#E00122;flex-shrink:0}
+.timeline{max-width:760px;margin:2rem auto 3rem;padding:0 1rem}
+.timeline-title{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+ color:#999;margin-bottom:1rem;padding-left:2rem}
+.timeline-list{list-style:none;position:relative;padding-left:2rem}
+.timeline-list::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:#ddd}
+.week-group{position:relative;margin-bottom:.5rem}
+.week-group::before{content:'';position:absolute;left:-25px;top:1rem;width:12px;height:12px;
+ border-radius:50%;background:#ddd;border:2px solid #f8f8f8;z-index:1}
+.week-group.past::before{background:#E00122}
+.week-group.current::before{background:#E00122;box-shadow:0 0 0 4px rgba(224,1,34,.2)}
+.week-group.future::before{background:#ccc}
+.week-header{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+ color:#999;padding:.5rem 0 .4rem}
+.week-group.current .week-header{color:#E00122}
+.day-cards{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.25rem}
+.day-card{background:#fff;border-radius:10px;padding:.9rem 1rem;display:flex;flex-direction:column;
+ gap:.4rem;text-decoration:none;color:inherit;transition:transform .12s,box-shadow .12s;
+ border:1px solid #e8e8e8;position:relative}
+.week-group.past .day-card[href],.week-group.current .day-card[href]{cursor:pointer}
+.day-card[href]:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.week-group.current .day-card{border-color:#f0c0c8}
+.week-group.current .day-card[href]{border-color:#E00122}
+.week-group.future .day-card{opacity:.4;cursor:default}
+.day-card.no-class{background:#f2f2f2;opacity:.6}
+.day-top{display:flex;align-items:center;justify-content:space-between}
+.day-tag{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+ color:#fff;background:#bbb;padding:.2rem .5rem;border-radius:4px}
+.week-group.current .day-tag{background:#E00122}
+.week-group.past .day-tag{background:#999}
+.day-date{font-size:.65rem;color:#aaa;font-weight:500}
+.card-body{flex:1}
+.card-body h3{font-size:.95rem;font-weight:600;margin-bottom:.1rem;line-height:1.3}
+.card-status{font-size:.8rem}
+.card-status .arrow{color:#E00122;font-size:1.1rem}
+.card-status .lock{color:#bbb;font-size:.9rem}
+.footer{text-align:center;padding:1.5rem 1rem 2rem;font-size:.7rem;color:#aaa;line-height:1.6}
+@media (max-width:560px){
+ .header{padding:2rem 1rem 1.75rem}
+ .header-inner{flex-direction:column;text-align:center;gap:.25rem}
+ .header-right{text-align:center}
+ .header-left h1{font-size:1.8rem}
+ .hero-card{flex-wrap:wrap;gap:.65rem;padding:1.1rem}
+ .hero-icon{width:40px;font-size:2rem}
+ .day-cards{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
-
-<div class="header">
-  <div class="header-inner">
-    <div class="header-left">
-      <h1>MKTG 2080</h1>
-      <p>Prof. Greg Hudnall</p>
-    </div>
-    <div class="header-right">
-      <div class="school">UC Blue Ash</div>
-      <div class="semester">Spring 2026</div>
-    </div>
-  </div>
-</div>
-
+<div class="header"><div class="header-inner">
+  <div class="header-left"><h1>MKTG 2080</h1><p>Prof. Greg Hudnall</p></div>
+  <div class="header-right"><div class="school">UC Blue Ash</div><div class="semester">Fall 2026</div></div>
+</div></div>
 <div class="hero" id="hero"></div>
-
-<div class="timeline">
-  <div class="timeline-title">All Weeks</div>
-  <ul class="timeline-list" id="timeline"></ul>
-</div>
-
-<div class="footer">
-  MKTG 2080 · University of Cincinnati Blue Ash · Spring 2026<br>
-  Case company names and logos are property of their respective owners and are used here for educational purposes only.
-</div>
-
+<div class="timeline"><div class="timeline-title">All Weeks</div><ul class="timeline-list" id="timeline"></ul></div>
+<div class="footer">MKTG 2080 · University of Cincinnati Blue Ash · Fall 2026<br>
+Case company names and logos are property of their respective owners and are used here for educational purposes only.</div>
 <script>
-// ╔════════════════════════════════════════════════════════════════════╗
-// ║  SPRING 2026 SCHEDULE                                            ║
-// ║                                                                  ║
-// ║  NAMING CONVENTION:  W{nn}-{slug}.html                           ║
-// ║    • nn = two-digit week number (01–15)                          ║
-// ║    • slug = lowercase, dashes, no spaces                         ║
-// ║    • Each day gets its own file                                  ║
-// ║                                                                  ║
-// ║  Set link = null until the exercise file is uploaded to GitHub.   ║
-// ║  Once uploaded, set link to the filename and commit index.html.  ║
-// ╚════════════════════════════════════════════════════════════════════╝
-
+/* GENERATED FILE — do not edit by hand.
+   Source: exercises/schedule.json   Build: python3 exercises/build-index.py */
+const DAY_LABELS = ["Monday", "Wednesday"];
 const weeks = [
-  {
-    num: 1, case: "Quibi", chapter: "Ch 1", icon: "📺",
-    day1: { date: "2026-01-13", focus: "What is marketing? What is a case?",       link: null },  // W01-value-lab.html
-    day2: { date: "2026-01-15", focus: "Is this a marketing problem?",              link: null }   // W01-value-lab-rebuild.html
-  },
-  {
-    num: 2, case: "ALDI", chapter: "Ch 2", icon: "🛒",
-    day1: { date: "2026-01-20", focus: "Strategy & tradeoffs",                      link: null },  // W02-strategy-stress-test.html
-    day2: { date: "2026-01-22", focus: "Choosing who not to serve",                 link: null }   // W02-strategy-stress-test-reverse.html
-  },
-  {
-    num: 3, case: "Dollar General vs Walmart", chapter: "Ch 5", icon: "🏪",
-    day1: { date: "2026-01-27", focus: "Environment constraints & capability fit",  link: null },  // W03-force-field.html
-    day2: { date: "2026-01-29", focus: "SWOT as fit vs tension",                    link: null }   // W03-force-field-asymmetry.html
-  },
-  {
-    num: 4, case: "Amazon Fire Phone", chapter: "Ch 6", icon: "📱",
-    day1: { date: "2026-02-03", focus: "Habit, risk, switching costs",              link: null },  // W04-decision-path.html
-    day2: { date: "2026-02-05", focus: "Behavior beats marketing",                  link: null }   // W04-decision-path-compare.html
-  },
-  {
-    num: 5, case: "St. Anne's Hospital", chapter: "Ch 7", icon: "🏥",
-    day1: { date: "2026-02-10", focus: "Buying center roles & risk",                link: null },  // W05-buying-center.html
-    day2: { date: "2026-02-12", focus: "Coordination vs persuasion",                link: null }   // W05-buying-center-pressure.html
-  },
-  {
-    num: 6, case: "Warby Parker", chapter: "Ch 9", icon: "👓",
-    day1: { date: "2026-02-17", focus: "Picking the right segment",                 link: null },  // W06-segment-lab.html
-    day2: { date: "2026-02-19", focus: "STP tradeoffs & constraints",               link: null }   // W06-segment-lab-position.html
-  },
-  {
-    num: 7, case: "Google Flu Trends", chapter: "Ch 10", icon: "🔬",
-    day1: { date: "2026-02-24", focus: "Signals vs behavior",                       link: null },  // W07-signal-lab.html
-    day2: { date: "2026-02-26", focus: "Assumptions & drift",                       link: null }   // W07-signal-lab-update.html
-  },
-  {
-    num: 8, case: "Midterm", chapter: "", icon: "📝",
-    day1: { date: "2026-03-03", focus: "Marketing brief review",                     link: null },  // no exercise
-    day2: { date: "2026-03-05", focus: "Midterm exam",                              link: null }   // no exercise
-  },
-  {
-    num: 9, case: "P&G Low-Cost Razor (India)", chapter: "Ch 11–12", icon: "🚀",
-    day1: { date: "2026-03-10", focus: "Product–market fit via context",            link: "W9.1-launch-it-ecuador.html" },
-    day2: { date: "2026-03-12", focus: "Standardization vs localization",           link: null }   // W09-launch-it-adapt.html
-  },
-  {
-    num: 10, case: "Valvoline", chapter: "Ch 13", icon: "🛢️",
-    day1: { date: "2026-03-24", focus: "Experience is the product",                 link: "W10.1-run-the-bay.html" },
-    day2: { date: "2026-03-26", focus: "Premium depends on delivery",               link: "W10.2-rate-the-bay.html" }
-  },
-  {
-    num: 11, case: "Polymarket", chapter: "Ch 14", icon: "📊",
-    day1: { date: "2026-03-31", focus: "Value vs cost logic",                       link: "W11.1-5cs-netflix.html" },  // W11.1-5cs-netflix.html
-    day2: { date: "2026-04-02", focus: "Demand can be destructive",                 link: "W11.2-price-the-stream.html" }   // W11.2-price-the-stream.html
-  },
-  {
-    num: 12, case: "Apple vs Epic", chapter: "Ch 15", icon: "🎮",
-    day1: { date: "2026-04-07", focus: "Channel control & power",                   link: "W12.1-value-or-rent.html" },  // W12.1-value-or-rent.html
-    day2: { date: "2026-04-09", focus: "Brand risk & backlash",                     link: "W12.2-the-toll-booth.html" }   // W12.2-the-toll-booth.html
-  },
-  {
-    num: 13, case: "Stranger Things", chapter: "Ch 17", icon: "📡",
-    day1: { date: "2026-04-14", focus: "AIDA funnel & measurement",                 link: "W13.1-spot-the-funnel.html" },  // W13.1-spot-the-funnel.html
-    day2: { date: "2026-04-16", focus: "Six IMC tools, one story",                   link: "W13.2-six-tool-plan.html" }   // W13.2-six-tool-plan.html
-  },
-  {
-    num: 14, case: "They Ask, You Answer", chapter: "Ch 3", icon: "💬",
-    day1: { date: "2026-04-21", focus: "Content builds trust",                      link: "W14.1-what-would-you-google.html" },  // W14.1-what-would-you-google.html
-    day2: { date: "2026-04-23", focus: "Transparency tradeoffs",                    link: "W14.2-content-map.html" }   // W14.2-content-map.html
-  },
-  {
-    num: 15, case: "Finals", chapter: "", icon: "🎓",
-    day1: { date: "2026-04-28", focus: "Project presentations + career day",        link: null },  // no exercise
-    day2: { date: "2026-04-30", focus: "Final exam",                                link: null }   // no exercise
-  }
+{
+"num": 1,
+"chapter": "Ch 1",
+"framework": "4 Ps + Value Proposition",
+"case": "Liquid Death",
+"icon": "💀",
+"day1": {
+"date": "2026-08-24",
+"focus": "What marketing is, and what a case is",
+"link": "W1.1-life-lessons-intake.html"
+},
+"day2": {
+"date": "2026-08-26",
+"focus": "Build the value proposition",
+"link": "W1.2-build-the-promise.html"
+}
+},
+{
+"num": 2,
+"chapter": "Ch 2",
+"framework": "SWOT",
+"case": "Nike",
+"icon": "👟",
+"day1": {
+"date": "2026-08-31",
+"focus": "Sort the 2x2",
+"link": "W2.1-swot-sort.html"
+},
+"day2": {
+"date": "2026-09-02",
+"focus": "From grid to move",
+"link": "W2.2-from-grid-to-move.html"
+}
+},
+{
+"num": 3,
+"chapter": "Ch 6",
+"framework": "Consumer Decision Process",
+"case": "CarMax",
+"icon": "🚗",
+"day1": {
+"date": "2026-09-07",
+"focus": "Labor Day — no class",
+"link": null,
+"noClass": true
+},
+"day2": {
+"date": "2026-09-09",
+"focus": "Five stages, one buyer",
+"link": null
+}
+},
+{
+"num": 4,
+"chapter": "Ch 7",
+"framework": "Buying Center",
+"case": "Surgical Devices",
+"icon": "🏥",
+"day1": {
+"date": "2026-09-14",
+"focus": "Six roles, one purchase",
+"link": null
+},
+"day2": {
+"date": "2026-09-16",
+"focus": "Who owns the risk",
+"link": null
+}
+},
+{
+"num": 5,
+"chapter": "Ch 9",
+"framework": "Segmentation + Targeting",
+"case": "Aldi",
+"icon": "🛒",
+"day1": {
+"date": "2026-09-21",
+"focus": "Who is this store for",
+"link": null
+},
+"day2": {
+"date": "2026-09-23",
+"focus": "Choosing who not to serve",
+"link": null
+}
+},
+{
+"num": 6,
+"chapter": "Ch 9",
+"framework": "Positioning",
+"case": "Warby Parker",
+"icon": "👓",
+"day1": {
+"date": "2026-09-28",
+"focus": "Owning a place in the mind",
+"link": null
+},
+"day2": {
+"date": "2026-09-30",
+"focus": "The customer you decide to lose",
+"link": null
+}
+},
+{
+"num": 7,
+"chapter": "",
+"framework": "",
+"case": "Midterm",
+"icon": "📝",
+"day1": {
+"date": "2026-10-05",
+"focus": "Project sign-off",
+"link": null
+},
+"day2": {
+"date": "2026-10-07",
+"focus": "Midterm exam",
+"link": null
+}
+},
+{
+"num": 8,
+"chapter": "Ch 10",
+"framework": "Marketing Research",
+"case": "LEGO",
+"icon": "🧱",
+"day1": {
+"date": "2026-10-12",
+"focus": "Reading day — no class",
+"link": null,
+"noClass": true
+},
+"day2": {
+"date": "2026-10-14",
+"focus": "The question you pay to answer",
+"link": null
+}
+},
+{
+"num": 9,
+"chapter": "Ch 11–12",
+"framework": "NPD + Brand Equity",
+"case": "Gillette Guard",
+"icon": "🚀",
+"day1": {
+"date": "2026-10-19",
+"focus": "Product-market fit via context",
+"link": "W9.1-launch-it-ecuador.html"
+},
+"day2": {
+"date": "2026-10-21",
+"focus": "Standardize or localize",
+"link": null
+}
+},
+{
+"num": 10,
+"chapter": "Ch 13",
+"framework": "Services",
+"case": "Southwest",
+"icon": "✈️",
+"day1": {
+"date": "2026-10-26",
+"focus": "Experience is the product",
+"link": null,
+"rebuild": "W10.1 exists but is built on the Valvoline case"
+},
+"day2": {
+"date": "2026-10-28",
+"focus": "The service gap",
+"link": null,
+"rebuild": "W10.2 exists but is built on the Valvoline case"
+}
+},
+{
+"num": 11,
+"chapter": "Ch 14",
+"framework": "3 Pricing Methods",
+"case": "Apple + Costco",
+"icon": "💲",
+"day1": {
+"date": "2026-11-02",
+"focus": "Cost, competition, value",
+"link": null,
+"rebuild": "W11.1 exists but is built on Netflix"
+},
+"day2": {
+"date": "2026-11-04",
+"focus": "Price as a signal",
+"link": null,
+"rebuild": "W11.2 exists but is built on Netflix"
+}
+},
+{
+"num": 12,
+"chapter": "Ch 15",
+"framework": "Channel",
+"case": "Ford vs Tesla",
+"icon": "🔗",
+"day1": {
+"date": "2026-11-09",
+"focus": "Four structures, three powers",
+"link": null,
+"rebuild": "W12.1 exists but is built on Apple vs Epic"
+},
+"day2": {
+"date": "2026-11-11",
+"focus": "Channel conflict",
+"link": null,
+"rebuild": "W12.2 exists but is built on Apple vs Epic"
+}
+},
+{
+"num": 13,
+"chapter": "Ch 17",
+"framework": "IMC + AIDA",
+"case": "Barbie",
+"icon": "🎟️",
+"day1": {
+"date": "2026-11-16",
+"focus": "Spot the funnel",
+"link": null,
+"rebuild": "W13.1 exists but is built on Stranger Things"
+},
+"day2": {
+"date": "2026-11-18",
+"focus": "Six tools, one message",
+"link": null,
+"rebuild": "W13.2 exists but is built on Stranger Things"
+}
+},
+{
+"num": 14,
+"chapter": "Ch 3",
+"framework": "Digital 4E",
+"case": "West Roofing",
+"icon": "💬",
+"day1": {
+"date": "2026-11-23",
+"focus": "What would you Google",
+"link": "W14.1-what-would-you-google.html"
+},
+"day2": {
+"date": "2026-11-25",
+"focus": "Build the content map",
+"link": "W14.2-content-map.html"
+}
+},
+{
+"num": 15,
+"chapter": "",
+"framework": "",
+"case": "Finals",
+"icon": "🎓",
+"day1": {
+"date": "2026-11-30",
+"focus": "Project presentations",
+"link": null
+},
+"day2": {
+"date": "2026-12-02",
+"focus": "Final exam",
+"link": null
+}
+}
 ];
 
-// ── DATE LOGIC ──
-function getDayStatus(dateStr) {
-  const now = new Date(); now.setHours(0,0,0,0);
-  const d = new Date(dateStr + "T00:00:00");
-  if (now > d) return "past";
-  if (now.getTime() === d.getTime()) return "current";
-  return "future";
+function status(dateStr){
+  const now=new Date();now.setHours(0,0,0,0);
+  const d=new Date(dateStr+"T00:00:00");
+  if(now>d)return"past"; if(now.getTime()===d.getTime())return"current"; return"future";
 }
-
-function getWeekStatus(w) {
-  const s1 = getDayStatus(w.day1.date);
-  const s2 = getDayStatus(w.day2.date);
-  if (s1 === "past" && s2 === "past") return "past";
-  if (s1 === "future" && s2 === "future") return "future";
-  return "current";
+function weekStatus(w){
+  const a=status(w.day1.date),b=status(w.day2.date);
+  if(a==="past"&&b==="past")return"past";
+  if(a==="future"&&b==="future")return"future";
+  return"current";
 }
-
-// ── HERO: next upcoming or today's class ──
-function renderHero() {
-  const heroEl = document.getElementById("hero");
-  // Find the next upcoming or current-day class session
-  let heroDay = null, heroWeek = null;
-  for (const w of weeks) {
-    for (const day of [w.day1, w.day2]) {
-      const s = getDayStatus(day.date);
-      if (s === "current" || s === "future") {
-        if (!heroDay) { heroDay = day; heroWeek = w; }
-        break;
-      }
+function renderHero(){
+  const el=document.getElementById("hero");
+  let day=null,wk=null,label="";
+  outer: for(const w of weeks){
+    for(const [k,lab] of [["day1",DAY_LABELS[0]],["day2",DAY_LABELS[1]]]){
+      const d=w[k]; if(d.noClass) continue;
+      const s=status(d.date);
+      if(s==="current"||s==="future"){day=d;wk=w;label=lab;break outer;}
     }
-    if (heroDay) break;
   }
-
-  if (!heroDay) {
-    heroEl.innerHTML = `
-      <div class="hero-card no-active" style="margin-top:1.25rem;">
-        <div class="hero-icon">🎉</div>
-        <div class="hero-text">
-          <div class="week-label">Semester Complete</div>
-          <h2>Great work this semester!</h2>
-          <div class="concept">All exercises are available below.</div>
-        </div>
-      </div>`;
+  if(!day){
+    el.innerHTML='<div class="hero-card no-active" style="margin-top:1.25rem"><div class="hero-icon">🎉</div>'+
+      '<div class="hero-text"><div class="week-label">Semester Complete</div><h2>Great work this semester.</h2>'+
+      '<div class="concept">All exercises are available below.</div></div></div>';
     return;
   }
-
-  const isToday = getDayStatus(heroDay.date) === "current";
-  const badge = isToday ? "Today" : "Up Next";
-  const dayLabel = heroDay === heroWeek.day1 ? "Tuesday" : "Thursday";
-  const hasLink = heroDay.link !== null;
-  const tag = hasLink ? "a" : "div";
-  const href = hasLink ? ` href="${heroDay.link}"` : "";
-
-  heroEl.innerHTML = `
-    <${tag} class="hero-card" style="margin-top:1.25rem;"${href}>
-      <div class="hero-icon">${heroWeek.icon}</div>
-      <div class="hero-text">
-        <div class="week-label"><span class="hero-badge">${badge}</span> &nbsp;Week ${heroWeek.num} · ${dayLabel}${heroWeek.chapter ? " · " + heroWeek.chapter : ""}</div>
-        <h2>${heroWeek.case}</h2>
-        <div class="concept">${heroDay.focus}</div>
-      </div>
-      ${hasLink ? '<div class="hero-arrow">→</div>' : '<div class="hero-arrow" style="color:#bbb;font-size:0.75rem;">Coming soon</div>'}
-    </${tag}>`;
+  const today=status(day.date)==="current";
+  const has=!!day.link, tag=has?"a":"div", href=has?' href="'+day.link+'"':"";
+  el.innerHTML='<'+tag+' class="hero-card" style="margin-top:1.25rem"'+href+'>'+
+    '<div class="hero-icon">'+wk.icon+'</div><div class="hero-text">'+
+    '<div class="week-label"><span class="hero-badge">'+(today?"Today":"Up Next")+'</span> &nbsp;Week '+wk.num+' · '+label+
+      (wk.chapter?' · '+wk.chapter:'')+'</div>'+
+    '<h2>'+wk.case+'</h2><div class="concept">'+day.focus+'</div></div>'+
+    (has?'<div class="hero-arrow">→</div>':'<div class="hero-arrow" style="color:#bbb;font-size:.75rem">Coming soon</div>')+
+    '</'+tag+'>';
 }
-
-// ── TIMELINE ──
-function renderTimeline() {
-  const list = document.getElementById("timeline");
-  list.innerHTML = weeks.map(w => {
-    const wStatus = getWeekStatus(w);
-
-    function dayCard(day, label) {
-      const dStatus = getDayStatus(day.date);
-      // Make days clickable if the WEEK is current or past (not just the individual day)
-      const accessible = wStatus !== "future";
-      const hasLink = day.link && accessible;
-      const tag = hasLink ? "a" : "div";
-      const href = hasLink ? ` href="${day.link}"` : "";
-
-      let statusHtml = "";
-      if (!accessible) statusHtml = '<span class="lock">🔒</span>';
-      else if (hasLink) statusHtml = '<span class="arrow">→</span>';
-      else statusHtml = '';
-
-      const dateObj = new Date(day.date + "T00:00:00");
-      const dateLabel = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-      return `
-        <${tag} class="day-card"${href}>
-          <div class="day-top">
-            <span class="day-tag">${label}</span>
-            <span class="day-date">${dateLabel}</span>
-          </div>
-          <div class="card-body">
-            <h3>${day.focus}</h3>
-          </div>
-          <div class="card-status">${statusHtml}</div>
-        </${tag}>`;
-    }
-
-    return `
-      <li class="week-group ${wStatus}">
-        <div class="week-header">Week ${w.num}${w.chapter ? " · " + w.chapter : ""} — ${w.case}</div>
-        <div class="day-cards">
-          ${dayCard(w.day1, "Tuesday")}
-          ${dayCard(w.day2, "Thursday")}
-        </div>
-      </li>`;
+function renderTimeline(){
+  document.getElementById("timeline").innerHTML=weeks.map(w=>{
+    const ws=weekStatus(w);
+    const card=(d,label)=>{
+      if(d.noClass) return '<div class="day-card no-class"><div class="day-top"><span class="day-tag">'+label+
+        '</span><span class="day-date">'+fmt(d.date)+'</span></div><div class="card-body"><h3>'+d.focus+
+        '</h3></div><div class="card-status"></div></div>';
+      const open=ws!=="future", has=d.link&&open, tag=has?"a":"div", href=has?' href="'+d.link+'"':"";
+      const st=!open?'<span class="lock">🔒</span>':(has?'<span class="arrow">→</span>':'');
+      return '<'+tag+' class="day-card"'+href+'><div class="day-top"><span class="day-tag">'+label+
+        '</span><span class="day-date">'+fmt(d.date)+'</span></div><div class="card-body"><h3>'+d.focus+
+        '</h3></div><div class="card-status">'+st+'</div></'+tag+'>';
+    };
+    const title='Week '+w.num+(w.chapter?' · '+w.chapter:'')+(w.framework?' · '+w.framework:'')+' — '+w.case;
+    return '<li class="week-group '+ws+'"><div class="week-header">'+title+'</div>'+
+      '<div class="day-cards">'+card(w.day1,DAY_LABELS[0])+card(w.day2,DAY_LABELS[1])+'</div></li>';
   }).join("");
 }
-
-renderHero();
-renderTimeline();
+function fmt(s){return new Date(s+"T00:00:00").toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+renderHero(); renderTimeline();
 </script>
-
 </body>
 </html>

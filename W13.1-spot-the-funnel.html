@@ -564,7 +564,7 @@ body {
     <div class="week-tag">Week 13 · Exercise 1</div>
     <div class="screen-title" style="margin-top:4px;">Spot the Funnel</div>
     <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:4px;">
-      Four activations. Same question: how would Netflix know it actually worked?
+      Three activations. Same question: how would Netflix know it actually worked?
     </p>
     <div class="pw-input-wrap">
       <input type="text" id="pw-input" maxlength="10" placeholder="CLASS PASSWORD" autocomplete="off"
@@ -581,7 +581,7 @@ body {
   <div class="page-wrap">
     <div class="week-tag">Week 13 · Exercise 1</div>
     <div class="screen-title">Get set up</div>
-    <div class="screen-sub">Four rounds. Each round is one real brand activation from the Stranger Things final-season campaign. You'll work on your own first, then your group discusses, then you lock a verdict together before moving on.</div>
+    <div class="screen-sub">Three rounds. Each round is one real brand activation from the Stranger Things final-season campaign. You'll work on your own first, then your group discusses, then you lock a verdict together before moving on.</div>
     <div class="card">
       <div class="field">
         <label>Your First Name</label>
@@ -644,7 +644,7 @@ body {
     </div>
 
     <div class="card" style="margin-bottom:20px;">
-      <p class="section-label">Four Rounds · One Case</p>
+      <p class="section-label">Three Rounds · One Case</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div style="background:var(--r1-lt);border-radius:8px;padding:12px;">
           <div style="font-size:11px;font-weight:800;color:var(--r1);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Round 1</div>
@@ -654,12 +654,8 @@ body {
           <div style="font-size:11px;font-weight:800;color:var(--r2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Round 2</div>
           <div style="font-size:14px;font-weight:700;">Target In-Store Takeover</div>
         </div>
-        <div style="background:var(--r3-lt);border-radius:8px;padding:12px;">
+        <div style="background:var(--r3-lt);border-radius:8px;padding:12px;grid-column:span 2;">
           <div style="font-size:11px;font-weight:800;color:var(--r3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Round 3</div>
-          <div style="font-size:14px;font-weight:700;">Discover "Nancy &amp; Jonathan" Spot</div>
-        </div>
-        <div style="background:var(--r4-lt);border-radius:8px;padding:12px;">
-          <div style="font-size:11px;font-weight:800;color:var(--r4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Round 4</div>
           <div style="font-size:14px;font-weight:700;">Tide "House of Kids" Ad</div>
         </div>
       </div>
@@ -676,7 +672,6 @@ body {
       <div class="round-pip" id="pip-1"></div>
       <div class="round-pip" id="pip-2"></div>
       <div class="round-pip" id="pip-3"></div>
-      <div class="round-pip" id="pip-4"></div>
     </div>
 
     <!-- Company header -->
@@ -779,7 +774,6 @@ body {
           <option value="">— pick one —</option>
           <option value="google">Google Upside Down Search</option>
           <option value="target">Target In-Store Takeover</option>
-          <option value="discover">Discover "Nancy &amp; Jonathan" Spot</option>
           <option value="tide">Tide "House of Kids" Ad</option>
         </select>
       </div>
@@ -809,7 +803,7 @@ body {
 
     <div class="card">
       <h3 style="font-size:16px;font-weight:800;margin-bottom:8px;">Individual — draft your fix</h3>
-      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Pick one of the four activations. Rewrite it so a real Stranger Things fan ends up <em>watching the show</em> — and so Netflix can actually prove it. Be specific: what's the new creative? What's the CTA? What metric would you report?</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Pick one of the three activations. Rewrite it so a real Stranger Things fan ends up <em>watching the show</em> — and so Netflix can actually prove it. Be specific: what's the new creative? What's the CTA? What metric would you report?</p>
 
       <div class="field">
         <label>Which activation are you fixing?</label>
@@ -817,7 +811,6 @@ body {
           <option value="">— pick one —</option>
           <option value="google">Google Upside Down Search</option>
           <option value="target">Target In-Store Takeover</option>
-          <option value="discover">Discover "Nancy &amp; Jonathan" Spot</option>
           <option value="tide">Tide "House of Kids" Ad</option>
         </select>
       </div>
@@ -851,7 +844,6 @@ body {
           <option value="">— pick one —</option>
           <option value="google">Google Upside Down Search</option>
           <option value="target">Target In-Store Takeover</option>
-          <option value="discover">Discover "Nancy &amp; Jonathan" Spot</option>
           <option value="tide">Tide "House of Kids" Ad</option>
         </select>
       </div>
@@ -879,7 +871,7 @@ body {
 <div id="summary-screen" class="screen">
   <div class="page-wrap">
     <div class="week-tag">Week 13 · Exercise 1 — Summary</div>
-    <div class="screen-title">All Four Rounds</div>
+    <div class="screen-title">All Three Rounds</div>
     <div class="confirm-pill">✓ Participation recorded — you're all set</div>
     <div id="student-tag" class="student-tag"></div>
 
@@ -933,23 +925,10 @@ const ROUNDS = [
   },
   {
     id: 3,
-    key: 'discover',
-    company: 'Discover "Nancy &amp; Jonathan" TV Spot',
-    colorClass: 'ch-r3',
-    pipActive: 'active-r3',
-    tool: 'Advertising',
-    frame: '"Reach times frequency. That\'s all you can sell your CFO."',
-    context: `
-      <p class="context-p">Discover produced a 30-second TV spot starring Nancy and Jonathan from Stranger Things "earning cash back" on their investigation expenses — flashlight batteries, walkie-talkies, gas money for their stakeouts. The spot was polished, on-brand for both Discover and the show, and felt more like a scene than an ad. It ran in prime-time rotation on broadcast TV and as pre-roll on YouTube throughout November and December 2025.</p>
-      <p class="context-p">The media buy was reach-optimized — Discover wanted maximum eyeballs, heavy frequency. That means Discover and Netflix can report GRPs (gross rating points), total impressions, and reach/frequency curves. They know how many people saw the ad at least once, and how many times the average viewer saw it. But they have no way to tell who then opened Netflix and watched the show. The spot didn't contain a QR code, a promo link, or any trackable element pointing back to Stranger Things on Netflix.</p>`,
-    gateText: 'Share both answers with your group. Advertising metrics are old and trusted — but what do they actually prove? Can reach and frequency tell Netflix whether anyone watched?'
-  },
-  {
-    id: 4,
     key: 'tide',
     company: 'Tide "House of Kids" Ad',
-    colorClass: 'ch-r4',
-    pipActive: 'active-r4',
+    colorClass: 'ch-r3',
+    pipActive: 'active-r3',
     tool: 'Advertising',
     frame: '"You will feel something. Nobody will know you felt it."',
     context: `
@@ -978,8 +957,7 @@ const state = {
   rounds: {
     1: { aida: '', aidaWhy: '', measure: '', gateAcked: false, verdict: '', locked: false },
     2: { aida: '', aidaWhy: '', measure: '', gateAcked: false, verdict: '', locked: false },
-    3: { aida: '', aidaWhy: '', measure: '', gateAcked: false, verdict: '', locked: false },
-    4: { aida: '', aidaWhy: '', measure: '', gateAcked: false, verdict: '', locked: false }
+    3: { aida: '', aidaWhy: '', measure: '', gateAcked: false, verdict: '', locked: false }
   },
   p2: { weakStage: '', hardMeasure: '', reasoning: '' },
   p3: {
@@ -1045,7 +1023,7 @@ function renderRound(n) {
   const rs = state.rounds[n];
 
   // Progress pips
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 3; i++) {
     const pip = document.getElementById(`pip-${i}`);
     pip.className = 'round-pip';
     if (i < n) pip.classList.add('done');
@@ -1054,7 +1032,7 @@ function renderRound(n) {
 
   // Header
   document.getElementById('r-company-header').className = `company-header ${round.colorClass}`;
-  document.getElementById('r-round-label').textContent = `Round ${n} of 4`;
+  document.getElementById('r-round-label').textContent = `Round ${n} of 3`;
   document.getElementById('r-company-name').innerHTML = round.company;
   document.getElementById('r-frame').textContent = round.frame;
   document.getElementById('r-tool-chip').textContent = 'IMC Tool · ' + round.tool;
@@ -1091,7 +1069,7 @@ function renderRound(n) {
   const nextBtn = document.getElementById('next-round-btn');
   nextBtn.disabled = !rs.verdict;
   document.getElementById('next-round-label').textContent =
-    n < 4 ? `Lock Round ${n} — start Round ${n + 1} →` : 'Lock Round 4 — continue to Phase 2 →';
+    n < 3 ? `Lock Round ${n} — start Round ${n + 1} →` : 'Lock Round 3 — continue to Phase 2 →';
 }
 
 function updateCount(textId, countId, min) {
@@ -1145,7 +1123,7 @@ function pickVerdict(v) {
 function nextRound() {
   state.rounds[state.currentRound].locked = true;
   const n = state.currentRound;
-  if (n < 4) {
+  if (n < 3) {
     startRound(n + 1);
   } else {
     show('phase2-screen');

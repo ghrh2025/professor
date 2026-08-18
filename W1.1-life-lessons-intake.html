@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MKTG 2080 — What Should We Learn?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E00122;
+  --red-d:#A8001A;
+  --ink:#1A1A1A;
+  --paper:#FAFAF9;
+  --line:#E2E2DF;
+  --muted:#6B6B66;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;-webkit-text-size-adjust:100%}
+
+/* ── SCREENS — ID specificity keeps pw centered without breaking others ── */
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:24px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:900px;margin:0 auto;padding:22px 20px 120px}
+.week-tag{
+  font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;color:var(--red);
+}
+.screen-title{font-size:32px;font-weight:900;line-height:1.1;letter-spacing:-.02em;margin-bottom:10px}
+.screen-sub{font-size:16px;color:var(--muted);line-height:1.55;margin-bottom:26px;max-width:640px}
+
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.04);margin-bottom:18px;
+}
+
+/* ── BUTTONS ── */
+.btn{
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:700;
+  border:none;border-radius:10px;padding:14px 26px;cursor:pointer;
+  transition:transform .12s,box-shadow .12s,background .12s;
+}
+.btn-go{background:var(--red);color:#fff}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(224,1,34,.35);transform:translateY(-1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-back{
+  background:none;border:none;color:var(--muted);font-family:'Inter',sans-serif;
+  font-size:14px;font-weight:600;cursor:pointer;padding:8px 0;margin-bottom:14px;
+}
+.btn-back:hover{color:var(--ink)}
+
+/* ── PASSWORD SCREEN ── */
+.pw-box{
+  background:var(--ink);color:#fff;border-radius:16px;
+  border-bottom:6px solid var(--red);
+  padding:40px 34px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.15;margin-bottom:10px}
+.pw-box h1 .g{color:var(--red)}
+.pw-box p{font-size:14px;color:#B8B8B4;margin-bottom:22px;line-height:1.5}
+.pw-input{
+  width:100%;background:#1F1F1F;border:2px solid #333;border-radius:10px;
+  color:#fff;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;
+  text-align:center;letter-spacing:2px;padding:14px;margin-bottom:12px;
+}
+.pw-input:focus{outline:none;border-color:var(--red)}
+.pw-err{color:#FF6B6B;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--muted);margin-bottom:7px}
+.field input,.field select,.field textarea{
+  width:100%;font-family:'Inter',sans-serif;font-size:16px;color:var(--ink);
+  background:#fff;border:2px solid var(--line);border-radius:10px;padding:12px 14px;
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--red)}
+.field textarea{resize:vertical;min-height:90px;line-height:1.5}
+
+/* ── TRACK FILTER ── */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.filter{
+  font-size:13px;font-weight:700;padding:8px 16px;border-radius:999px;
+  border:2px solid var(--line);background:#fff;color:var(--muted);cursor:pointer;
+  transition:all .12s;
+}
+.filter:hover{border-color:#BDBDB8}
+.filter.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* ── PICK GRID ── */
+.track-head{
+  font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  margin:26px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);
+}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.opt{
+  position:relative;text-align:left;background:#fff;border:2px solid var(--line);
+  border-radius:12px;padding:15px 16px 15px 46px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:all .12s;
+}
+.opt:hover:not(.locked){border-color:#BDBDB8;transform:translateY(-1px)}
+.opt .tick{
+  position:absolute;left:14px;top:16px;width:20px;height:20px;border-radius:6px;
+  border:2px solid var(--line);background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;color:#fff;transition:all .12s;
+}
+.opt .name{display:block;font-size:15px;font-weight:700;line-height:1.3;margin-bottom:4px}
+.opt .desc{display:block;font-size:13px;color:var(--muted);line-height:1.4}
+.opt.on{border-color:var(--red);background:#FFF5F6}
+.opt.on .tick{background:var(--red);border-color:var(--red)}
+.opt.on .tick::after{content:'✓'}
+.opt.locked{opacity:.4;cursor:not-allowed}
+
+/* ── COUNTER BAR ── */
+.counter-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:#fff;border-top:1px solid var(--line);
+  box-shadow:0 -4px 20px rgba(0,0,0,.07);
+  padding:14px 20px;
+}
+.counter-inner{
+  max-width:900px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.counter-text{font-size:15px;font-weight:700}
+.counter-text .n{color:var(--red);font-size:20px}
+.counter-text .hint{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
+
+/* ── YES/NO ROWS ── */
+.yn-row{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:14px 0;border-bottom:1px solid var(--line);
+}
+.yn-row:last-child{border-bottom:none}
+.yn-q{font-size:15px;font-weight:600;line-height:1.4;flex:1}
+.yn-btns{display:flex;gap:8px;flex-shrink:0}
+.yn{
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
+  padding:8px 18px;border-radius:8px;border:2px solid var(--line);
+  background:#fff;color:var(--muted);cursor:pointer;transition:all .12s;
+}
+.yn.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* ── SUMMARY ── */
+.pill-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.pill{
+  display:flex;align-items:center;gap:12px;
+  background:#fff;border:1px solid var(--line);border-left:4px solid var(--red);
+  border-radius:10px;padding:13px 16px;font-size:15px;font-weight:600;
+}
+.pill .rank{
+  font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  color:var(--red);flex-shrink:0;
+}
+.student-tag{
+  font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);
+  margin-top:22px;padding-top:16px;border-top:1px solid var(--line);
+}
+.send-note{font-size:13px;color:var(--muted);margin-top:14px;line-height:1.5}
+
+@media(max-width:600px){
+  .screen-title{font-size:26px}
+  .grid{grid-template-columns:1fr}
+  .counter-inner{flex-direction:column;align-items:stretch}
+  .counter-inner .btn{width:100%}
+  .yn-row{flex-direction:column;align-items:flex-start;gap:10px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 1.1</div>
+    <h1>What Should We <span class="g">Actually</span> Learn?</h1>
+    <p>Enter today's password to join. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <button class="btn-back" onclick="show('pw-screen')">← Back</button>
+    <div class="week-tag">Week 1.1 · Day One</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">
+      This class is about marketing. But ten minutes of most classes is going to be about
+      something else: the stuff nobody sits you down and explains. Money, work, and not getting
+      taken advantage of. You're about to tell me which ones to build.
+    </div>
+    <div class="card">
+      <div class="field">
+        <label for="in-name">Your name</label>
+        <input id="in-name" type="text" placeholder="First and last" autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="in-email">UC email</label>
+        <input id="in-email" type="email" placeholder="name@mail.uc.edu" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="in-section">Section</label>
+        <select id="in-section">
+          <option value="">Select your section…</option>
+          <option>Section 1</option>
+          <option>Section 2</option>
+          <option>Section 3</option>
+        </select>
+      </div>
+    </div>
+    <button id="join-btn" class="btn btn-go" onclick="goPick()">Start →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PICK ═══════════════════════ -->
+<div id="pick-screen" class="screen">
+  <div class="page-wrap">
+    <button class="btn-back" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Step 1 of 2</div>
+    <div class="screen-title">Pick your eight</div>
+    <div class="screen-sub">
+      Twenty-eight of these exist. We have room for about thirteen this semester. Pick the
+      <strong>eight you'd actually use</strong> in the next two years, not the eight that sound
+      the most responsible. The honest answer is the useful one.
+    </div>
+
+    <div class="filters" id="filters"></div>
+    <div id="pick-body"></div>
+  </div>
+
+  <div class="counter-bar">
+    <div class="counter-inner">
+      <div class="counter-text">
+        <span class="n" id="count-n">0</span> of 8 picked
+        <span class="hint" id="count-hint">Tap a card to pick it. Tap again to undo.</span>
+      </div>
+      <button id="pick-btn" class="btn btn-go" onclick="goBaseline()" disabled>Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BASELINE ═══════════════════════ -->
+<div id="base-screen" class="screen">
+  <div class="page-wrap">
+    <button class="btn-back" onclick="show('pick-screen')">← Back</button>
+    <div class="week-tag">Step 2 of 2</div>
+    <div class="screen-title">Where are you starting from?</div>
+    <div class="screen-sub">
+      No wrong answers and nobody else sees this. It tells me what to assume and what to explain.
+    </div>
+
+    <div class="card" id="yn-body"></div>
+
+    <div class="card">
+      <div class="field" style="margin-bottom:0">
+        <label for="in-must">If I could only run ONE of your picks, which should it be?</label>
+        <select id="in-must"><option value="">Select one…</option></select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="field">
+        <label for="in-other">Something not on the list you wish someone would explain?</label>
+        <textarea id="in-other" placeholder="Optional. One sentence is fine."></textarea>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label for="in-worry">What's the money or adulting thing you worry about most?</label>
+        <textarea id="in-worry" placeholder="Optional."></textarea>
+      </div>
+    </div>
+
+    <button class="btn btn-go" onclick="submitAll()">Submit →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="sum-screen" class="screen">
+  <div class="page-wrap">
+    <button class="btn-back" onclick="show('base-screen')">← Back</button>
+    <div class="week-tag">Done</div>
+    <div class="screen-title">You're in.</div>
+    <div class="screen-sub">
+      Here's what you asked for. I'll build the ones this room votes up the most, and you'll see
+      the first one within a couple of weeks.
+    </div>
+    <div class="card">
+      <div class="pill-list" id="sum-picks"></div>
+      <div class="student-tag" id="student-tag"></div>
+    </div>
+    <p class="send-note">
+      Your participation for today is recorded. You can close this tab.
+    </p>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════ CONFIG ═══════════════════════ */
+const PASSWORD = 'DAYONE';
+
+/* Set this to the Logic App URL to capture responses.
+   While it is not an https:// URL, the page runs fine but NOTHING is recorded. */
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── participation confirmation (Logic App contract) ─────────────────── */
+async function postForCredit(payload){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  const set = (bg,bd,fg,html)=>{
+    let el = document.getElementById('credit-status');
+    if(!el){
+      el = document.createElement('div');
+      el.id = 'credit-status';
+      (document.querySelector('.screen.active') || document.body).appendChild(el);
+    }
+    el.style.cssText = 'margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML = html;
+  };
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res = await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d = await res.json();
+    if(d.accepted){
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
+
+const MAX_PICKS = 8;
+
+/* ═══════════════════════ MODULE LIBRARY ═══════════════════════ */
+const TRACKS = [
+  {key:'money',  label:'Money'},
+  {key:'nego',   label:'Getting a Better Deal'},
+  {key:'health', label:'Health'},
+  {key:'career', label:'Work'},
+  {key:'surv',   label:'Staying Alive'}
+];
+
+const MODULES = [
+  /* ── MONEY ── */
+  {id:'M01',t:'money',n:'Read Your Paycheck',d:'Why the number on your check is smaller than the number you agreed to.'},
+  {id:'M02',t:'money',n:'Credit Score & Your First Card',d:'What builds the number, and how to pick a first card without wrecking it.'},
+  {id:'M03',t:'money',n:'Student Loans',d:'What you actually signed, what it costs, and who you owe.'},
+  {id:'M04',t:'money',n:'The Budget & the First $1,000',d:'Where the money goes before you get a chance to spend it.'},
+  {id:'M05',t:'money',n:'Banking 101',d:'Overdraft fees, minimum balances, and the places that charge you to touch your own money.'},
+  {id:'M06',t:'money',n:'Taxes 101',d:'Filing your first return, and why a big refund is not a win.'},
+  {id:'M07',t:'money',n:'How Compounding Works',d:'The math that makes starting at 22 beat starting at 32 by a lot.'},
+  {id:'M08',t:'money',n:'Retirement & the Free Money',d:'The employer match, and why not taking it is turning down a raise.'},
+  {id:'M09',t:'money',n:'Does It Pay You or Cost You?',d:'The difference between owning something and owing on something.'},
+  {id:'M10',t:'money',n:'The Real Cost of Financing',d:'Buy Now Pay Later, minimum payments, and what the interest actually adds up to.'},
+  {id:'M11',t:'money',n:'What a Car Really Costs',d:'The payment is maybe half of it. Insurance, gas, repairs, and the long-loan trap.'},
+
+  /* ── NEGOTIATION / CONSUMER ── */
+  {id:'N01',t:'nego',n:'Know Your Walk-Away',d:'Why having a backup option is the only real leverage you ever have.'},
+  {id:'N02',t:'nego',n:'Never Pay Sticker Price',d:'Three moves that work on rent, bills, cars, and salary.'},
+  {id:'N03',t:'nego',n:'Make the Call',d:'We call a company live in class and get a bill lowered or a subscription killed.'},
+  {id:'N04',t:'nego',n:'Verify Before You Buy',d:'Fake reviews, fake sellers, fake job offers, and how to check.'},
+  {id:'N05',t:'nego',n:'Why You See What You See',d:'How you got sorted into a bucket, and what you hand over to get there.'},
+
+  /* ── HEALTH ── */
+  {id:'H01',t:'health',n:'Health Insurance Basics',d:'Deductible, copay, premium, out-of-pocket max, in plain English.'},
+  {id:'H02',t:'health',n:'Urgent Care vs. ER vs. Telehealth',d:'Same problem, three doors, and one costs ten times the others.'},
+  {id:'H03',t:'health',n:'The Surprise Medical Bill',d:'What to do when a bill shows up that you cannot pay.'},
+
+  /* ── CAREER ── */
+  {id:'C01',t:'career',n:'Your Elevator Pitch',d:'Twenty seconds about you that does not sound rehearsed.'},
+  {id:'C02',t:'career',n:'LinkedIn & Your Résumé Line',d:'What a recruiter scans in six seconds, and what they find when they search you.'},
+  {id:'C03',t:'career',n:'How to Read a Job Offer',d:'We read a real one, line by line, including the part that is not the salary.'},
+  {id:'C04',t:'career',n:'Interview Clothes & the Tie',d:'What to wear when you own nothing, and how to tie one.'},
+  {id:'C05',t:'career',n:'The Email That Gets Answered',d:'One message that makes a landlord, boss, or professor actually do something.'},
+
+  /* ── SURVIVAL ── */
+  {id:'S01',t:'surv',n:'Hands-Only CPR & Choking',d:'The two things that decide whether someone makes it. We practice both.'},
+  {id:'S02',t:'surv',n:'Jumper Cables & the Trunk Kit',d:'The right order, the mistake that costs $600, and what belongs in your car.'},
+  {id:'S03',t:'surv',n:'$50 Cart, 5 Dinners',d:'Unit pricing at the shelf, one pan, and a week of food that is not ramen.'},
+  {id:'S04',t:'surv',n:'Making the Calendar Real',d:'Turning "I will get to it" into something that actually happens.'}
+];
+
+const BASELINE = [
+  {id:'b_job',    q:'I have a job right now (any job)'},
+  {id:'b_card',   q:'I have a credit card in my own name'},
+  {id:'b_loan',   q:'I have taken out a student loan'},
+  {id:'b_taxes',  q:'I have filed my own taxes'},
+  {id:'b_car',    q:'I drive myself to campus'},
+  {id:'b_budget', q:'I know roughly what I spent last month'}
+];
+
+/* ═══════════════════════ STATE ═══════════════════════ */
+const state = {
+  name:'', email:'', section:'',
+  picks:[],            // module ids, in the order they were tapped
+  baseline:{},         // id -> 'yes' | 'no'
+  other:'', worry:'', mustHave:''
+};
+let activeFilter = 'all';
+
+/* ═══════════════════════ NAV ═══════════════════════ */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelector('.counter-bar').style.display = (id==='pick-screen') ? 'block' : 'none';
+  window.scrollTo(0,0);
+}
+
+function checkPw(){
+  const v = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(v === PASSWORD){
+    document.getElementById('pw-err').textContent = '';
+    show('join-screen');
+  } else {
+    document.getElementById('pw-err').textContent = 'Not it. Check the screen.';
+  }
+}
+
+function goPick(){
+  const name    = document.getElementById('in-name').value.trim();
+  const email   = document.getElementById('in-email').value.trim();
+  const section = document.getElementById('in-section').value;
+  if(!name || !email || !section){
+    alert('Add your name, email, and section so I can give you credit.');
+    return;
+  }
+  state.name = name; state.email = email; state.section = section;
+  show('pick-screen');
+}
+
+function goBaseline(){
+  const sel = document.getElementById('in-must');
+  sel.innerHTML = '<option value="">Select one…</option>' + state.picks.map(id => {
+    const m = MODULES.find(x => x.id === id) || {n:id};
+    return `<option value="${id}">${m.n}</option>`;
+  }).join('');
+  show('base-screen');
+}
+
+/* ═══════════════════════ RENDER: PICK ═══════════════════════ */
+function renderFilters(){
+  const el = document.getElementById('filters');
+  const all = [{key:'all',label:'Everything'}].concat(TRACKS);
+  el.innerHTML = all.map(t =>
+    `<button class="filter${activeFilter===t.key?' on':''}" onclick="setFilter('${t.key}')">${t.label}</button>`
+  ).join('');
+}
+
+function setFilter(k){ activeFilter = k; renderFilters(); renderPicks(); refreshCardStates(); }
+
+function renderPicks(){
+  const body = document.getElementById('pick-body');
+  const shown = TRACKS.filter(t => activeFilter==='all' || activeFilter===t.key);
+  const full  = state.picks.length >= MAX_PICKS;
+
+  body.innerHTML = shown.map(track => {
+    const mods = MODULES.filter(m => m.t === track.key);
+    const cards = mods.map(m => {
+      const on     = state.picks.includes(m.id);
+      const locked = full && !on;
+      return `<button class="opt${on?' on':''}${locked?' locked':''}"
+                      id="opt-${m.id}" data-id="${m.id}"
+                      onclick="toggle('${m.id}')" ${locked?'disabled':''}>
+                <span class="tick"></span>
+                <span class="name">${m.n}</span>
+                <span class="desc">${m.d}</span>
+              </button>`;
+    }).join('');
+    return `<div class="track-head">${track.label}</div><div class="grid">${cards}</div>`;
+  }).join('');
+}
+
+/* Toggle in place — no full re-render, so the page never jumps under a tap. */
+function toggle(id){
+  const i = state.picks.indexOf(id);
+  if(i > -1)                              state.picks.splice(i,1);
+  else if(state.picks.length < MAX_PICKS) state.picks.push(id);
+  else return;
+  updateCounter();
+  refreshCardStates();
+}
+
+function refreshCardStates(){
+  const full = state.picks.length >= MAX_PICKS;
+  document.querySelectorAll('.opt').forEach(el => {
+    const on = state.picks.includes(el.dataset.id);
+    el.classList.toggle('on', on);
+    el.classList.toggle('locked', full && !on);
+    el.disabled = full && !on;
+  });
+}
+
+function updateCounter(){
+  const n = state.picks.length;
+  document.getElementById('count-n').textContent = n;
+  document.getElementById('pick-btn').disabled = (n === 0);
+  document.getElementById('count-hint').textContent =
+    n === 0            ? 'Tap a card to pick it. Tap again to undo.' :
+    n < MAX_PICKS      ? 'Tap again to undo. You can move on any time.' :
+                         'That is eight. Undo one if you want to swap.';
+}
+
+/* ═══════════════════════ RENDER: BASELINE ═══════════════════════ */
+function renderBaseline(){
+  document.getElementById('yn-body').innerHTML = BASELINE.map(b => `
+    <div class="yn-row">
+      <div class="yn-q">${b.q}</div>
+      <div class="yn-btns">
+        <button class="yn" id="${b.id}_yes" onclick="setYN('${b.id}','yes')">Yes</button>
+        <button class="yn" id="${b.id}_no"  onclick="setYN('${b.id}','no')">No</button>
+      </div>
+    </div>`).join('');
+}
+
+function setYN(id,val){
+  state.baseline[id] = val;
+  document.getElementById(id+'_yes').classList.toggle('on', val==='yes');
+  document.getElementById(id+'_no' ).classList.toggle('on', val==='no');
+}
+
+/* ═══════════════════════ SUBMIT ═══════════════════════ */
+function submitAll(){
+  state.other    = document.getElementById('in-other').value.trim();
+  state.worry    = document.getElementById('in-worry').value.trim();
+  state.mustHave = document.getElementById('in-must').value;
+
+  const payload = {
+    email: state.email, name: state.name,
+    week: 1, session: 1,
+    exerciseId: 'W01-life-lessons-intake',
+    password: PASSWORD,
+    group: String(state.section||''),
+    points: 12,
+    answers: [].concat(state.picks.map(id=>(MODULES.find(m=>m.id===id)||{}).n||''),[state.baseline||'',state.mustHaveName||'',state.other||'',state.worry||'']).filter(Boolean),
+    exercise:'W1.1 Life Lessons Intake',
+    week:'1.1',
+    submittedAt:new Date().toISOString(),
+    name:state.name, email:state.email, section:state.section,
+    picks:state.picks,
+    pickNames:state.picks.map(id => (MODULES.find(m=>m.id===id)||{}).n),
+    baseline:state.baseline,
+    mustHave:state.mustHave,
+    mustHaveName:(MODULES.find(m=>m.id===state.mustHave)||{}).n || '',
+    other:state.other,
+    worry:state.worry
+  };
+
+  postForCredit(payload);
+
+  document.getElementById('sum-picks').innerHTML = state.picks.map((id,i)=>{
+    const m = MODULES.find(x=>x.id===id) || {n:id};
+    const star = (id === state.mustHave) ? ' <span style="color:var(--red);font-weight:800">★ your #1</span>' : '';
+    return `<div class="pill"><span class="rank">${String(i+1).padStart(2,'0')}</span>${m.n}${star}</div>`;
+  }).join('');
+
+  document.getElementById('student-tag').textContent =
+    `${state.name} · ${state.section} · ${state.email}`;
+
+  show('sum-screen');
+}
+
+/* ═══════════════════════ INIT ═══════════════════════ */
+renderFilters();
+renderPicks();
+renderBaseline();
+updateCounter();
+show('pw-screen');
+document.getElementById('pw-input').focus();
+</script>
+</body>
+</html>

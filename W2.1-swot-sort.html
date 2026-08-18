@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W2.1 — The SWOT Sort</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Nike palette */
+  --nk-black:  #111111;
+  --nk-ink:    #0A0A0A;
+  --nk-orange: #FF6B00;
+  --nk-orange-d:#D95B00;
+
+  --bg:      #F5F5F3;
+  --surface: #FFFFFF;
+  --border:  #E4E4E0;
+  --text:    #1A1A1A;
+  --muted:   #6B7280;
+  --radius:  10px;
+  --shadow:  0 2px 14px rgba(0,0,0,0.08);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── SCREENS — CRITICAL: ID specificity keeps pw centered without breaking others ── */
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:860px;margin:0 auto;padding:22px 20px 90px}
+
+.week-tag{
+  font-family:'Space Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;color:var(--nk-orange-d);
+}
+.screen-title{font-size:29px;font-weight:900;line-height:1.15;margin-bottom:6px}
+.screen-sub{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:4px;background:transparent;
+  border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-radius:6px;
+  cursor:pointer;margin-bottom:16px;transition:all .15s;
+}
+.back-btn:hover{border-color:var(--nk-black);color:var(--nk-black)}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* ── PRIMARY BUTTON ── */
+.btn{
+  display:inline-block;width:100%;border:none;border-radius:9px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:.3px;
+  padding:15px 20px;transition:transform .08s, box-shadow .15s, opacity .15s;
+}
+.btn-go{background:var(--nk-orange);color:#fff}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(255,107,0,.4);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── PASSWORD SCREEN ── */
+.pw-box{
+  background:var(--nk-black);color:#fff;border-radius:16px;
+  border-bottom:6px solid var(--nk-orange);
+  padding:40px 34px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:var(--nk-orange);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.pw-box h1 .g{color:var(--nk-orange)}
+.pw-box p{font-size:14px;color:#B8B8B4;margin-bottom:22px;line-height:1.5}
+.pw-input{
+  width:100%;background:#1F1F1F;border:2px solid #333;border-radius:10px;
+  color:#fff;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;
+  letter-spacing:3px;text-align:center;text-transform:uppercase;padding:14px;margin-bottom:6px;
+  outline:none;transition:border-color .15s;
+}
+.pw-input:focus{border-color:var(--nk-orange)}
+.pw-input::placeholder{color:#555;letter-spacing:2px}
+.pw-err{color:#FCA5A5;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field select{
+  width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:12px 13px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--nk-orange-d)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ── 2x2 EXPLAINER ── */
+.grid-explain{display:grid;grid-template-columns:110px 1fr 1fr;gap:8px;margin:14px 0 8px;align-items:stretch}
+.gx-corner{display:flex;align-items:center;justify-content:center}
+.gx-axis{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);display:flex;align-items:center;justify-content:center;text-align:center;padding:6px}
+.gx-cell{border-radius:10px;padding:14px;color:#fff}
+.gx-cell .q{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:.85}
+.gx-cell .n{font-size:18px;font-weight:900;margin:2px 0 4px}
+.gx-cell .d{font-size:12.5px;line-height:1.45;opacity:.92}
+.gx-s{background:#166534}
+.gx-w{background:#B91C1C}
+.gx-o{background:#0E7490}
+.gx-t{background:#7C2D12}
+
+.mission{background:#FBF7F2;border:1px solid var(--border);border-left:4px solid var(--nk-orange);
+  border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;margin:14px 0}
+.mission b{color:var(--nk-black)}
+
+/* ── SORT SCREEN ── */
+.progress{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;
+  color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.fact-card{
+  background:var(--nk-black);color:#fff;border-radius:14px;border-left:6px solid var(--nk-orange);
+  padding:26px 24px;font-size:18px;font-weight:700;line-height:1.55;margin-bottom:18px;
+  box-shadow:var(--shadow);min-height:110px;display:flex;align-items:center;
+}
+.quad-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.quad-btn{
+  border:none;border-radius:12px;padding:16px 14px;cursor:pointer;color:#fff;text-align:left;
+  font-family:'Inter',sans-serif;transition:transform .08s, box-shadow .15s, opacity .15s;
+}
+.quad-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.22)}
+.quad-btn .q{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:.85}
+.quad-btn .n{font-size:17px;font-weight:900;margin-top:2px}
+.quad-btn .ax{font-size:11.5px;opacity:.85;margin-top:3px}
+.qb-s{background:#166534}
+.qb-w{background:#B91C1C}
+.qb-o{background:#0E7490}
+.qb-t{background:#7C2D12}
+.axis-note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5}
+
+/* ── REVIEW GRID ── */
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.rv-cell{border-radius:12px;padding:14px;color:#fff;min-height:120px}
+.rv-cell h4{font-size:14px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.rv-cell ul{margin:0 0 0 16px}
+.rv-cell li{font-size:12.5px;line-height:1.45;margin-bottom:6px}
+.rv-s{background:#166534}
+.rv-w{background:#B91C1C}
+.rv-o{background:#0E7490}
+.rv-t{background:#7C2D12}
+
+/* ── GROUP GATE ── */
+.stop-banner{
+  background:var(--nk-orange);color:#fff;border-radius:12px;padding:16px 20px;
+  font-size:16px;font-weight:800;letter-spacing:.3px;margin-bottom:18px;text-align:center;
+}
+.fence{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+.fence .f-fact{font-size:15.5px;font-weight:800;line-height:1.5;margin-bottom:10px}
+.fence .f-sub{font-size:13px;color:var(--muted);margin-bottom:10px}
+.fence select{width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:12px 13px;outline:none}
+.fence select:focus{border-color:var(--nk-orange-d)}
+
+.stress-q{background:#FBF7F2;border:1px solid var(--border);border-left:4px solid var(--nk-orange);
+  border-radius:10px;padding:18px 20px;font-size:16.5px;font-weight:700;line-height:1.5;margin-bottom:14px}
+textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;color:var(--text);
+  padding:14px;outline:none;resize:vertical;min-height:110px;transition:border-color .15s;
+}
+textarea:focus{border-color:var(--nk-orange-d)}
+.char-count{font-size:12px;color:var(--muted);margin-top:6px;text-align:right}
+.char-count.ok{color:#16A34A;font-weight:700}
+.submit-note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+
+/* ── SUMMARY ── */
+.confirm-pill{display:inline-block;background:#FFEDD5;color:#7C2D12;border:1px solid var(--nk-orange);
+  font-size:13px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:20px;margin-bottom:16px}
+.student-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.section-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--nk-orange-d);margin:18px 0 8px}
+.answer-final{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:15px 18px;font-size:14.5px;line-height:1.6}
+.debrief-box{background:#FBF7F2;border:1px solid var(--border);border-top:4px solid var(--nk-orange);
+  border-radius:12px;padding:20px 22px;margin-top:22px}
+.debrief-box h3{font-size:16px;font-weight:800;margin-bottom:12px}
+.debrief-box ol{margin:0 0 0 20px}
+.debrief-box li{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+
+@media(max-width:680px){
+  .screen-title{font-size:24px}
+  .fact-card{font-size:16px}
+  .grid-explain{grid-template-columns:70px 1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 2.1</div>
+    <h1>The <span class="g">SWOT</span> Sort</h1>
+    <p>Enter today's password to join. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <div class="week-tag">Week 2.1 · Nike</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">You're on the strategy team Elliott Hill just walked into the room. Twelve facts from the case are about to hit the table. Your job: put every one of them where it belongs.</div>
+    <div class="card">
+      <div class="field">
+        <label for="j-name">Your name</label>
+        <input id="j-name" type="text" placeholder="First and last" autocomplete="off" oninput="onJoin()">
+      </div>
+      <div class="field">
+        <label for="j-email">UC email</label>
+        <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
+        <div class="hint">Use your @mail.uc.edu (or @uc.edu) address — this is how credit is matched.</div>
+      </div>
+      <div class="field">
+        <label for="j-group">Your group</label>
+        <select id="j-group" onchange="onJoin()">
+          <option value="">Pick your group…</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+        </select>
+      </div>
+      <button class="btn btn-go" id="join-btn" onclick="show('brief-screen')" disabled>Let's go →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BRIEF: THE 2x2 ═══════════════════════ -->
+<div id="brief-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Week 2.1 · The 2×2</div>
+    <div class="screen-title">Four boxes, two questions</div>
+    <div class="screen-sub">A SWOT analysis sorts everything a company faces by asking two questions about each fact. <b>Question 1:</b> is this inside the company (something Nike controls) or outside (something happening TO Nike)? <b>Question 2:</b> is it helping or hurting?</div>
+
+    <div class="grid-explain">
+      <div class="gx-corner"></div>
+      <div class="gx-axis">Helping</div>
+      <div class="gx-axis">Hurting</div>
+      <div class="gx-axis">Inside<br>(internal)</div>
+      <div class="gx-cell gx-s"><div class="q">Internal · Helping</div><div class="n">Strength</div><div class="d">Something Nike owns or does that gives it an edge.</div></div>
+      <div class="gx-cell gx-w"><div class="q">Internal · Hurting</div><div class="n">Weakness</div><div class="d">Something Nike did to itself or lacks.</div></div>
+      <div class="gx-axis">Outside<br>(external)</div>
+      <div class="gx-cell gx-o"><div class="q">External · Helping</div><div class="n">Opportunity</div><div class="d">An opening in the outside world Nike could use.</div></div>
+      <div class="gx-cell gx-t"><div class="q">External · Hurting</div><div class="n">Threat</div><div class="d">An outside force working against Nike.</div></div>
+    </div>
+
+    <div class="mission">
+      <b>Solo first.</b> Sort all 12 facts on your own — no talking yet. Then STOP: your group compares grids and has to reach consensus on the two facts that don't sort cleanly. The internal-vs-external question is where the argument lives.
+    </div>
+
+    <button class="btn btn-go" onclick="show('sort-screen');renderFact()">Start sorting →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SORT ═══════════════════════ -->
+<div id="sort-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('brief-screen')">← Back to the 2×2</button>
+    <div class="week-tag">Week 2.1 · Solo Sort</div>
+    <div class="progress" id="sort-progress">Fact 1 of 12</div>
+
+    <div class="fact-card" id="fact-text"></div>
+
+    <div class="quad-grid">
+      <button class="quad-btn qb-s" onclick="placeFact('S')"><div class="q">Internal · Helping</div><div class="n">Strength</div><div class="ax">Nike controls it, it helps</div></button>
+      <button class="quad-btn qb-w" onclick="placeFact('W')"><div class="q">Internal · Hurting</div><div class="n">Weakness</div><div class="ax">Nike controls it, it hurts</div></button>
+      <button class="quad-btn qb-o" onclick="placeFact('O')"><div class="q">External · Helping</div><div class="n">Opportunity</div><div class="ax">Outside Nike, it helps</div></button>
+      <button class="quad-btn qb-t" onclick="placeFact('T')"><div class="q">External · Hurting</div><div class="n">Threat</div><div class="ax">Outside Nike, it hurts</div></button>
+    </div>
+
+    <div class="axis-note">Ask the two questions in order: inside or outside? Then: helping or hurting?<br>Every fact is straight from the case. Trust the reading, not the vibes.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ REVIEW ═══════════════════════ -->
+<div id="review-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="restartSort()">← Re-sort from the start</button>
+    <div class="week-tag">Week 2.1 · Your Grid</div>
+    <div class="screen-title">Your SWOT, sorted</div>
+    <div class="screen-sub">This is how you called it. Look at your four boxes for ten seconds before the group round: does anything feel like it's sitting in the wrong box?</div>
+
+    <div class="review-grid">
+      <div class="rv-cell rv-s"><h4>Strengths</h4><ul id="rv-s"></ul></div>
+      <div class="rv-cell rv-w"><h4>Weaknesses</h4><ul id="rv-w"></ul></div>
+      <div class="rv-cell rv-o"><h4>Opportunities</h4><ul id="rv-o"></ul></div>
+      <div class="rv-cell rv-t"><h4>Threats</h4><ul id="rv-t"></ul></div>
+    </div>
+
+    <button class="btn btn-go" onclick="show('gate-screen')">I'm done — group round →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ GROUP GATE ═══════════════════════ -->
+<div id="gate-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('review-screen')">← Back to my grid</button>
+    <div class="week-tag">Week 2.1 · Group Consensus</div>
+
+    <div class="stop-banner">✋ STOP — Turn to your group. Compare grids out loud before you touch anything below.</div>
+
+    <div class="screen-sub">Two of the twelve facts don't sort cleanly — groups always split on them. Your group must agree on a final box for each, and then write down the rule you used to decide. One answer per person; your group should agree on the wording together.</div>
+
+    <div class="fence">
+      <div class="f-fact">"Sales in Greater China have fallen six quarters in a row."</div>
+      <div class="f-sub">Is that the market turning against Nike (external), or Nike failing to execute in China (internal)?</div>
+      <select id="fence-china" onchange="onGate()">
+        <option value="">Your group's final call…</option>
+        <option value="W">Weakness — internal, Nike's execution problem</option>
+        <option value="T">Threat — external, the market moved against Nike</option>
+      </select>
+    </div>
+
+    <div class="fence">
+      <div class="f-fact">"Running is booming — Nike's running category grew more than 20% for three straight quarters."</div>
+      <div class="f-sub">Is the boom Nike's doing (internal strength), or an outside wave Nike is riding (external opportunity)?</div>
+      <select id="fence-run" onchange="onGate()">
+        <option value="">Your group's final call…</option>
+        <option value="S">Strength — Nike's product and sport offense earned it</option>
+        <option value="O">Opportunity — the running wave lifts everyone; Nike is catching it</option>
+      </select>
+    </div>
+
+    <div class="stress-q">Write your group's rule: how do you decide whether a fact is INTERNAL or EXTERNAL? One or two sentences — a test you could apply to any company, not just Nike.</div>
+    <textarea id="gate-input" placeholder="Our test for internal vs. external is…" oninput="onGate()"></textarea>
+    <div class="char-count" id="gate-count">0 / 80 minimum</div>
+
+    <p class="submit-note">Submitting records your participation and your group's work for today's class.</p>
+    <button class="btn btn-go" id="submit-btn" onclick="submitAll()" disabled style="margin-top:6px;">
+      Submit &amp; Record Participation →
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="summary-screen" class="screen">
+  <div class="page-wrap">
+    <div class="week-tag">Week 2.1 — Summary</div>
+    <div class="screen-title">Grid locked</div>
+    <div class="confirm-pill">✓ Participation recorded — you're all set</div>
+    <div id="student-tag" class="student-tag"></div>
+
+    <p class="section-label">Your final SWOT grid</p>
+    <div class="review-grid">
+      <div class="rv-cell rv-s"><h4>Strengths</h4><ul id="sum-s"></ul></div>
+      <div class="rv-cell rv-w"><h4>Weaknesses</h4><ul id="sum-w"></ul></div>
+      <div class="rv-cell rv-o"><h4>Opportunities</h4><ul id="sum-o"></ul></div>
+      <div class="rv-cell rv-t"><h4>Threats</h4><ul id="sum-t"></ul></div>
+    </div>
+
+    <p class="section-label">Your group's internal-vs-external rule</p>
+    <div class="answer-final" id="sum-rule"></div>
+
+    <div class="debrief-box">
+      <h3>Bring to the debrief</h3>
+      <ol>
+        <li>Which fact did your group fight over longest — and why does the inside-vs-outside call matter?</li>
+        <li>China: which box did your group pick, and what would change your mind?</li>
+        <li>Look at your Strengths and Opportunities together. Which pairing is Nike's best move?</li>
+        <li>The case ends with two comebacks on the table. Which one does your grid say to fund first?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
+<script>
+const PW = 'SWOOSH26';
+
+/* ── PARTICIPATION CREDIT ─────────────────────────────────────────────────
+   On submit, the student's completion is POSTed as JSON to an HTTP-triggered
+   flow that records credit in Canvas.
+
+   TO GO LIVE: paste your Azure Logic App "When a HTTP request is received"
+   trigger URL into CREDIT_ENDPOINT below. That one line is the ONLY thing to
+   change — the JSON payload posts to the Logic App exactly as-is.
+
+   Until a real https URL is set, submit still works end-to-end (students reach
+   the summary and see "recorded"); it simply doesn't post anywhere yet. */
+const CREDIT_ENDPOINT = 'PASTE_POWER_AUTOMATE_HTTP_URL_HERE';
+
+/* ── THE 12 FACTS (all sourced from the Week 2 Nike case; order fixed, fence cards unmarked) ── */
+const FACTS = [
+  { id:'scale',   text:'Nike still sells $46.4 billion a year — five times New Balance.', fence:false },
+  { id:'retro',   text:'Nike printed more and more Air Force 1s, Jordan 1s, and Dunks until the shoes stopped feeling rare.', fence:false },
+  { id:'on',      text:'On grew 30% last year, and New Balance says out loud it will hit $10 billion.', fence:false },
+  { id:'china',   text:'Sales in Greater China have fallen six quarters in a row.', fence:true },
+  { id:'jordan',  text:"The Jordan brand alone is bigger than On's entire company.", fence:false },
+  { id:'markdown',text:"Nike's own website turned into a discount rack of constant markdowns.", fence:false },
+  { id:'skims',   text:'NikeSKIMS just opened a women’s market Nike had struggled to excite.', fence:false },
+  { id:'tariffs', text:'New tariffs are costing Nike about $1.5 billion this year.', fence:false },
+  { id:'running', text:"Running is booming — Nike's running category grew more than 20% for three straight quarters.", fence:true },
+  { id:'walkaway',text:'Nike walked away from Amazon in 2019 and cut off the local running shops.', fence:false },
+  { id:'shelf',   text:"Dick's bought Foot Locker — one rebuilt retail partner now controls a tenth of Nike's sales.", fence:false },
+  { id:'roster',  text:'Nike has the deepest athlete roster in sports and billions in cash.', fence:false },
+];
+const QUAD_NAMES = { S:'Strengths', W:'Weaknesses', O:'Opportunities', T:'Threats' };
+
+/* ── STATE ── */
+let state = {
+  name:'', email:'', groupNum:'',
+  placements:{},          // factId -> 'S'|'W'|'O'|'T'
+  fenceChina:'', fenceRun:'',
+  rule:''
+};
+let factIndex = 0;
+
+/* ── UTILS ── */
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ── PASSWORD ── */
+function checkPw(){
+  const input = document.getElementById('pw-input');
+  if(input.value.trim().toUpperCase() === PW){
+    show('join-screen');
+  } else {
+    const err = document.getElementById('pw-err');
+    err.textContent = "That's not it — the password is given in class.";
+    input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
+  }
+}
+
+/* ── JOIN ── */
+function onJoin(){
+  const name  = document.getElementById('j-name').value.trim();
+  const email = document.getElementById('j-email').value.trim().toLowerCase();
+  const group = document.getElementById('j-group').value;
+  const emailOk = /@(mail\.)?uc\.edu$/.test(email);
+  state.name = name; state.email = email; state.groupNum = group;
+  document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk && group);
+}
+
+/* ── SOLO SORT ── */
+function renderFact(){
+  const f = FACTS[factIndex];
+  document.getElementById('sort-progress').textContent = `Fact ${factIndex+1} of ${FACTS.length}`;
+  document.getElementById('fact-text').textContent = '“' + f.text + '”';
+}
+function placeFact(quad){
+  state.placements[FACTS[factIndex].id] = quad;
+  factIndex++;
+  if(factIndex < FACTS.length){
+    renderFact();
+  } else {
+    fillGrid('rv');
+    show('review-screen');
+  }
+}
+function restartSort(){
+  factIndex = 0; state.placements = {};
+  renderFact(); show('sort-screen');
+}
+function fillGrid(prefix){
+  ['S','W','O','T'].forEach(q=>{
+    const ul = document.getElementById(prefix + '-' + q.toLowerCase());
+    ul.innerHTML = '';
+    FACTS.filter(f=>state.placements[f.id]===q).forEach(f=>{
+      const li = document.createElement('li');
+      li.textContent = f.text;
+      ul.appendChild(li);
+    });
+  });
+}
+
+/* ── GROUP GATE ── */
+function onGate(){
+  state.fenceChina = document.getElementById('fence-china').value;
+  state.fenceRun   = document.getElementById('fence-run').value;
+  state.rule       = document.getElementById('gate-input').value.trim();
+  const n = state.rule.length;
+  const counter = document.getElementById('gate-count');
+  counter.textContent = `${n} / 80 minimum`;
+  counter.classList.toggle('ok', n >= 80);
+  document.getElementById('submit-btn').disabled = !(state.fenceChina && state.fenceRun && n >= 80);
+}
+
+/* ── SUBMIT ── */
+function submitAll(){
+  document.getElementById('submit-btn').disabled = true;   // no double submits
+  // Fold the group's fence consensus into the final grid
+  state.placements['china']   = state.fenceChina;
+  state.placements['running'] = state.fenceRun;
+
+  const payload = {
+    exercise: 'W2.1-swot-sort',
+    week: '2.1',
+    submittedAt: new Date().toISOString(),
+    name: state.name, email: state.email, group: state.groupNum,
+    placements: state.placements,
+    fenceChina: state.fenceChina, fenceRunning: state.fenceRun,
+    internalExternalRule: state.rule
+  };
+  if(CREDIT_ENDPOINT.startsWith('https://')){
+    fetch(CREDIT_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload), keepalive:true
+    }).catch(()=>{});
+  }
+  fillGrid('sum');
+  document.getElementById('sum-rule').textContent = state.rule;
+  document.getElementById('student-tag').textContent =
+    `${state.name} · Group ${state.groupNum} · ${state.email}`;
+  show('summary-screen');
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FIREBASE (dormant) — future persistent group data
+   const firebaseConfig = { apiKey:"...", authDomain:"...", projectId:"..." };
+   firebase.initializeApp(firebaseConfig);
+   const db = firebase.firestore();
+   db.collection('w2_1_submissions').add(payload);
+──────────────────────────────────────────────────────────────────────────── */
+</script>
+</body>
+</html>
