@@ -895,8 +895,14 @@ body {
 const PW = 'HAWKIN55';
 const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
 
-/* ── participation confirmation (Logic App contract) ─────────────────── */
-async function postForCredit(payload){
+/* ── participation credit (Logic App contract) ───────────────────────── */
+function creditAnswers(src){
+  const skip=['email','name','week','session','exerciseId','password','group','points','answers','timestamp','submittedAt','exercise'];
+  return Object.entries(src||{}).filter(([k])=>!skip.includes(k))
+    .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
+    .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
+}
+async function postForCredit(c){
   if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
   const set=(bg,bd,fg,html)=>{
     let el=document.getElementById('credit-status');
@@ -908,8 +914,7 @@ async function postForCredit(payload){
   };
   set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
   try{
-    const res=payload.answers = [JSON.stringify(payload).slice(0,4000)];
-    postForCredit(payload);
+    const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
     const d=await res.json();
     if(d.accepted){
       set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
@@ -1254,12 +1259,6 @@ function updateSubmitBtn() {
 /* ── SUBMIT ── */
 function submitAll() {
   const payload = {
-      email: state.email, name: state.name,
-      week: 13, session: 1,
-      exerciseId: 'W13-spot-the-funnel',
-      password: PW,
-      group: String(state.group||''),
-      points: 12,
     exercise: 'W13.1',
     name: state.name,
     email: state.email,
@@ -1278,13 +1277,12 @@ function submitAll() {
     phase3_fix: state.p3,
     timestamp: new Date().toISOString()
   };
-  fetch(CREDIT_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).catch(() => {
-    console.log('Webhook delivery attempt made (may fail silently)');
-  });
+  postForCredit({
+        email: state.email, name: state.name,
+        week: 13, session: 1, exerciseId: 'W13-spot-the-funnel',
+        password: PW, group: String(state.group||''), points: 12,
+        answers: creditAnswers(payload)
+      });
   renderSummary();
   show('summary-screen');
 }
