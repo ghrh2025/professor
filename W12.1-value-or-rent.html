@@ -878,7 +878,36 @@ body {
 <script>
 /* ── CONFIG ── */
 const PW = 'RENT30';
-const WEBHOOK_URL = 'https://reciprocityaccounting.app.n8n.cloud/webhook/exercise-completion';
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── participation confirmation (Logic App contract) ─────────────────── */
+async function postForCredit(payload){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  const set=(bg,bd,fg,html)=>{
+    let el=document.getElementById('credit-status');
+    if(!el){el=document.createElement('div');el.id='credit-status';
+      (document.querySelector('.screen.active')||document.body).appendChild(el);}
+    el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML=html;
+  };
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res=payload.answers = [JSON.stringify(payload).slice(0,4000)];
+    postForCredit(payload);
+    const d=await res.json();
+    if(d.accepted){
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
 
 /* ── STATE ── */
 let state = {
@@ -1343,6 +1372,12 @@ function checkDefense() {
 ══════════════════════════════════════════ */
 function submitMove() {
   const payload = {
+      email: state.email, name: state.name,
+      week: 12, session: 1,
+      exerciseId: 'W12-value-or-rent',
+      password: PW,
+      group: String(state.group||''),
+      points: 12,
     exercise: 'W12.1',
     name: state.name,
     email: state.email,
@@ -1354,7 +1389,7 @@ function submitMove() {
     defense: state.defense,
     timestamp: new Date().toISOString()
   };
-  fetch(WEBHOOK_URL, {
+  fetch(CREDIT_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
