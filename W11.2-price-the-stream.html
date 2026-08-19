@@ -806,18 +806,14 @@
         <div class="input-group">
           <label for="groupNum">Group Number (1-10)</label>
           <select id="groupNum" onchange="updateJoinButton()">
-            <option value="">Select your group...</option>
-            <option value="1">Group 1</option>
-            <option value="2">Group 2</option>
-            <option value="3">Group 3</option>
-            <option value="4">Group 4</option>
-            <option value="5">Group 5</option>
-            <option value="6">Group 6</option>
-            <option value="7">Group 7</option>
-            <option value="8">Group 8</option>
-            <option value="9">Group 9</option>
-            <option value="10">Group 10</option>
-          </select>
+          <option value="">Select your group...</option>
+          <option value="1">Group 1</option>
+          <option value="2">Group 2</option>
+          <option value="3">Group 3</option>
+          <option value="4">Group 4</option>
+          <option value="5">Group 5</option>
+          <option value="6">Group 6</option>
+        </select>
         </div>
 
         <div class="input-group">
@@ -1446,6 +1442,11 @@
   </div>
 
   <script>
+/* ── UC email gate — one definition, used by every join validator.
+   Credit depends on this matching the Canvas roster. Case-insensitive on
+   purpose: phones autocapitalize. ── */
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
     // ============ Configuration ============
     const WEBHOOK_URL = 'https://reciprocityaccounting.app.n8n.cloud/webhook/exercise-completion'; // n8n webhook URL goes here
     const CORRECT_PASSWORD = 'VALUE3';
@@ -1536,7 +1537,7 @@
 
       let emailValid = false;
       if (studentEmail) {
-        emailValid = studentEmail.endsWith('@mail.uc.edu') || studentEmail.endsWith('@uc.edu');
+        emailValid = ucEmailOk(studentEmail);
       }
 
       if (!emailValid && studentEmail) {

@@ -213,15 +213,6 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);min
         <label for="in-email">UC email</label>
         <input id="in-email" type="email" placeholder="name@mail.uc.edu" autocomplete="email">
       </div>
-      <div class="field">
-        <label for="in-section">Section</label>
-        <select id="in-section">
-          <option value="">Select your section…</option>
-          <option>Section 1</option>
-          <option>Section 2</option>
-          <option>Section 3</option>
-        </select>
-      </div>
     </div>
     <button id="join-btn" class="btn btn-go" onclick="goPick()">Start →</button>
   </div>
@@ -309,6 +300,11 @@ body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);min
 </div>
 
 <script>
+/* ── UC email gate — one definition, used by every join validator.
+   Credit depends on this matching the Canvas roster. Case-insensitive on
+   purpose: phones autocapitalize. ── */
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
 /* ═══════════════════════ CONFIG ═══════════════════════ */
 const PASSWORD = 'DAYONE';
 
@@ -412,7 +408,7 @@ const BASELINE = [
 
 /* ═══════════════════════ STATE ═══════════════════════ */
 const state = {
-  name:'', email:'', section:'',
+  name:'', email:'',
   picks:[],            // module ids, in the order they were tapped
   baseline:{},         // id -> 'yes' | 'no'
   other:'', worry:'', mustHave:''
@@ -440,12 +436,11 @@ function checkPw(){
 function goPick(){
   const name    = document.getElementById('in-name').value.trim();
   const email   = document.getElementById('in-email').value.trim();
-  const section = document.getElementById('in-section').value;
-  if(!name || !email || !section){
-    alert('Add your name, email, and section so I can give you credit.');
+  if(!name || !ucEmailOk(email)){
+    alert('Add your name and your UC email (name@mail.uc.edu) so I can give you credit.');
     return;
   }
-  state.name = name; state.email = email; state.section = section;
+  state.name = name; state.email = email;
   show('pick-screen');
 }
 
@@ -549,7 +544,7 @@ function submitAll(){
     exercise:'W1.1 Life Lessons Intake',
     week:'1.1',
     submittedAt:new Date().toISOString(),
-    name:state.name, email:state.email, section:state.section,
+    name:state.name, email:state.email,
     picks:state.picks,
     pickNames:state.picks.map(id => (MODULES.find(m=>m.id===id)||{}).n),
     baseline:state.baseline,
@@ -563,7 +558,7 @@ function submitAll(){
     postForCredit({
         email: state.email, name: state.name,
         week: 1, session: 1, exerciseId: 'W01-life-lessons-intake',
-        password: PASSWORD, group: String(state.section||''), points: 12,
+        password: PASSWORD, group: '', points: 12,
         answers: creditAnswers(payload)
       });
   }
@@ -575,7 +570,7 @@ function submitAll(){
   }).join('');
 
   document.getElementById('student-tag').textContent =
-    `${state.name} · ${state.section} · ${state.email}`;
+    `${state.name} · ${state.email}`;
 
   show('sum-screen');
 }

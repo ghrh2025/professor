@@ -445,10 +445,14 @@
       <input type="email" id="j-email" placeholder="m.last@mail.uc.edu" autocomplete="email">
       <label class="field-label" for="j-group">Group Number</label>
       <select id="j-group">
-        <option value="">— Select your group —</option>
-        <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
-      </select>
+          <option value="">— Select your group —</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+        </select>
       <div class="err" id="join-err"></div>
       <button class="btn btn-primary" onclick="doJoin()">Choose Your Role &rarr;</button>
     </div>
@@ -551,6 +555,11 @@
 </div>
 
 <script>
+/* ── UC email gate — one definition, used by every join validator.
+   Credit depends on this matching the Canvas roster. Case-insensitive on
+   purpose: phones autocapitalize. ── */
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
 // ══════════════════════════════════════
 //  CONSTANTS
 // ══════════════════════════════════════
@@ -746,7 +755,7 @@ function doJoin() {
   var err   = document.getElementById('join-err');
 
   if (!name)                          { err.textContent = 'Please enter your name.'; return; }
-  if (!email || !email.includes('@')) { err.textContent = 'Please enter a valid email.'; return; }
+  if (!ucEmailOk(email))              { err.textContent = 'Use your UC email (name@mail.uc.edu).'; return; }
   if (!group)                         { err.textContent = 'Please select your group.'; return; }
 
   S.name = name; S.email = email; S.groupNum = group;

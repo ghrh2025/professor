@@ -216,7 +216,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
 <!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
 <div id="pw-screen" class="screen active">
   <div class="pw-box">
-    <div class="lockup">MKTG 2080 · Week 2.1</div>
+    <div class="lockup">MKTG 2080 · Week 2.2</div>
     <h1>The <span class="g">SWOT</span> Sort</h1>
     <p>Enter today's password to join. It records your participation for class credit.</p>
     <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
@@ -229,7 +229,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
 <!-- ═══════════════════════ JOIN ═══════════════════════ -->
 <div id="join-screen" class="screen">
   <div class="page-wrap">
-    <div class="week-tag">Week 2.1 · Nike</div>
+    <div class="week-tag">Week 2.2 · Nike</div>
     <div class="screen-title">Get set up</div>
     <div class="screen-sub">You're on the strategy team Elliott Hill just walked into the room. Twelve facts from the case are about to hit the table. Your job: put every one of them where it belongs.</div>
     <div class="card">
@@ -246,8 +246,12 @@ textarea:focus{border-color:var(--nk-orange-d)}
         <label for="j-group">Your group</label>
         <select id="j-group" onchange="onJoin()">
           <option value="">Pick your group…</option>
-          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
         </select>
       </div>
       <button class="btn btn-go" id="join-btn" onclick="show('brief-screen')" disabled>Let's go →</button>
@@ -259,7 +263,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
 <div id="brief-screen" class="screen">
   <div class="page-wrap">
     <button class="back-btn" onclick="show('join-screen')">← Back</button>
-    <div class="week-tag">Week 2.1 · The 2×2</div>
+    <div class="week-tag">Week 2.2 · The 2×2</div>
     <div class="screen-title">Four boxes, two questions</div>
     <div class="screen-sub">A SWOT analysis sorts everything a company faces by asking two questions about each fact. <b>Question 1:</b> is this inside the company (something Nike controls) or outside (something happening TO Nike)? <b>Question 2:</b> is it helping or hurting?</div>
 
@@ -287,7 +291,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
 <div id="sort-screen" class="screen">
   <div class="page-wrap">
     <button class="back-btn" onclick="show('brief-screen')">← Back to the 2×2</button>
-    <div class="week-tag">Week 2.1 · Solo Sort</div>
+    <div class="week-tag">Week 2.2 · Solo Sort</div>
     <div class="progress" id="sort-progress">Fact 1 of 12</div>
 
     <div class="fact-card" id="fact-text"></div>
@@ -307,7 +311,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
 <div id="review-screen" class="screen">
   <div class="page-wrap">
     <button class="back-btn" onclick="restartSort()">← Re-sort from the start</button>
-    <div class="week-tag">Week 2.1 · Your Grid</div>
+    <div class="week-tag">Week 2.2 · Your Grid</div>
     <div class="screen-title">Your SWOT, sorted</div>
     <div class="screen-sub">This is how you called it. Look at your four boxes for ten seconds before the group round: does anything feel like it's sitting in the wrong box?</div>
 
@@ -326,7 +330,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
 <div id="gate-screen" class="screen">
   <div class="page-wrap">
     <button class="back-btn" onclick="show('review-screen')">← Back to my grid</button>
-    <div class="week-tag">Week 2.1 · Group Consensus</div>
+    <div class="week-tag">Week 2.2 · Group Consensus</div>
 
     <div class="stop-banner">✋ STOP — Turn to your group. Compare grids out loud before you touch anything below.</div>
 
@@ -366,7 +370,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
 <!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
 <div id="summary-screen" class="screen">
   <div class="page-wrap">
-    <div class="week-tag">Week 2.1 — Summary</div>
+    <div class="week-tag">Week 2.2 — Summary</div>
     <div class="screen-title">Grid locked</div>
     <div class="confirm-pill">✓ Participation recorded — you're all set</div>
     <div id="student-tag" class="student-tag"></div>
@@ -396,6 +400,11 @@ textarea:focus{border-color:var(--nk-orange-d)}
 
 <!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
 <script>
+/* ── UC email gate — one definition, used by every join validator.
+   Credit depends on this matching the Canvas roster. Case-insensitive on
+   purpose: phones autocapitalize. ── */
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
 const PW = 'SWOOSH26';
 
 /* ── PARTICIPATION CREDIT ─────────────────────────────────────────────────
@@ -494,7 +503,7 @@ function onJoin(){
   const name  = document.getElementById('j-name').value.trim();
   const email = document.getElementById('j-email').value.trim().toLowerCase();
   const group = document.getElementById('j-group').value;
-  const emailOk = /@(mail\.)?uc\.edu$/.test(email);
+  const emailOk = ucEmailOk(email);
   state.name = name; state.email = email; state.groupNum = group;
   document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk && group);
 }
@@ -552,7 +561,7 @@ function submitAll(){
 
   const payload = {
     exercise: 'W2.1-swot-sort',
-    week: '2.1',
+    week: '2.2',
     submittedAt: new Date().toISOString(),
     name: state.name, email: state.email, group: state.groupNum,
     placements: state.placements,
@@ -562,7 +571,10 @@ function submitAll(){
   if(CREDIT_ENDPOINT.startsWith('https://')){
     postForCredit({
         email: state.email, name: state.name,
-        week: 2, session: 1, exerciseId: 'W02-swot-sort',
+        // FALL 2026 OVERRIDE: runs on the Wednesday (2.2) session, not Monday.
+        // Mon Aug 31 is a team working session (professor out). To restore the
+        // normal two-exercise week, set session back to 1 and relabel 'Week 2.2' -> 'Week 2.2'.
+        week: 2, session: 2, exerciseId: 'W02-swot-sort',
         password: PW, group: String(state.groupNum||''), points: 12,
         answers: creditAnswers(payload)
       });

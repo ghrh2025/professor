@@ -591,9 +591,12 @@ body {
         <label>Group Number</label>
         <select id="j-group" onchange="onJoin()">
           <option value="">— pick your group —</option>
-          <option>1</option><option>2</option><option>3</option>
-          <option>4</option><option>5</option><option>6</option>
-          <option>7</option><option>8</option><option>9</option><option>10</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
         </select>
       </div>
       <button class="btn btn-taya" id="join-btn" onclick="show('brief-screen')" disabled>Let's go →</button>
@@ -926,6 +929,11 @@ body {
 
 <!-- ═══════════════════════════ JAVASCRIPT ═══════════════════════════ -->
 <script>
+/* ── UC email gate — one definition, used by every join validator.
+   Credit depends on this matching the Canvas roster. Case-insensitive on
+   purpose: phones autocapitalize. ── */
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
 const PW = 'MAP426';
 const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
 
@@ -1016,7 +1024,7 @@ function onJoin() {
   const name  = document.getElementById('j-name').value.trim();
   const email = document.getElementById('j-email').value.trim();
   const group = document.getElementById('j-group').value;
-  const emailOk = /^[^\s@]+@(mail\.uc\.edu|uc\.edu)$/i.test(email);
+  const emailOk = ucEmailOk(email);
   document.getElementById('join-btn').disabled = !(name && emailOk && group);
   if (name)  state.name  = name;
   if (email) state.email = email;
