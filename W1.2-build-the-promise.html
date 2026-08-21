@@ -194,6 +194,9 @@ textarea:focus{border-color:var(--ld-green-d)}
   .template,.assembled .sentence,.vp-final{font-size:15px}
 }
 </style>
+<style>/* credit-fix 2026-08-21: never claim credit before the server answers */
+body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
+#credit-status{margin:18px auto !important}</style>
 </head>
 <body>
 
@@ -215,7 +218,7 @@ textarea:focus{border-color:var(--ld-green-d)}
   <div class="page-wrap">
     <div class="week-tag">Week 1.2 · Liquid Death</div>
     <div class="screen-title">Get set up</div>
-    <div class="screen-sub">You and your group are Liquid Death's brand team. Your job today: build the one-sentence promise that makes people pay $2 for water.</div>
+    <div class="screen-sub">You and your group are Liquid Death's brand team. It is the morning after the Super Bowl, three of your cans just stopped being plain water, and Cessario wants to know what goes in the next one. Before you can answer that, you have to say what people are actually buying.</div>
     <div class="card">
       <div class="field">
         <label for="j-name">Your name</label>
@@ -293,14 +296,14 @@ textarea:focus{border-color:var(--ld-green-d)}
     <button class="back-btn" onclick="show('build-screen')">← Back to the builder</button>
     <div class="week-tag">Week 1.2 · Stress Test</div>
     <div class="screen-title">Now try to break it</div>
-    <div class="screen-sub">A promise that only works in one place is fragile. Test yours.</div>
+    <div class="screen-sub">A promise you cannot break is a promise you have not tested. Hold yours up against what the company just did.</div>
 
     <div class="vp-recall">
       <span class="cap">The promise you built</span>
       <span id="stress-vp"></span>
     </div>
 
-    <div class="stress-q">Would this promise still hold if you could buy Liquid Death in every gas station and Walmart? Why or why not?</div>
+    <div class="stress-q">Cessario just put three cans of sweetened water on the shelf, three weeks before a Super Bowl ad attacking drinks loaded with sugar. Read your promise back one slot at a time. Which slot does the new can break?</div>
 
     <textarea id="stress-input" placeholder="Type your group's answer… (a couple of sentences)" oninput="onStressInput()"></textarea>
     <div class="char-count" id="stress-count">0 / 80 minimum</div>
@@ -331,7 +334,7 @@ textarea:focus{border-color:var(--ld-green-d)}
       <ol>
         <li>Which slot did your group argue about most — and why?</li>
         <li>Read your "unlike" out loud. Whose is sharpest?</li>
-        <li>If Liquid Death cut its price in half, which parts of your promise break?</li>
+        <li>Your &quot;unlike&quot; says sugary energy drinks. The new can has agave in it. Is Liquid Death still unlike the thing it says it is unlike?</li>
         <li>So — what is a value proposition, in one line?</li>
       </ol>
     </div>
@@ -370,17 +373,25 @@ async function postForCredit(c){
   if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
   const set=(bg,bd,fg,html)=>{
     let el=document.getElementById('credit-status');
-    if(!el){el=document.createElement('div');el.id='credit-status';
-      (document.querySelector('.screen.active')||document.body).appendChild(el);}
+    if(!el){el=document.createElement('div');el.id='credit-status';}
+    var _anchor=document.querySelector('.confirm-pill,.credit-claim');
+    var _host=(_anchor&&_anchor.parentElement)||document.getElementById('summary-screen')
+      ||document.getElementById('sum-screen')||document.querySelector('.screen.active')||document.body;
+    if(el.parentElement!==_host){
+      if(_anchor&&_anchor.parentElement===_host) _host.insertBefore(el,_anchor.nextSibling);
+      else _host.appendChild(el);
+    }
     el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
       'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
     el.innerHTML=html;
   };
+  document.body.classList.add('awaiting-credit');
   set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
   try{
     const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
     const d=await res.json();
     if(d.accepted){
+      document.body.classList.remove('awaiting-credit');
       set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
         '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
     } else {

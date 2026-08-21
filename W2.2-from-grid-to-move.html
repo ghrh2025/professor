@@ -205,6 +205,9 @@ textarea:focus{border-color:var(--nk-orange-d)}
   .stat-grid,.cold-grid,.bridge-grid{grid-template-columns:1fr}
 }
 </style>
+<style>/* credit-fix 2026-08-21: never claim credit before the server answers */
+body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
+#credit-status{margin:18px auto !important}</style>
 </head>
 <body>
 
@@ -226,7 +229,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
   <div class="page-wrap">
     <div class="week-tag">Week 2.2 · Nike → Crumbl</div>
     <div class="screen-title">Get set up</div>
-    <div class="screen-sub">Tuesday you built Nike's grid. Today the grid earns its keep — and then you prove you can do the whole thing cold.</div>
+    <div class="screen-sub">Monday you built Nike's grid. Today the grid earns its keep — and then you prove you can do the whole thing cold.</div>
     <div class="card">
       <div class="field">
         <label for="j-name">Your name</label>
@@ -276,7 +279,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
     </div>
 
     <div class="mission">
-      <b>Two rounds today.</b> Round 1: build Nike's best move and worst nightmare from Tuesday's grid, then your group kills the weakest move on the table. Round 2: a brand-new company, no card bank, no help — you build the grid AND the move from scratch. That's the skill the midterm tests.
+      <b>Two rounds today.</b> Round 1: build Nike's best move and worst nightmare from Monday's grid, then your group kills the weakest move on the table. Round 2: a brand-new company, no card bank, no help — you build the grid AND the move from scratch. That's the skill the midterm tests.
     </div>
 
     <button class="btn btn-go" onclick="show('nike-screen')">Round 1: Nike →</button>
@@ -289,7 +292,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
     <button class="back-btn" onclick="show('bridge-screen')">← Back</button>
     <div class="week-tag">Week 2.2 · Round 1 — Nike</div>
     <div class="screen-title">Cross the boxes</div>
-    <div class="screen-sub">Work solo. Pull from Tuesday's grid. Make the "by" specific enough that someone could start Monday morning.</div>
+    <div class="screen-sub">Work solo. Pull from Monday's grid. Make the "by" specific enough that someone could act on it tomorrow morning.</div>
 
     <div class="mb">
       <h4>Nike's best move</h4>
@@ -378,7 +381,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
     <button class="back-btn" onclick="show('crumbl1-screen')">← Back to the story</button>
     <div class="week-tag cr">Week 2.2 · Round 2 — New Client Briefing (2 of 2)</div>
     <div class="screen-title">Crumbl by the numbers</div>
-    <div class="screen-sub">Same rule as Tuesday: these are facts, not conclusions. Where each one belongs is your call.</div>
+    <div class="screen-sub">Same rule as Monday: these are facts, not conclusions. Where each one belongs is your call.</div>
 
     <div class="stat-grid">
       <div class="stat"><div class="n">1,101 stores</div><div class="d">Net 42 new locations added last year, with 99 more openings planned and 206 signed franchise agreements waiting.</div></div>
@@ -386,7 +389,7 @@ textarea:focus{border-color:var(--nk-orange-d)}
       <div class="stat"><div class="n">100% franchised</div><div class="d">Every store is owned by a franchisee who paid roughly $850K–$1.5M to open it. Crumbl runs zero stores itself.</div></div>
       <div class="stat"><div class="n">One product</div><div class="d">Dessert — mostly cookies. Copycat cookie chains have multiplied, and grocery stores now sell oversized cookies in lookalike boxes.</div></div>
     </div>
-    <div class="cr-note">Hint from Tuesday: a falling number is an outcome. Sort what's driving it.</div>
+    <div class="cr-note">Hint from Monday: a falling number is an outcome. Sort what's driving it.</div>
 
     <button class="btn btn-cr" onclick="show('cold-screen')">Build the grid →</button>
   </div>
@@ -499,17 +502,25 @@ async function postForCredit(c){
   if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
   const set=(bg,bd,fg,html)=>{
     let el=document.getElementById('credit-status');
-    if(!el){el=document.createElement('div');el.id='credit-status';
-      (document.querySelector('.screen.active')||document.body).appendChild(el);}
+    if(!el){el=document.createElement('div');el.id='credit-status';}
+    var _anchor=document.querySelector('.confirm-pill,.credit-claim');
+    var _host=(_anchor&&_anchor.parentElement)||document.getElementById('summary-screen')
+      ||document.getElementById('sum-screen')||document.querySelector('.screen.active')||document.body;
+    if(el.parentElement!==_host){
+      if(_anchor&&_anchor.parentElement===_host) _host.insertBefore(el,_anchor.nextSibling);
+      else _host.appendChild(el);
+    }
     el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
       'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
     el.innerHTML=html;
   };
+  document.body.classList.add('awaiting-credit');
   set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
   try{
     const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
     const d=await res.json();
     if(d.accepted){
+      document.body.classList.remove('awaiting-credit');
       set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
         '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
     } else {
