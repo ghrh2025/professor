@@ -1112,6 +1112,16 @@ function nextRound() {
     };
     postForCredit({
         email: state.email, name: state.name,
+        /* ══════════════════════════════════════════════════════════════
+           FALL 2026: RETIRED. DO NOT RUN THIS EXERCISE THIS SEMESTER.
+           Week 12 meets Mon Nov 9 only. Wed Nov 11 is Veterans Day, so there
+           is no 12.2 session and the `W12.2 Case Participation` column was
+           deliberately deleted from Canvas. This line still posts session 2,
+           so a live run returns NO_ASSIGNMENT and every student loses the 12
+           points. Separately it is still built on Apple vs Epic while the Fall
+           case is Ford vs Tesla, so it needs a full rebuild before any use.
+           To revive: create the Canvas column FIRST, then set the session.
+           ══════════════════════════════════════════════════════════════ */
         week: 12, session: 2, exerciseId: 'W12b-the-toll-booth',
         password: PW, group: String(state.group||''), points: 12,
         answers: creditAnswers(payload)
