@@ -279,7 +279,7 @@ body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:no
       </div>
     </div>
 
-    <button class="btn btn-go" onclick="submitAll()">Submit →</button>
+    <button class="btn btn-go" id="submit-btn" onclick="submitAll()">Submit →</button>
   </div>
 </div>
 
@@ -554,6 +554,8 @@ function setYN(id,val){
 
 /* ═══════════════════════ SUBMIT ═══════════════════════ */
 function submitAll(){
+  const _sb = document.getElementById('submit-btn');
+  if(_sb){ if(_sb.disabled) return; _sb.disabled = true; }   // no double submits
   state.other    = document.getElementById('in-other').value.trim();
   state.worry    = document.getElementById('in-worry').value.trim();
   state.mustHave = document.getElementById('in-must').value;
