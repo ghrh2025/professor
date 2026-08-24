@@ -405,36 +405,42 @@ async function postForCredit(c){
 
 
 /* ── SLOT DEFINITIONS (options sourced from the case; order varied, nothing marked) ── */
+/* Options are deliberately length-matched within each slot (max spread 6 chars)
+   and the correct answer sits at a different index in every slot: 1, 0, 2, 1, 2.
+   Before this, the correct answer was the LONGEST option in 4 of 5 slots — a
+   student could score 4/5 on string length without reading the case.
+   If you edit these, keep the three options in a slot within a few characters
+   of each other, and do not let the correct one become the longest everywhere. */
 const SLOTS = [
   { key:'target', lead:'For', num:'Slot 1', name:"Who it's for", sub:'the target customer',
     options:[
-      'pretty much everyone who drinks water',
-      'bold, anti-corporate young people',
-      'health-conscious athletes tracking hydration'
+      'anyone who picks up bottled water at the grocery store',
+      'young people who want to look bold and anti-corporate',
+      'health-conscious shoppers who read every calorie label'
     ]},
   { key:'constraint', lead:'who', num:'Slot 2', name:'Their problem', sub:'the constraint',
     options:[
-      'find bottled water too expensive',
-      "worry their water isn't healthy enough",
-      'think plain water is boring and "healthy" brands feel corporate or uncool'
+      'find plain water boring and healthy brands uncool',
+      'cannot afford what premium bottled water usually costs',
+      'want water that is cleaner than what they can buy'
     ]},
   { key:'offering', lead:'we offer', num:'Slot 3', name:'What we give them', sub:'the offering',
     options:[
-      'cleaner, healthier water',
-      'water in an outrageous, recyclable, beer-style can',
-      'cheaper water'
+      'cleaner mountain water than the bottle beside it',
+      'the cheapest way to stay hydrated for a whole week',
+      'mountain water in a recyclable, skull-covered can'
     ]},
   { key:'job', lead:'so they can', num:'Slot 4', name:'The job it does', sub:'the job-to-be-done',
     options:[
-      'just stay hydrated',
-      'save money',
-      'stay hydrated and make a statement'
+      'stay hydrated with the healthiest water they can buy',
+      'stay hydrated and say something about themselves',
+      'stay hydrated without spending very much money'
     ]},
   { key:'unlike', lead:'unlike', num:'Slot 5', name:"What they didn't grab", sub:'the alternative',
     options:[
-      'boring bottled water and sugary energy drinks',
-      'tap water',
-      'soda'
+      'every other brand that comes in a plastic bottle',
+      'tap water from the kitchen sink back at home',
+      'boring bottled water and sugary energy drinks'
     ]},
 ];
 
