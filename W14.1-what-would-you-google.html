@@ -1044,6 +1044,17 @@ function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e|
 var PW = '';
 const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
 
+/* ── DRY-RUN PASSTHROUGH (2026-08-25) ─────────────────────────────────────
+   ?testKey=... on the URL turns this page into a dry run: the workflow skips
+   the class-window gate and answers on the join branch, so no grade is ever
+   written. Absent the parameter this is '' — which matches no secret — and the
+   page behaves exactly as it does for a student. The key itself never lives in
+   this file; it is typed into the address bar. ── */
+var TEST_KEY = (function(){
+  try { return new URLSearchParams(location.search).get('testKey') || ''; }
+  catch(e){ return ''; }
+})();
+
 /* ── participation credit (Logic App contract) ───────────────────────── */
 function creditAnswers(src){
   const skip=['email','name','week','session','exerciseId','password','group','points','answers','timestamp','submittedAt','exercise'];
@@ -1073,6 +1084,7 @@ function creditFields(src){
 }
 async function postForCredit(c){
   if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  if(TEST_KEY) c.testKey = TEST_KEY;
   const set=(bg,bd,fg,html)=>{
     let el=document.getElementById('credit-status');
     if(!el){el=document.createElement('div');el.id='credit-status';}
@@ -1092,7 +1104,11 @@ async function postForCredit(c){
   try{
     const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
     const d=await res.json();
-    if(d.accepted){
+    if(d.code==='DRY_RUN_OK'){
+      document.body.classList.remove('awaiting-credit');
+      set('#eef4ff','#c3d4f7','#1e3a8a','<strong>Dry run.</strong> Every gate passed and the roster matched — '+
+        'nothing was written to Canvas. Remove ?testKey from the URL to run for real.');
+    } else if(d.accepted){
       document.body.classList.remove('awaiting-credit');
       set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
         '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
@@ -1569,7 +1585,7 @@ async function joinVerify(){
     var res = await fetch(CREDIT_ENDPOINT, {
       method:'POST', headers:{'Content-Type':'application/json'},
       signal: ctl ? ctl.signal : undefined,
-      body: JSON.stringify({ mode:'join', email:email, name:name,
+      body: JSON.stringify({ mode:'join', email:email, name:name, testKey:TEST_KEY,
         week:14, session:1, exerciseId:'W14-what-would-you-google',
         password:PW, group:group })
     });
