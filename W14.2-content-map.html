@@ -954,7 +954,9 @@ body.has-credit-banner{padding-top:58px}
    purpose: phones autocapitalize. ── */
 function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
 
-const PW = 'MAP426';
+/* The class code is NOT stored here. This file ships to a PUBLIC repo.
+   The student types it; the Logic App checks it against Key Vault. */
+var PW = '';
 const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
 
 /* ── participation credit (Logic App contract) ───────────────────────── */
@@ -1053,17 +1055,16 @@ let state = {
 };
 
 /* ── PASSWORD ── */
-function checkPw() {
-  const val = document.getElementById('pw-input').value.trim().toUpperCase();
-  if (val === PW) {
+function checkPw(){
+  var val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val.length >= 4){
+    PW = val;                       /* verified server-side at the join step */
+    document.getElementById('pw-err').textContent = '';
     show('join-screen');
   } else {
-    const box = document.getElementById('pw-input').closest('.pw-box') ||
-                document.getElementById('pw-input').parentElement;
-    box.classList.remove('shake');
-    void box.offsetWidth;
-    box.classList.add('shake');
-    document.getElementById('pw-err').textContent = 'Wrong password — try again.';
+    var box = document.querySelector('.pw-box');
+    if(box){ box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
+    document.getElementById('pw-err').textContent = "Enter today's class code.";
   }
 }
 
