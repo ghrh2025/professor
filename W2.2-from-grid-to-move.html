@@ -212,6 +212,17 @@ body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:no
 .join-msg{margin-top:10px;font-size:14px;line-height:1.45;min-height:1px}
 .join-msg.bad{color:#a4262c;font-weight:600}
 .join-msg.warn{color:#7a5c00}
+
+/* persistent credit banner (2026-08-25) */
+#credit-banner{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;gap:12px;
+  align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 16px;
+  font-size:14px;font-weight:600;line-height:1.35;text-align:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#credit-banner.bad{background:#a4262c;color:#fff}
+#credit-banner.warn{background:#ffd24a;color:#3a2d00}
+#credit-banner .cb-fix{border:0;border-radius:6px;padding:6px 12px;font-weight:700;
+  cursor:pointer;background:rgba(255,255,255,.92);color:#222}
+body.has-credit-banner{padding-top:58px}
 </style>
 </head>
 <body>
@@ -702,21 +713,20 @@ function __joinField(id, fallback){
 }
 async function joinVerify(){
   var btn = document.getElementById('join-btn');
-  var err = document.getElementById('join-err');
   if(!btn || btn.disabled) return;
   var orig = btn.textContent;
-  var msg = function(cls, txt){ if(err){ err.className = 'join-msg ' + cls; err.textContent = txt; } };
   var release = function(){ btn.disabled = false; btn.textContent = orig; };
   var email = __joinField('j-email', (window.state && state.email));
   var name  = __joinField('j-name',  (window.state && state.name));
   var group = __joinField('j-group', (window.state && (state.groupNum || state.group)));
 
+  /* local/unwired copy only — the published file always has a real endpoint */
   if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)){ __joinNext(); return; }
 
-  btn.disabled = true; btn.textContent = 'Checking the roster…';
-  msg('', '');
+  btn.disabled = true; btn.textContent = 'Checking…';
   var ctl = (window.AbortController ? new AbortController() : null);
   var timer = setTimeout(function(){ if(ctl) ctl.abort(); }, JOIN_VERIFY_MS);
+  var code = 'NO_ANSWER';
   try{
     var res = await fetch(CREDIT_ENDPOINT, {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -726,21 +736,50 @@ async function joinVerify(){
         password:PW, group:group })
     });
     clearTimeout(timer);
-    var d = await res.json();
-    if(d && d.code === 'NOT_ENROLLED'){
-      msg('bad', 'That address is not on the class roster. Check it for a typo — it should be your @mail.uc.edu address, the same one Canvas uses. If you added the class recently, tell Professor Hudnall now.');
-      release(); return;                       /* the only hard stop */
-    }
-    release();
-    if(d && d.code === 'JOIN_OK'){ __joinNext(); return; }
-    msg('warn', 'Could not verify your roster spot (' + ((d && d.code) || 'no code') + '). Go ahead and start — but tell Professor Hudnall if your credit is missing.');
-    setTimeout(__joinNext, 1400);
+    var d = await res.json().catch(function(){ return null; });
+    code = (d && d.code) || ('HTTP_' + res.status);
   }catch(e){
-    clearTimeout(timer); release();
-    msg('warn', 'The roster check did not answer. Go ahead and start — but tell Professor Hudnall if your credit is missing.');
-    setTimeout(__joinNext, 1400);
+    clearTimeout(timer); code = 'NO_ANSWER';
+  }
+  release();
+
+  /* EVERY failure is a hard stop. Nobody enters the exercise unverified. */
+  if(code === 'JOIN_OK'){ creditBanner('clear'); __joinNext(); return; }
+
+  if(code === 'NOT_ENROLLED'){
+    creditBanner('bad', 'That email is not on the class roster, so you cannot be given credit. Check it for a typo — it is your @mail.uc.edu address, the one Canvas uses. If it is correct, see Professor Hudnall now.', 'retry');
+  } else if(code === 'BAD_PASSWORD'){
+    creditBanner('bad', 'That is not today\'s class code. Get it from Professor Hudnall and enter it again.', 'pw');
+  } else if(code === 'WINDOW_CLOSED'){
+    creditBanner('bad', 'This exercise is only open during class.', 'retry');
+  } else {
+    creditBanner('warn', 'Could not reach the roster check (' + code + '). Try again. If it keeps failing, Professor Hudnall will tell the class what to do.', 'retry');
   }
 }
+
+/* ── PERSISTENT BANNER ────────────────────────────────────────────────────
+   Lives on <body>, not inside a screen, so it survives every show() call.
+   It is the message on a BLOCKED screen — never a permission to continue. ── */
+function creditBanner(kind, text, action){
+  var el = document.getElementById('credit-banner');
+  if(kind === 'clear'){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    document.body.classList.remove('has-credit-banner');
+    return;
+  }
+  if(!el){ el = document.createElement('div'); el.id = 'credit-banner'; document.body.appendChild(el); }
+  el.className = kind;
+  el.innerHTML = '';
+  var span = document.createElement('span'); span.textContent = text; el.appendChild(span);
+  var toPw = (action === 'pw') && document.getElementById('pw-screen');
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cb-fix';
+  b.textContent = toPw ? 'Re-enter the code' : 'Try again';
+  b.onclick = function(){ if(toPw){ show('pw-screen'); } else { joinVerify(); } };
+  el.appendChild(b);
+  document.body.classList.add('has-credit-banner');
+}
+
 </script>
 </body>
 </html>
