@@ -665,7 +665,12 @@ body {
 </style>
 <style>/* credit-fix 2026-08-21: never claim credit before the server answers */
 body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
-#credit-status{margin:18px auto !important}</style>
+#credit-status{margin:18px auto !important}
+/* roster gate message (added 2026-08-25) */
+.join-msg{margin-top:10px;font-size:14px;line-height:1.45;min-height:1px}
+.join-msg.bad{color:#a4262c;font-weight:600}
+.join-msg.warn{color:#7a5c00}
+</style>
 </head>
 <body>
 
@@ -723,7 +728,8 @@ body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:no
           <option value="3">3</option><option value="4">4</option><option value="5">5</option>
         </select>
       </div>
-      <button class="btn btn-primary btn-full" id="join-btn" onclick="doJoin()" disabled>Get My Cards →</button>
+      <button class="btn btn-primary btn-full" id="join-btn" onclick="joinVerify()" disabled>Get My Cards →</button>
+      <div id="join-err" class="join-msg"></div>
     </div>
   </div>
 </div>
@@ -897,6 +903,26 @@ function creditAnswers(src){
   return Object.entries(src||{}).filter(([k])=>!skip.includes(k))
     .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
     .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
+}
+
+/* ── NAMED PAYLOAD (added 2026-08-25) ─────────────────────────────────────
+   creditAnswers() above returns positional strings and DROPS empty ones, so
+   the same five questions came back as arrays of 3 to 7 elements across the
+   2026-08-24 class. Position is not a stable key. creditFields() sends the
+   same content keyed by NAME, keeping blanks so every student has the same
+   keys. `answers` stays exactly as it was: the Logic App's completeness gate
+   measures its joined length. ── */
+function creditFields(src){
+  var skip = ['email','name','week','session','exerciseId','password','group',
+              'points','answers','fields','timestamp','submittedAt','exercise'];
+  var out = {};
+  Object.keys(src || {}).forEach(function(k){
+    if (skip.indexOf(k) !== -1) return;
+    var v = src[k];
+    if (v === undefined || v === null) return;
+    out[k] = v;
+  });
+  return out;
 }
 async function postForCredit(c){
   if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
@@ -1411,6 +1437,7 @@ function submitMove() {
         email: state.email, name: state.name,
         week: 12, session: 1, exerciseId: 'W12-value-or-rent',
         password: PW, group: String(state.group||''), points: 12,
+        fields: creditFields(payload),
         answers: creditAnswers(payload)
       });
   renderSummary();
@@ -1461,6 +1488,62 @@ document.addEventListener('keydown', e => {
     checkPw();
   }
 });
+
+/* ── ROSTER GATE (added 2026-08-25) ───────────────────────────────────────
+   The Logic App has always verified enrollment server-side via mode:"join".
+   Nothing called it, so on 2026-08-24 ten students typed an address that
+   passed the format check, failed the roster, and silently got no credit.
+
+   Fail-closed ONLY on an explicit NOT_ENROLLED. Timeout, network error,
+   WINDOW_CLOSED and BAD_PASSWORD all let the student through with a warning.
+   Never lock a student out of a class activity because Azure hiccuped. ── */
+var JOIN_VERIFY_MS = 4500;
+function __joinNext(){ doJoin(); }
+function __joinField(id, fallback){
+  var el = document.getElementById(id);
+  return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
+}
+async function joinVerify(){
+  var btn = document.getElementById('join-btn');
+  var err = document.getElementById('join-err');
+  if(!btn || btn.disabled) return;
+  var orig = btn.textContent;
+  var msg = function(cls, txt){ if(err){ err.className = 'join-msg ' + cls; err.textContent = txt; } };
+  var release = function(){ btn.disabled = false; btn.textContent = orig; };
+  var email = __joinField('j-email', (window.state && state.email));
+  var name  = __joinField('j-name',  (window.state && state.name));
+  var group = __joinField('j-group', (window.state && (state.groupNum || state.group)));
+
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)){ __joinNext(); return; }
+
+  btn.disabled = true; btn.textContent = 'Checking the roster…';
+  msg('', '');
+  var ctl = (window.AbortController ? new AbortController() : null);
+  var timer = setTimeout(function(){ if(ctl) ctl.abort(); }, JOIN_VERIFY_MS);
+  try{
+    var res = await fetch(CREDIT_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ mode:'join', email:email, name:name,
+        week:12, session:1, exerciseId:'W12-value-or-rent',
+        password:PW, group:group })
+    });
+    clearTimeout(timer);
+    var d = await res.json();
+    if(d && d.code === 'NOT_ENROLLED'){
+      msg('bad', 'That address is not on the class roster. Check it for a typo — it should be your @mail.uc.edu address, the same one Canvas uses. If you added the class recently, tell Professor Hudnall now.');
+      release(); return;                       /* the only hard stop */
+    }
+    release();
+    if(d && d.code === 'JOIN_OK'){ __joinNext(); return; }
+    msg('warn', 'Could not verify your roster spot (' + ((d && d.code) || 'no code') + '). Go ahead and start — but tell Professor Hudnall if your credit is missing.');
+    setTimeout(__joinNext, 1400);
+  }catch(e){
+    clearTimeout(timer); release();
+    msg('warn', 'The roster check did not answer. Go ahead and start — but tell Professor Hudnall if your credit is missing.');
+    setTimeout(__joinNext, 1400);
+  }
+}
 </script>
 </body>
 </html>

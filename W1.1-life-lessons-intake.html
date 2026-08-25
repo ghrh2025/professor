@@ -323,6 +323,26 @@ function creditAnswers(src){
     .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
     .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
 }
+
+/* ── NAMED PAYLOAD (added 2026-08-25) ─────────────────────────────────────
+   creditAnswers() above returns positional strings and DROPS empty ones, so
+   the same five questions came back as arrays of 3 to 7 elements across the
+   2026-08-24 class. Position is not a stable key. creditFields() sends the
+   same content keyed by NAME, keeping blanks so every student has the same
+   keys. `answers` stays exactly as it was: the Logic App's completeness gate
+   measures its joined length. ── */
+function creditFields(src){
+  var skip = ['email','name','week','session','exerciseId','password','group',
+              'points','answers','fields','timestamp','submittedAt','exercise'];
+  var out = {};
+  Object.keys(src || {}).forEach(function(k){
+    if (skip.indexOf(k) !== -1) return;
+    var v = src[k];
+    if (v === undefined || v === null) return;
+    out[k] = v;
+  });
+  return out;
+}
 async function postForCredit(c){
   if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
   const set=(bg,bd,fg,html)=>{
@@ -579,6 +599,7 @@ function submitAll(){
         email: state.email, name: state.name,
         week: 1, session: 1, exerciseId: 'W01-life-lessons-intake',
         password: PASSWORD, group: '', points: 12,
+        fields: creditFields(payload),
         answers: creditAnswers(payload)
       });
   }
