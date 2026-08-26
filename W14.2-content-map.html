@@ -1349,7 +1349,14 @@ async function joinVerify(){
   release();
 
   /* EVERY failure is a hard stop. Nobody enters the exercise unverified. */
-  if(code === 'JOIN_OK'){ creditBanner('clear'); __joinNext(); return; }
+  if(code === 'JOIN_OK' || code === 'DRY_RUN_OK'){
+    if(code === 'DRY_RUN_OK'){
+      creditBanner('warn', 'DRY RUN — test key active. Every gate is being checked for real, but nothing will be written to Canvas.', 'retry');
+    } else {
+      creditBanner('clear');
+    }
+    __joinNext(); return;
+  }
 
   if(code === 'NOT_ENROLLED'){
     creditBanner('bad', 'That email is not on the class roster, so you cannot be given credit. Check it for a typo — it is your @mail.uc.edu address, the one Canvas uses. If it is correct, see Professor Hudnall now.', 'retry');
