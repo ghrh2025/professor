@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W3.2 — Eleven Days</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Week 3 palette — matched to the 3.2 deck */
+  --ink:      #1A1A1A;
+  --amber:    #F59E0B;   /* EXERCISE role colour on the deck */
+  --amber-d:  #D97706;
+  --amber-l:  #FEF3C7;
+  --maroon:   #881337;   /* DEBRIEF role colour on the deck */
+  --maroon-l: #FCE7F3;
+  --teal:     #14B8A6;
+  --teal-l:   #CCFBF1;
+  --sand:     #D4C5A9;
+  --sand-d:   #B8A88A;
+
+  --bg:      #FAF8F3;
+  --surface: #FFFFFF;
+  --border:  #E6E1D6;
+  --text:    #1A1A1A;
+  --muted:   #64748B;
+  --radius:  10px;
+  --shadow:  0 2px 14px rgba(0,0,0,0.07);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── SCREENS — CRITICAL: ID specificity keeps pw centered without breaking others ── */
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:860px;margin:0 auto;padding:22px 20px 90px}
+
+.week-tag{
+  font-family:'Space Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;color:var(--amber-d);
+}
+.week-tag.mr{color:var(--maroon)}
+.screen-title{font-size:29px;font-weight:900;line-height:1.15;margin-bottom:6px}
+.screen-sub{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:4px;background:transparent;
+  border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-radius:6px;
+  cursor:pointer;margin-bottom:16px;transition:all .15s;
+}
+.back-btn:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* ── PRIMARY BUTTON ── */
+.btn{
+  display:inline-block;width:100%;border:none;border-radius:9px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:.3px;
+  padding:15px 20px;transition:transform .08s, box-shadow .15s, opacity .15s;
+}
+.btn-go{background:var(--amber);color:var(--ink)}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(245,158,11,.45);transform:translateY(-1px)}
+.btn-mr{background:var(--maroon);color:#fff}
+.btn-mr:hover:not(:disabled){box-shadow:0 4px 18px rgba(136,19,55,.4);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── PASSWORD SCREEN ── */
+.pw-box{
+  background:var(--ink);color:#fff;border-radius:16px;
+  border-bottom:6px solid var(--amber);
+  padding:40px 34px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.pw-box h1 .g{color:var(--amber)}
+.pw-box p{font-size:14px;color:#B8B8B4;margin-bottom:22px;line-height:1.5}
+.pw-input{
+  width:100%;background:#1F1F1F;border:2px solid #333;border-radius:10px;
+  color:#fff;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;
+  letter-spacing:3px;text-align:center;text-transform:uppercase;padding:14px;margin-bottom:6px;
+  outline:none;transition:border-color .15s;
+}
+.pw-input:focus{border-color:var(--amber)}
+.pw-input::placeholder{color:#555;letter-spacing:2px}
+.pw-err{color:#FCA5A5;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field select{
+  width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:12px 13px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--amber-d)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ── BRIEF ── */
+.mission{background:#FDFAF3;border:1px solid var(--border);border-left:4px solid var(--amber);
+  border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;margin:14px 0}
+.mission b{color:var(--ink)}
+.stage-rail{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0}
+.rail-cell{background:var(--surface);border:1px solid var(--border);border-top:4px solid var(--sand-d);
+  border-radius:9px;padding:11px 10px;text-align:center}
+.rail-cell .n{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:1px;color:var(--amber-d);margin-bottom:4px}
+.rail-cell .l{font-size:12.5px;font-weight:800;line-height:1.3}
+.rail-cell .d{font-size:11px;color:var(--muted);line-height:1.35;margin-top:4px}
+
+/* ── SORT ── */
+.progress-bar{display:flex;gap:5px;margin-bottom:18px}
+.pip{flex:1;height:6px;border-radius:3px;background:var(--border)}
+.pip.done{background:var(--amber)}
+.pip.now{background:var(--ink)}
+.moment-card{
+  background:var(--surface);border:1px solid var(--border);border-top:5px solid var(--amber);
+  border-radius:12px;padding:26px 24px;box-shadow:var(--shadow);margin-bottom:18px;
+}
+.moment-card .idx{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.moment-card .txt{font-size:18.5px;font-weight:600;line-height:1.55}
+.stage-picks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.pick{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:10px;
+  padding:13px 15px;cursor:pointer;text-align:left;font-family:'Inter',sans-serif;
+  transition:all .12s;
+}
+.pick:hover{border-color:var(--amber-d);background:#FFFDF6}
+.pick.sel{border-color:var(--ink);background:var(--amber-l)}
+.pick .n{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:1px;color:var(--amber-d);display:block;margin-bottom:3px}
+.pick .l{display:block;font-size:14.5px;font-weight:800;color:var(--text);line-height:1.3}
+.pick .d{display:block;font-size:12px;color:var(--muted);line-height:1.4;margin-top:3px}
+.say-it{font-size:13px;color:var(--muted);text-align:center;margin-bottom:14px;line-height:1.5}
+
+/* ── TIMELINE ── */
+.tl-stage{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--sand-d);
+  border-radius:10px;padding:14px 17px;margin-bottom:10px}
+.tl-stage h4{font-size:14.5px;font-weight:900;margin-bottom:2px}
+.tl-stage .sn{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:1.5px;color:var(--amber-d);margin-bottom:5px}
+.tl-stage ul{margin:6px 0 0 17px}
+.tl-stage li{font-size:13.5px;line-height:1.5;margin-bottom:7px}
+.tl-stage .empty{font-size:13px;color:var(--muted);font-style:italic;margin-top:4px}
+.check-box{background:var(--maroon-l);border:1px solid #F3C9D8;border-left:4px solid var(--maroon);
+  border-radius:9px;padding:15px 17px;font-size:14.5px;line-height:1.6;margin:18px 0}
+.check-box b{color:var(--maroon)}
+
+/* ── CALL IT ── */
+.call-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.call-cell{border-radius:12px;padding:16px 17px;color:#fff}
+.cc-won{background:#14655A}
+.cc-lost{background:var(--maroon)}
+.call-cell h4{font-size:14px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
+.call-cell .q{font-size:12.5px;line-height:1.45;opacity:.9;margin-bottom:10px}
+.call-cell select{width:100%;border:none;border-radius:8px;background:rgba(255,255,255,.95);
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--text);padding:11px 12px;outline:none}
+textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;color:var(--text);
+  padding:13px;outline:none;resize:vertical;min-height:96px;transition:border-color .15s;
+}
+textarea:focus{border-color:var(--amber-d)}
+.char-count{font-size:12px;color:var(--muted);margin-top:5px;text-align:right}
+.char-count.ok{color:#16A34A;font-weight:700}
+.prompt-q{background:#FDFAF3;border:1px solid var(--border);border-left:4px solid var(--amber);
+  border-radius:10px;padding:15px 17px;font-size:15.5px;font-weight:700;line-height:1.5;margin-bottom:12px}
+
+/* ── FIX ── */
+.rule-banner{
+  background:var(--ink);color:#fff;border-radius:12px;padding:15px 20px;
+  font-size:15.5px;font-weight:800;letter-spacing:.2px;margin-bottom:18px;text-align:center;
+  border-bottom:4px solid var(--amber);
+}
+.rule-banner span{color:var(--amber)}
+.submit-note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.5}
+
+/* ── SUMMARY ── */
+.confirm-pill{display:inline-block;background:var(--amber-l);color:#7C4A03;border:1px solid var(--amber);
+  font-size:13px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:20px;margin-bottom:16px}
+.student-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.section-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--amber-d);margin:18px 0 8px}
+.section-label.mr{color:var(--maroon)}
+.answer-final{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:14px 17px;font-size:14.5px;line-height:1.6;margin-bottom:6px}
+.call-final{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.cf{border-radius:12px;padding:14px 16px;color:#fff}
+.cf h4{font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;opacity:.85}
+.cf .v{font-size:16px;font-weight:800;line-height:1.3}
+.debrief-box{background:#FDFAF3;border:1px solid var(--border);border-top:4px solid var(--amber);
+  border-radius:12px;padding:20px 22px;margin-top:22px}
+.debrief-box h3{font-size:16px;font-weight:800;margin-bottom:12px}
+.debrief-box ol{margin:0 0 0 20px}
+.debrief-box li{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+
+@media(max-width:680px){
+  .screen-title{font-size:24px}
+  .stage-picks,.call-grid,.call-final{grid-template-columns:1fr}
+  .stage-rail{grid-template-columns:1fr 1fr}
+}
+</style>
+<style>/* credit-fix 2026-08-21: never claim credit before the server answers */
+body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
+#credit-status{margin:18px auto !important}
+/* roster gate message (added 2026-08-25) */
+.join-msg{margin-top:10px;font-size:14px;line-height:1.45;min-height:1px}
+.join-msg.bad{color:#a4262c;font-weight:600}
+.join-msg.warn{color:#7a5c00}
+
+/* persistent credit banner (2026-08-25) */
+#credit-banner{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;gap:12px;
+  align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 16px;
+  font-size:14px;font-weight:600;line-height:1.35;text-align:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#credit-banner.bad{background:#a4262c;color:#fff}
+#credit-banner.warn{background:#ffd24a;color:#3a2d00}
+#credit-banner .cb-fix{border:0;border-radius:6px;padding:6px 12px;font-weight:700;
+  cursor:pointer;background:rgba(255,255,255,.92);color:#222}
+body.has-credit-banner{padding-top:58px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 3.2</div>
+    <h1>Eleven <span class="g">Days</span></h1>
+    <p>Enter today's password to join. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('pw-screen')">← Back</button>
+    <div class="week-tag">Week 3.2 · CarMax · Chapter 6</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">Week 3 meets once, so today is the whole week. Nothing went wrong on that Saturday, and CarMax still lost the sale. You are going to find where.</div>
+    <div class="card">
+      <div class="field">
+        <label for="j-name">Your name</label>
+        <input id="j-name" type="text" placeholder="First and last" autocomplete="off" oninput="onJoin()">
+      </div>
+      <div class="field">
+        <label for="j-email">UC email</label>
+        <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
+        <div class="hint">Use your @mail.uc.edu address, the same one Canvas uses. Credit is matched on it.</div>
+      </div>
+      <div class="field">
+        <label for="j-group">Your group</label>
+        <select id="j-group" onchange="onJoin()">
+          <option value="">Pick your group…</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+        </select>
+      </div>
+      <button class="btn btn-go" id="join-btn" onclick="joinVerify()" disabled>Let's go →</button>
+      <div id="join-err" class="join-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BRIEF ═══════════════════════ -->
+<div id="brief-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Week 3.2 · Eleven Days, Five Steps</div>
+    <div class="screen-title">Every buyer walks the same five steps</div>
+    <div class="screen-sub">Maya Ruiz took eleven days. Some people take eleven minutes. The steps are the same either way, and the sale is almost never won or lost at the one everybody watches.</div>
+
+    <div class="stage-rail">
+      <div class="rail-cell"><div class="n">STEP 1</div><div class="l">Need</div><div class="d">Something breaks the routine</div></div>
+      <div class="rail-cell"><div class="n">STEP 2</div><div class="l">Search</div><div class="d">You go looking</div></div>
+      <div class="rail-cell"><div class="n">STEP 3</div><div class="l">Evaluation</div><div class="d">You decide what matters, then compare</div></div>
+      <div class="rail-cell"><div class="n">STEP 4</div><div class="l">Purchase</div><div class="d">Money changes hands</div></div>
+      <div class="rail-cell"><div class="n">STEP 5</div><div class="l">Postpurchase</div><div class="d">You explain it to yourself</div></div>
+    </div>
+
+    <div class="mission">
+      <b>Two phases.</b> First, nine moments from the case come at you one at a time. Put each one on the step where it belongs. You will not be told whether you are right, and that is on purpose. Second, your group reads its own timeline, decides which step CarMax won and which step lost her, and names one change CarMax could make. <b>You may not cut the price.</b>
+    </div>
+
+    <div class="mission" style="border-left-color:var(--maroon)">
+      <b>Say your answer out loud to your group before you tap.</b> If someone disagrees, argue it. The tap is the end of the argument, not the start of it.
+    </div>
+
+    <button class="btn btn-go" onclick="startSort()">Start phase 1 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SORT ═══════════════════════ -->
+<div id="sort-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="sortBack()">← Back</button>
+    <div class="week-tag">Phase 1 · Place the moments</div>
+    <div class="progress-bar" id="pips"></div>
+
+    <div class="moment-card">
+      <div class="idx" id="m-idx"></div>
+      <div class="txt" id="m-txt"></div>
+    </div>
+
+    <div class="say-it">Which step is this? Say it out loud first.</div>
+
+    <div class="stage-picks" id="picks"></div>
+
+    <button class="btn btn-go" id="sort-btn" onclick="lockMoment()" disabled>Lock it in →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TIMELINE ═══════════════════════ -->
+<div id="timeline-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('sort-screen')">← Back</button>
+    <div class="week-tag">Phase 2 · Your timeline</div>
+    <div class="screen-title">Maya's eleven days, as your group built it</div>
+    <div class="screen-sub">Read it top to bottom. This is your group's version, not the answer. Check it against the case before you go on.</div>
+
+    <div id="tl-out"></div>
+
+    <div class="check-box">
+      <b>Two things to look at.</b> Is any step holding a moment that does not sound like the rest of that step? And look at how full each step is. If one step is nearly empty, ask your group why the case gave it so little.
+    </div>
+
+    <button class="btn btn-mr" onclick="show('call-screen')">We have read it → call it</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CALL IT ═══════════════════════ -->
+<div id="call-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('timeline-screen')">← Back</button>
+    <div class="week-tag mr">Phase 2 · The two calls</div>
+    <div class="screen-title">Where was it won, where was it lost?</div>
+    <div class="screen-sub">Nothing went wrong in the store. So the sale was not lost in the store. Your group has to agree on both calls before anyone types.</div>
+
+    <div class="call-grid">
+      <div class="call-cell cc-won">
+        <h4>Won</h4>
+        <div class="q">Which step did CarMax own?</div>
+        <select id="c-won" onchange="onCall()">
+          <option value="">Pick a step…</option>
+          <option>Step 1 · Need recognition</option>
+          <option>Step 2 · Information search</option>
+          <option>Step 3 · Evaluation of alternatives</option>
+          <option>Step 4 · Purchase</option>
+          <option>Step 5 · Postpurchase</option>
+        </select>
+      </div>
+      <div class="call-cell cc-lost">
+        <h4>Lost</h4>
+        <div class="q">Which step lost her?</div>
+        <select id="c-lost" onchange="onCall()">
+          <option value="">Pick a step…</option>
+          <option>Step 1 · Need recognition</option>
+          <option>Step 2 · Information search</option>
+          <option>Step 3 · Evaluation of alternatives</option>
+          <option>Step 4 · Purchase</option>
+          <option>Step 5 · Postpurchase</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="prompt-q">
+      Two of Maya's five columns were ones only CarMax could fill: the return window and the warranty. She could put a dollar figure on both. She still bought the car without them. Why didn't those two columns win?
+    </div>
+    <textarea id="c-why" placeholder="Do not stop at &quot;she wanted it cheaper.&quot; The gap was $700 on a $21,000 car. Say what actually beat the warranty." oninput="onCall()"></textarea>
+    <div class="char-count" id="why-count">0 / 90 minimum</div>
+
+    <button class="btn btn-mr" id="call-btn" onclick="show('fix-screen')" disabled style="margin-top:16px">Locked → name the fix</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ THE FIX ═══════════════════════ -->
+<div id="fix-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('call-screen')">← Back</button>
+    <div class="week-tag">Phase 2 · The change</div>
+    <div class="screen-title">One thing CarMax could do differently</div>
+
+    <div class="rule-banner">You may <span>not</span> cut the price.</div>
+
+    <div class="screen-sub">Every group's first instinct is to drop $700 and win. That is not a marketing decision, it is a surrender. Name a change that works at a step instead, then tell us which step it lands in.</div>
+
+    <div class="card">
+      <div class="field">
+        <label for="f-change">The change CarMax makes</label>
+        <textarea id="f-change" placeholder="Be specific enough that someone at that store could actually do it on Monday." oninput="onFix()"></textarea>
+        <div class="char-count" id="fix-count">0 / 70 minimum</div>
+      </div>
+      <div class="field">
+        <label for="f-stage">Which step does it land in?</label>
+        <select id="f-stage" onchange="onFix()">
+          <option value="">Pick a step…</option>
+          <option>Step 1 · Need recognition</option>
+          <option>Step 2 · Information search</option>
+          <option>Step 3 · Evaluation of alternatives</option>
+          <option>Step 4 · Purchase</option>
+          <option>Step 5 · Postpurchase</option>
+        </select>
+        <div class="hint">If your change lands in the same step you said CarMax already won, look again.</div>
+      </div>
+      <button class="btn btn-go" id="submit-btn" onclick="submitAll()" disabled>Submit for credit →</button>
+      <div class="submit-note">One submission per student. Your placements, both calls, and both written answers go in together.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="summary-screen" class="screen">
+  <div class="page-wrap">
+    <div class="week-tag">Week 3.2 — Summary</div>
+    <div class="screen-title">Eleven days, placed and called</div>
+    <div class="confirm-pill">✓ Participation recorded — you're all set</div>
+    <div id="student-tag" class="student-tag"></div>
+
+    <p class="section-label mr">Your two calls</p>
+    <div class="call-final">
+      <div class="cf cc-won"><h4>Won</h4><div class="v" id="sum-won"></div></div>
+      <div class="cf cc-lost"><h4>Lost</h4><div class="v" id="sum-lost"></div></div>
+    </div>
+
+    <p class="section-label mr">Why the two columns didn't win</p>
+    <div class="answer-final" id="sum-why"></div>
+
+    <p class="section-label">The change, and where it lands</p>
+    <div class="answer-final" id="sum-fix"></div>
+
+    <p class="section-label">Your timeline</p>
+    <div id="sum-tl"></div>
+
+    <div class="debrief-box">
+      <h3>Bring to the debrief</h3>
+      <ol>
+        <li>Which moment did your group argue about most, and which step did it end up on?</li>
+        <li>CarMax won the search. Find the sentence in the case where winning the search stopped mattering.</li>
+        <li>She could put $2,400 on what a warranty is worth and still bought without one. What beat that column?</li>
+        <li>Two months earlier she bought a phone without comparing anything. Same person, same five steps. What changed?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
+<script>
+/* ── UC email gate — one definition, used by every join validator.
+   Credit depends on this matching the Canvas roster. Case-insensitive on
+   purpose: phones autocapitalize. ── */
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
+/* The class code is NOT stored here. This file ships to a PUBLIC repo.
+   The student types it; the Logic App checks it against Key Vault. */
+var PW = '';
+
+/* ── PARTICIPATION CREDIT ─────────────────────────────────────────────────
+   On submit, the student's completion is POSTed as JSON to an HTTP-triggered
+   flow that records credit in Canvas. CREDIT_ENDPOINT is the only wiring
+   line; the payload posts to the Logic App exactly as-is. */
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── DRY-RUN PASSTHROUGH (2026-08-25) ─────────────────────────────────────
+   ?testKey=... on the URL turns this page into a dry run: the workflow skips
+   the class-window gate and answers on the join branch, so no grade is ever
+   written. Absent the parameter this is '' — which matches no secret — and the
+   page behaves exactly as it does for a student. The key itself never lives in
+   this file; it is typed into the address bar. ── */
+var TEST_KEY = (function(){
+  try { return new URLSearchParams(location.search).get('testKey') || ''; }
+  catch(e){ return ''; }
+})();
+
+/* ── participation credit (Logic App contract) ───────────────────────── */
+function creditAnswers(src){
+  const skip=['email','name','week','session','exerciseId','password','group','points','answers','timestamp','submittedAt','exercise'];
+  return Object.entries(src||{}).filter(([k])=>!skip.includes(k))
+    .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
+    .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
+}
+
+/* ── NAMED PAYLOAD (added 2026-08-25) ─────────────────────────────────────
+   creditAnswers() returns positional strings and DROPS empty ones, so the
+   same questions came back as different-length arrays across a class.
+   Position is not a stable key. creditFields() sends the same content keyed
+   by NAME, keeping blanks so every student has the same keys. `answers`
+   stays as it was: the Logic App's completeness gate measures its joined
+   length. ── */
+function creditFields(src){
+  var skip = ['email','name','week','session','exerciseId','password','group',
+              'points','answers','fields','timestamp','submittedAt','exercise'];
+  var out = {};
+  Object.keys(src || {}).forEach(function(k){
+    if (skip.indexOf(k) !== -1) return;
+    var v = src[k];
+    if (v === undefined || v === null) return;
+    out[k] = v;
+  });
+  return out;
+}
+async function postForCredit(c){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  if(TEST_KEY) c.testKey = TEST_KEY;
+  const set=(bg,bd,fg,html)=>{
+    let el=document.getElementById('credit-status');
+    if(!el){el=document.createElement('div');el.id='credit-status';}
+    var _anchor=document.querySelector('.confirm-pill,.credit-claim');
+    var _host=(_anchor&&_anchor.parentElement)||document.getElementById('summary-screen')
+      ||document.getElementById('sum-screen')||document.querySelector('.screen.active')||document.body;
+    if(el.parentElement!==_host){
+      if(_anchor&&_anchor.parentElement===_host) _host.insertBefore(el,_anchor.nextSibling);
+      else _host.appendChild(el);
+    }
+    el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML=html;
+  };
+  document.body.classList.add('awaiting-credit');
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
+    const d=await res.json();
+    if(d.code==='DRY_RUN_OK'){
+      document.body.classList.remove('awaiting-credit');
+      set('#eef4ff','#c3d4f7','#1e3a8a','<strong>Dry run.</strong> Every gate passed and the roster matched — '+
+        'nothing was written to Canvas. Remove ?testKey from the URL to run for real.');
+    } else if(d.accepted){
+      document.body.classList.remove('awaiting-credit');
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
+/* ── THE NINE MOMENTS ─────────────────────────────────────────────────────
+   Verbatim from the CarMax case. NO stage key ships with them — this file is
+   public and a student reading the source learns only how the page works.
+   The order is fixed so that no two consecutive moments share a step; a group
+   that pattern-matches on position instead of reading will get it wrong. ── */
+var MOMENTS = [
+  "The transmission goes on the Norwood Lateral. The shop quotes $2,400 to rebuild a car that is not worth $2,400.",
+  "Her coworker Tasha Reed tells her the price is the price at CarMax, and nobody can talk you into anything.",
+  "By the second weekend it is a real spreadsheet, five columns wide: price, model year, mileage, return window, warranty.",
+  "Asked later why she did not buy the first one, she says, “I don’t know, I just liked this one better.” A minute later she adds, “And it was cheaper.”",
+  "Rick Vance opens by asking what she was hoping to pay a month. She tells him the number in her head, and he beats it.",
+  "Her commute from Norwood to a job in Blue Ash does not exist without a car. The question was never whether to buy one.",
+  "Eleven days. Five websites, about forty listings, a YouTube review watched twice, and one long phone call with her cousin Danny.",
+  "Whether she would feel stupid if something went wrong in the first month never became a column on the sheet.",
+  "Ninety minutes in a finance office on a Thursday, and she drives it home that evening."
+];
+
+var STAGES = [
+  { n:'STEP 1', l:'Need recognition',           d:'Something breaks the routine' },
+  { n:'STEP 2', l:'Information search',         d:'You go looking' },
+  { n:'STEP 3', l:'Evaluation of alternatives', d:'You decide what matters, then compare' },
+  { n:'STEP 4', l:'Purchase',                   d:'Money changes hands' },
+  { n:'STEP 5', l:'Postpurchase',               d:'You explain it to yourself' }
+];
+
+/* ── STATE ── */
+let state = {
+  name:'', email:'', groupNum:'',
+  idx:0, pick:null,
+  placements: new Array(9).fill(null),   /* index into STAGES */
+  won:'', lost:'', why:'',
+  change:'', changeStage:''
+};
+
+/* ── UTILS ── */
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+function counter(el, id, min){
+  const c = document.getElementById(id);
+  c.textContent = `${el.length} / ${min} minimum`;
+  c.classList.toggle('ok', el.length >= min);
+  return el.length >= min;
+}
+
+/* ── PASSWORD ── */
+function checkPw(){
+  var val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val.length >= 4){
+    PW = val;                       /* verified server-side at the join step */
+    document.getElementById('pw-err').textContent = '';
+    show('join-screen');
+  } else {
+    var box = document.querySelector('.pw-box');
+    if(box){ box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
+    document.getElementById('pw-err').textContent = "Enter today's class code.";
+  }
+}
+
+/* ── JOIN ── */
+function onJoin(){
+  const name  = document.getElementById('j-name').value.trim();
+  const email = document.getElementById('j-email').value.trim().toLowerCase();
+  const group = document.getElementById('j-group').value;
+  const emailOk = ucEmailOk(email);
+  state.name = name; state.email = email; state.groupNum = group;
+  document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk && group);
+}
+
+/* ── PHASE 1: THE SORT ── */
+function startSort(){ state.idx = 0; renderMoment(); show('sort-screen'); }
+
+function renderMoment(){
+  var i = state.idx;
+  state.pick = state.placements[i];
+
+  var pips = document.getElementById('pips');
+  pips.innerHTML = '';
+  for(var p=0; p<MOMENTS.length; p++){
+    var d = document.createElement('div');
+    d.className = 'pip' + (p < i ? ' done' : (p === i ? ' now' : ''));
+    pips.appendChild(d);
+  }
+
+  document.getElementById('m-idx').textContent = 'Moment ' + (i+1) + ' of ' + MOMENTS.length;
+  document.getElementById('m-txt').textContent = MOMENTS[i];
+
+  var box = document.getElementById('picks');
+  box.innerHTML = '';
+  STAGES.forEach(function(s, si){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pick' + (state.pick === si ? ' sel' : '');
+    b.onclick = (function(k){ return function(){ pickStage(k); }; })(si);
+    b.innerHTML = '<span class="n"></span><span class="l"></span><span class="d"></span>';
+    b.querySelector('.n').textContent = s.n;
+    b.querySelector('.l').textContent = s.l;
+    b.querySelector('.d').textContent = s.d;
+    box.appendChild(b);
+  });
+
+  document.getElementById('sort-btn').disabled = (state.pick === null);
+  document.getElementById('sort-btn').textContent =
+    (i === MOMENTS.length - 1) ? 'Lock it in → see your timeline' : 'Lock it in →';
+}
+
+function pickStage(si){
+  state.pick = si;
+  var kids = document.getElementById('picks').children;
+  for(var k=0; k<kids.length; k++){ kids[k].classList.toggle('sel', k === si); }
+  document.getElementById('sort-btn').disabled = false;
+}
+
+function lockMoment(){
+  if(state.pick === null) return;
+  state.placements[state.idx] = state.pick;
+  if(state.idx < MOMENTS.length - 1){
+    state.idx++;
+    renderMoment();
+    window.scrollTo(0,0);
+  } else {
+    renderTimeline('tl-out');
+    show('timeline-screen');
+  }
+}
+
+function sortBack(){
+  if(state.idx > 0){ state.idx--; renderMoment(); }
+  else { show('brief-screen'); }
+}
+
+/* ── THE TIMELINE (the student's own placements, never a corrected one) ── */
+function renderTimeline(targetId){
+  var host = document.getElementById(targetId);
+  host.innerHTML = '';
+  STAGES.forEach(function(s, si){
+    var wrap = document.createElement('div');
+    wrap.className = 'tl-stage';
+    var sn = document.createElement('div'); sn.className = 'sn'; sn.textContent = s.n;
+    var h  = document.createElement('h4');  h.textContent = s.l;
+    wrap.appendChild(sn); wrap.appendChild(h);
+
+    var mine = [];
+    state.placements.forEach(function(p, mi){ if(p === si) mine.push(MOMENTS[mi]); });
+
+    if(mine.length){
+      var ul = document.createElement('ul');
+      mine.forEach(function(t){ var li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+      wrap.appendChild(ul);
+    } else {
+      var e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = 'Your group put nothing here.';
+      wrap.appendChild(e);
+    }
+    host.appendChild(wrap);
+  });
+}
+
+/* ── PHASE 2: THE CALLS ── */
+function onCall(){
+  state.won  = document.getElementById('c-won').value;
+  state.lost = document.getElementById('c-lost').value;
+  state.why  = document.getElementById('c-why').value.trim();
+  var whyOk = counter(state.why, 'why-count', 90);
+  document.getElementById('call-btn').disabled = !(state.won && state.lost && whyOk);
+}
+
+/* ── PHASE 2: THE FIX ── */
+function onFix(){
+  state.change      = document.getElementById('f-change').value.trim();
+  state.changeStage = document.getElementById('f-stage').value;
+  var changeOk = counter(state.change, 'fix-count', 70);
+  document.getElementById('submit-btn').disabled = !(changeOk && state.changeStage);
+}
+
+/* ── SUBMIT ── */
+function submitAll(){
+  document.getElementById('submit-btn').disabled = true;   // no double submits
+
+  var placed = state.placements.map(function(p, i){
+    return (p === null ? 'unplaced' : STAGES[p].n) + ' — ' + MOMENTS[i];
+  });
+
+  const payload = {
+    exercise: 'W3.2-eleven-days',
+    week: '3.2',
+    submittedAt: new Date().toISOString(),
+    name: state.name, email: state.email, group: state.groupNum,
+    placements: placed,
+    stageWon: state.won,
+    stageLost: state.lost,
+    whyColumnsLost: state.why,
+    changeCarMaxMakes: state.change,
+    changeLandsInStage: state.changeStage
+  };
+  if(CREDIT_ENDPOINT.startsWith('https://')){
+    postForCredit({
+        email: state.email, name: state.name,
+        week: 3, session: 2, exerciseId: 'W03b-eleven-days',
+        password: PW, group: String(state.groupNum||''), points: 12,
+        fields: creditFields(payload),
+        answers: creditAnswers(payload)
+      });
+  }
+
+  document.getElementById('sum-won').textContent  = state.won;
+  document.getElementById('sum-lost').textContent = state.lost;
+  document.getElementById('sum-why').textContent  = state.why;
+  document.getElementById('sum-fix').textContent  = state.change + '  →  ' + state.changeStage;
+  renderTimeline('sum-tl');
+  document.getElementById('student-tag').textContent =
+    `${state.name} · Group ${state.groupNum} · ${state.email}`;
+  show('summary-screen');
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FIREBASE (dormant) — future persistent group data
+   const firebaseConfig = { apiKey:"...", authDomain:"...", projectId:"..." };
+   firebase.initializeApp(firebaseConfig);
+   const db = firebase.firestore();
+   db.collection('w3_2_submissions').add(payload);
+──────────────────────────────────────────────────────────────────────────── */
+
+/* ── ROSTER GATE (added 2026-08-25) ───────────────────────────────────────
+   The Logic App verifies enrollment server-side via mode:"join".
+   Fail-closed ONLY on an explicit NOT_ENROLLED. Timeout, network error,
+   WINDOW_CLOSED and BAD_PASSWORD all stop the student with a banner rather
+   than silently handing out no credit. ── */
+var JOIN_VERIFY_MS = 4500;
+function __joinNext(){ show('brief-screen'); }
+function __joinField(id, fallback){
+  var el = document.getElementById(id);
+  return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
+}
+async function joinVerify(){
+  var btn = document.getElementById('join-btn');
+  if(!btn || btn.disabled) return;
+  var orig = btn.textContent;
+  var release = function(){ btn.disabled = false; btn.textContent = orig; };
+  var email = __joinField('j-email', (window.state && state.email));
+  var name  = __joinField('j-name',  (window.state && state.name));
+  var group = __joinField('j-group', (window.state && (state.groupNum || state.group)));
+
+  /* local/unwired copy only — the published file always has a real endpoint */
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)){ __joinNext(); return; }
+
+  btn.disabled = true; btn.textContent = 'Checking…';
+  var ctl = (window.AbortController ? new AbortController() : null);
+  var timer = setTimeout(function(){ if(ctl) ctl.abort(); }, JOIN_VERIFY_MS);
+  var code = 'NO_ANSWER';
+  try{
+    var res = await fetch(CREDIT_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ mode:'join', email:email, name:name, testKey:TEST_KEY,
+        week:3, session:2, exerciseId:'W03b-eleven-days',
+        password:PW, group:group })
+    });
+    clearTimeout(timer);
+    var d = await res.json().catch(function(){ return null; });
+    code = (d && d.code) || ('HTTP_' + res.status);
+  }catch(e){
+    clearTimeout(timer); code = 'NO_ANSWER';
+  }
+  release();
+
+  /* EVERY failure is a hard stop. Nobody enters the exercise unverified. */
+  if(code === 'JOIN_OK' || code === 'DRY_RUN_OK'){
+    if(code === 'DRY_RUN_OK'){
+      creditBanner('warn', 'DRY RUN — test key active. Every gate is being checked for real, but nothing will be written to Canvas.', 'retry');
+    } else {
+      creditBanner('clear');
+    }
+    __joinNext(); return;
+  }
+
+  if(code === 'NOT_ENROLLED'){
+    creditBanner('bad', 'That email is not on the class roster, so you cannot be given credit. Check it for a typo — it is your @mail.uc.edu address, the one Canvas uses. If it is correct, see Professor Hudnall now.', 'retry');
+  } else if(code === 'BAD_PASSWORD'){
+    creditBanner('bad', 'That is not today\'s class code. Get it from Professor Hudnall and enter it again.', 'pw');
+  } else if(code === 'WINDOW_CLOSED'){
+    creditBanner('bad', 'This exercise is only open during class.', 'retry');
+  } else {
+    creditBanner('warn', 'Could not reach the roster check (' + code + '). Try again. If it keeps failing, Professor Hudnall will tell the class what to do.', 'retry');
+  }
+}
+
+/* ── PERSISTENT BANNER ────────────────────────────────────────────────────
+   Lives on <body>, not inside a screen, so it survives every show() call.
+   It is the message on a BLOCKED screen — never a permission to continue. ── */
+function creditBanner(kind, text, action){
+  var el = document.getElementById('credit-banner');
+  if(kind === 'clear'){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    document.body.classList.remove('has-credit-banner');
+    return;
+  }
+  if(!el){ el = document.createElement('div'); el.id = 'credit-banner'; document.body.appendChild(el); }
+  el.className = kind;
+  el.innerHTML = '';
+  var span = document.createElement('span'); span.textContent = text; el.appendChild(span);
+  var toPw = (action === 'pw') && document.getElementById('pw-screen');
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cb-fix';
+  b.textContent = toPw ? 'Re-enter the code' : 'Try again';
+  b.onclick = function(){ if(toPw){ show('pw-screen'); } else { joinVerify(); } };
+  el.appendChild(b);
+  document.body.classList.add('has-credit-banner');
+}
+
+</script>
+</body>
+</html>
