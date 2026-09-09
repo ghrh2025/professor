@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a Car Really Costs — Field Card</title>
+<style>
+  :root{
+    --ink:#1f2328; --muted:#5b6570; --line:#d9dee3;
+    --bg:#fafaf9; --card:#ffffff;
+    --teal:#12a79d; --tealbg:#e6f7f5;
+    --orange:#e8730c; --orangebg:#fdf0e2;
+    --red:#c0392b; --redbg:#fbeae8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:880px;margin:0 auto;padding:28px 20px 60px}
+  header{border-left:6px solid var(--teal);padding:2px 0 2px 16px;margin-bottom:6px}
+  h1{font-size:30px;line-height:1.15;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:15px;margin:0}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);font-weight:700;margin:0 0 6px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:18px 0}
+  h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:0 0 4px}
+  h3{font-size:20px;margin:0 0 10px;line-height:1.25}
+  p{margin:0 0 10px}
+  .note{color:var(--muted);font-size:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
+  input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:16px;
+        font-family:inherit;background:#fff;color:var(--ink)}
+  input:focus{outline:2px solid var(--teal);outline-offset:-1px;border-color:var(--teal)}
+  .row{display:grid;grid-template-columns:1fr 120px;gap:10px;align-items:center;margin-bottom:8px}
+  .out{background:var(--tealbg);border:1px solid var(--teal);border-radius:8px;padding:14px 16px;margin-top:12px}
+  .big{font-size:34px;font-weight:800;line-height:1.1;color:var(--teal)}
+  .big.warn{color:var(--orange)}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:15px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.hi td{background:var(--orangebg);font-weight:700}
+  ul{margin:0;padding-left:20px} li{margin-bottom:7px}
+  .say{background:var(--tealbg);border-left:4px solid var(--teal);padding:10px 14px;margin:0 0 10px;border-radius:0 6px 6px 0}
+  .say b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:2px}
+  .stop{background:var(--redbg);border-left:4px solid var(--red);padding:12px 14px;border-radius:0 6px 6px 0}
+  .stop h3{color:var(--red)}
+  .foot{color:var(--muted);font-size:13px;text-align:center;margin-top:26px;padding-top:14px;border-top:1px solid var(--line)}
+  a{color:var(--teal)}
+  @media print{
+    body{background:#fff} .wrap{max-width:none;padding:0}
+    section{break-inside:avoid;box-shadow:none} .noprint{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="kicker">MKTG 2080 &nbsp;·&nbsp; Life Skill &nbsp;·&nbsp; Week 3</p>
+  <h1>What a Car Really Costs</h1>
+  <p class="sub">Keep this. You will use it before you use anything else from this course.</p>
+</header>
+
+<section>
+  <h2>The Point</h2>
+  <h3>The payment was never the price.</h3>
+  <p>A dealership will happily talk to you about one number for two hours: the monthly payment. It is the number they can move without giving anything up. They lengthen the loan, the payment drops, and you pay thousands more.</p>
+  <p class="note">Everything on this card exists to keep you looking at the other numbers.</p>
+</section>
+
+<section>
+  <h2>Step 1</h2>
+  <h3>Build the real monthly number</h3>
+  <p>Five costs, not one. Fill in what you expect. The insurance line is the one that surprises people under 25, and it is the only one you can find out for free in four minutes.</p>
+  <div class="row"><label for="c1" style="margin:0">Loan payment</label><input id="c1" type="number" value="300" min="0" step="10"></div>
+  <div class="row"><label for="c2" style="margin:0">Insurance</label><input id="c2" type="number" value="180" min="0" step="10"></div>
+  <div class="row"><label for="c3" style="margin:0">Gas</label><input id="c3" type="number" value="120" min="0" step="10"></div>
+  <div class="row"><label for="c4" style="margin:0">Maintenance (oil, tires, wipers)</label><input id="c4" type="number" value="55" min="0" step="5"></div>
+  <div class="row"><label for="c5" style="margin:0">The repair you have not had yet</label><input id="c5" type="number" value="70" min="0" step="5"></div>
+  <div class="out">
+    <div class="note">What the car actually costs you every month</div>
+    <div class="big" id="stackTotal">$725</div>
+    <div class="note" id="stackNote"></div>
+  </div>
+  <p class="note" style="margin-top:10px">That last line is not optional. Something breaks. Budgeting zero for it is how a $300 car becomes a crisis.</p>
+</section>
+
+<section>
+  <h2>Step 2</h2>
+  <h3>Price the insurance before you fall in love with the car</h3>
+  <p>Insurance is priced on the car, not just on you. A coupe and a sedan of the same value can be hundreds apart a year. Get the quote while you can still change your mind.</p>
+  <p><b>Go straight to the carriers.</b> <a href="https://www.geico.com">geico.com</a> and <a href="https://www.progressive.com">progressive.com</a> both quote in a few minutes with a VIN or just a year, make and model.</p>
+  <p class="note"><b>Skip the comparison sites.</b> They are lead-generation businesses. The quote is the bait and your phone number is the product. You will be called for weeks. That is not a scam, it is a business model, and noticing it is the marketing lesson in this card.</p>
+</section>
+
+<section>
+  <h2>Step 3</h2>
+  <h3>See what the loan length actually costs</h3>
+  <p>Same car, same rate. Only the number of months changes.</p>
+  <div class="grid">
+    <div><label for="amt">Amount financed</label><input id="amt" type="number" value="18000" min="500" step="500"></div>
+    <div><label for="apr">APR %</label><input id="apr" type="number" value="9.5" min="0" step="0.1"></div>
+  </div>
+  <table>
+    <thead><tr><th>Term</th><th class="num">Monthly</th><th class="num">Total paid</th><th class="num">Interest</th></tr></thead>
+    <tbody id="loanRows"></tbody>
+  </table>
+  <p class="note" style="margin-top:10px">The longest term always has the friendliest monthly payment and the ugliest total. It also keeps you <b>upside down</b> — owing more than the car is worth — for years, which means you cannot sell it or trade it without writing a check.</p>
+</section>
+
+<section>
+  <h2>Step 4</h2>
+  <h3>The four numbers that decide everything</h3>
+  <ul>
+    <li><b>Out-the-door price.</b> The single number including tax, title, doc fee, everything. Not the sticker. Not the monthly.</li>
+    <li><b>APR.</b> Get pre-approved at a credit union first so you have a rate to beat. Dealer financing is a product they sell at a markup.</li>
+    <li><b>Term in months.</b> Shortest payment you can genuinely afford. 48 or 60, not 84.</li>
+    <li><b>Total of payments.</b> Monthly times term. This is the real price of the car. Say it out loud before you sign.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Step 5</h2>
+  <h3>What to say</h3>
+  <div class="say"><b>When they ask your monthly budget</b>I'd rather not start there. What's the out-the-door price on this car?</div>
+  <div class="say"><b>When the number keeps moving</b>Can you email me the buyer's order with everything itemized? I'll look at it tonight.</div>
+  <div class="say"><b>When there's a fee you don't recognize</b>What is that line, and is it optional?</div>
+  <div class="say"><b>When they need an answer today</b>Then it's a no today. I'm fine either way.</div>
+  <p class="note">You are allowed to leave. Nothing in a dealership expires. The person who can walk out gets the better price, every time, and everyone in the building knows it.</p>
+</section>
+
+<section class="stop">
+  <h3>Walk away when</h3>
+  <ul>
+    <li>They will only discuss monthly payment and will not put an out-the-door price in writing.</li>
+    <li>The price changes once you are in the finance office.</li>
+    <li>You are told the deal is only good today.</li>
+    <li>A used car has no inspection allowed and no history report offered.</li>
+    <li>You feel rushed. That feeling is a product too.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>One more thing</h2>
+  <h3>New cars lose the most money in the quietest way</h3>
+  <p>Depreciation is usually the single largest cost of owning a new car, and it never arrives as a bill you pay. A two or three year old car has already taken that hit for you, which is most of the argument for buying used.</p>
+</section>
+
+<p class="foot">MKTG 2080 &nbsp;·&nbsp; Professor Hudnall &nbsp;·&nbsp; Fall 2026<br>
+This card is educational, not financial advice. Numbers are illustrative. Get your own quote.</p>
+
+</div>
+<script>
+(function(){
+  var money = function(n){ return "$" + Math.round(n).toLocaleString("en-US"); };
+
+  var stackIds = ["c1","c2","c3","c4","c5"];
+  function stack(){
+    var t = 0;
+    stackIds.forEach(function(id){
+      var v = parseFloat(document.getElementById(id).value);
+      if (!isNaN(v) && v > 0) t += v;
+    });
+    document.getElementById("stackTotal").textContent = money(t) + " / month";
+    var pay = parseFloat(document.getElementById("c1").value) || 0;
+    var el = document.getElementById("stackNote");
+    el.textContent = pay > 0
+      ? "You budgeted " + money(pay) + " and the car costs " + money(t) + ". That gap is " + money(t - pay) + " a month, or " + money((t - pay) * 12) + " a year."
+      : "";
+  }
+  stackIds.forEach(function(id){
+    document.getElementById(id).addEventListener("input", stack);
+  });
+
+  function payment(P, apr, n){
+    var r = apr / 100 / 12;
+    if (r === 0) return P / n;
+    return P * r / (1 - Math.pow(1 + r, -n));
+  }
+  function loans(){
+    var P = parseFloat(document.getElementById("amt").value);
+    var apr = parseFloat(document.getElementById("apr").value);
+    var body = document.getElementById("loanRows");
+    body.innerHTML = "";
+    if (isNaN(P) || P <= 0 || isNaN(apr) || apr < 0) return;
+    [48, 60, 72, 84].forEach(function(n){
+      var m = payment(P, apr, n), tot = m * n;
+      var tr = document.createElement("tr");
+      if (n === 84) tr.className = "hi";
+      tr.innerHTML = "<td>" + n + " months</td>" +
+                     "<td class='num'>" + money(m) + "</td>" +
+                     "<td class='num'>" + money(tot) + "</td>" +
+                     "<td class='num'>" + money(tot - P) + "</td>";
+      body.appendChild(tr);
+    });
+  }
+  ["amt","apr"].forEach(function(id){
+    document.getElementById(id).addEventListener("input", loans);
+  });
+
+  stack(); loans();
+})();
+</script>
+</body>
+</html>
