@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W4.2 — Who Owns the Risk?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Week 4.2 palette */
+  --cm-blue:   #4A3578;
+  --cm-ink:    #241A3D;
+  --cm-gold:   #C7A8F0;
+  --cm-gold-d: #6B4DAB;
+
+  --bg:      #F3F5F8;
+  --surface: #FFFFFF;
+  --border:  #DFE4EC;
+  --text:    #1A1A1A;
+  --muted:   #6B7280;
+  --radius:  10px;
+  --shadow:  0 2px 14px rgba(0,0,0,0.08);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── SCREENS — ID specificity keeps pw centered without breaking others ── */
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:820px;margin:0 auto;padding:22px 20px 90px}
+
+.week-tag{
+  font-family:'Space Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;color:var(--cm-gold-d);
+}
+.screen-title{font-size:29px;font-weight:900;line-height:1.15;margin-bottom:6px}
+.screen-sub{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:4px;background:transparent;
+  border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-radius:6px;
+  cursor:pointer;margin-bottom:16px;transition:all .15s;
+}
+.back-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* ── PRIMARY BUTTON ── */
+.btn{
+  display:inline-block;width:100%;border:none;border-radius:9px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:.3px;
+  padding:15px 20px;transition:transform .08s, box-shadow .15s, opacity .15s;
+}
+.btn-go{background:var(--cm-gold);color:var(--cm-ink)}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(255,194,32,.5);transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--cm-blue);font-size:14px;padding:12px 18px}
+.btn-ghost:hover{border-color:var(--cm-blue)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── PASSWORD SCREEN ── */
+.pw-box{
+  background:var(--cm-blue);color:#fff;border-radius:16px;
+  border-bottom:6px solid var(--cm-gold);
+  padding:40px 34px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:var(--cm-gold);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.pw-box h1 .g{color:var(--cm-gold)}
+.pw-box p{font-size:14px;color:#B9C4D4;margin-bottom:22px;line-height:1.5}
+.pw-input{
+  width:100%;background:#0E2244;border:2px solid #2A4A78;border-radius:10px;
+  color:#fff;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;
+  letter-spacing:3px;text-align:center;text-transform:uppercase;padding:14px;margin-bottom:6px;
+  outline:none;transition:border-color .15s;
+}
+.pw-input:focus{border-color:var(--cm-gold)}
+.pw-input::placeholder{color:#4A6B94;letter-spacing:2px}
+.pw-err{color:#FCA5A5;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field select{
+  width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:12px 13px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--cm-blue)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ── STAGE LADDER (brief) ── */
+.ladder{background:var(--cm-blue);color:#fff;border-radius:12px;padding:18px 20px;
+  border-left:5px solid var(--cm-gold);margin-bottom:8px}
+.ladder .row{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.ladder .row:last-child{border-bottom:none}
+.ladder .n{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--cm-gold);min-width:22px}
+.ladder .nm{font-size:15.5px;font-weight:800}
+.ladder .pl{font-size:13px;color:#B9C4D4;margin-top:2px}
+
+.mission{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;margin:14px 0}
+.mission b{color:var(--cm-blue)}
+
+/* ── SORT ── */
+.sort-progress{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.moment-card{
+  background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:24px 24px;box-shadow:var(--shadow);margin-bottom:18px;
+  font-size:18px;line-height:1.55;font-weight:500;min-height:120px;display:flex;align-items:center;
+}
+.stage-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.stage-btn{
+  display:block;width:100%;text-align:left;background:var(--cm-blue);color:#fff;
+  border:none;border-radius:10px;padding:13px 16px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:transform .1s, box-shadow .15s;
+}
+.stage-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(20,49,92,.3)}
+.stage-btn .q{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--cm-gold)}
+.stage-btn .n{font-size:16px;font-weight:900;margin-top:2px}
+.stage-btn .ax{font-size:12px;opacity:.8;margin-top:2px}
+
+/* ── REVIEW TIMELINE ── */
+.tl-stage{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;margin-bottom:10px}
+.tl-head{display:flex;align-items:baseline;gap:9px;margin-bottom:6px}
+.tl-num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:1px;color:var(--cm-gold-d);text-transform:uppercase}
+.tl-name{font-size:16px;font-weight:800}
+.tl-stage ul{margin:0;padding:0;list-style:none}
+.tl-stage li{font-size:14px;line-height:1.5;padding:7px 0 7px 26px;position:relative;
+  border-top:1px solid var(--border)}
+.tl-stage li:first-child{border-top:none}
+.tl-stage li .mark{position:absolute;left:0;top:7px;font-weight:800}
+.tl-stage li.hit .mark{color:#1B7F4B}
+.tl-stage li.miss .mark{color:#B4232A}
+.tl-stage li .why{display:block;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+.tl-empty{font-size:13px;color:var(--muted);font-style:italic;padding:4px 0}
+.score-pill{display:inline-block;background:#EAF2FF;color:var(--cm-blue);border:1px solid #BFD4F2;
+  font-size:13px;font-weight:800;padding:8px 16px;border-radius:20px;margin-bottom:14px}
+
+/* ── GATE ── */
+.gate-q{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:18px 20px;font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px}
+.pull{background:var(--cm-blue);color:#fff;border-radius:10px;padding:15px 18px;
+  font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.pull .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--cm-gold);display:block;margin-bottom:6px}
+textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;color:var(--text);
+  padding:14px;outline:none;resize:vertical;min-height:120px;transition:border-color .15s;
+}
+textarea:focus{border-color:var(--cm-blue)}
+.char-count{font-size:12px;color:var(--muted);margin-top:6px;text-align:right}
+.char-count.ok{color:#1B7F4B;font-weight:700}
+.submit-note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+.rule-out{background:#FFF6E0;border:1px solid #F0DBA6;border-radius:8px;padding:12px 15px;
+  font-size:13.5px;line-height:1.55;color:#6B5200;margin-bottom:16px}
+.rule-out b{color:#4A3800}
+
+/* ── SUMMARY ── */
+.confirm-pill{display:inline-block;background:#E7F3EC;color:#14512F;border:1px solid #A9D6BC;
+  font-size:13px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:20px;margin-bottom:16px}
+.student-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.section-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--cm-gold-d);margin-bottom:8px}
+.answer-box{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:15px 18px;font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.verdict{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:16px;line-height:1.7;margin-bottom:18px}
+.verdict .fill{color:var(--cm-gold);font-weight:700}
+.debrief-box{background:#F7F9FC;border:1px solid var(--border);border-top:4px solid var(--cm-gold);
+  border-radius:12px;padding:20px 22px;margin-top:8px}
+.debrief-box h3{font-size:16px;font-weight:800;margin-bottom:12px}
+.debrief-box ol{margin:0 0 0 20px}
+.debrief-box li{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+
+@media(max-width:680px){
+  .screen-title{font-size:24px}
+  .moment-card{font-size:16px}
+  .verdict{font-size:15px}
+}
+
+/* ── W4 additions ── */
+.person-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:14px}
+.pc-name{font-size:18px;font-weight:900;margin-bottom:6px}
+.pc-bio{font-size:14px;line-height:1.55;color:#3A3A3A;margin-bottom:12px}
+.role-chips{display:flex;flex-wrap:wrap;gap:7px}
+.role-chip{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.3px;
+  background:#fff;border:1.5px solid var(--border);color:var(--muted);
+  border-radius:999px;padding:7px 13px;cursor:pointer;transition:all .12s}
+.role-chip:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+.role-chip.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.tally{font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.7;
+  background:#F7F9FC;border:1px solid var(--border);border-radius:8px;
+  padding:12px 15px;margin:16px 0;color:var(--muted)}
+.tally .missing{color:#B4232A;font-weight:700}
+.tally .got{color:#1B7F4B;font-weight:700}
+.sel-big{width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15.5px;color:var(--text);padding:13px 14px;outline:none}
+.sel-big:focus{border-color:var(--cm-blue)}
+.rv-person{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:13px 16px;margin-bottom:9px}
+.rv-name{font-size:15.5px;font-weight:800;margin-bottom:5px}
+.rv-roles{display:flex;flex-wrap:wrap;gap:6px}
+.rv-role{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;background:#EDE9FE;color:var(--cm-gold-d);
+  border:1px solid #D6C9F5;border-radius:5px;padding:4px 8px}
+.rv-none{font-size:13px;color:var(--muted);font-style:italic}
+.rv-two{font-size:12.5px;color:var(--cm-gold-d);font-weight:700;margin-top:6px}
+</style>
+<style>/* credit-fix 2026-08-21: never claim credit before the server answers */
+body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
+#credit-status{margin:18px auto !important}
+/* roster gate message (added 2026-08-25) */
+.join-msg{margin-top:10px;font-size:14px;line-height:1.45;min-height:1px}
+.join-msg.bad{color:#a4262c;font-weight:600}
+.join-msg.warn{color:#7a5c00}
+
+/* persistent credit banner (2026-08-25) */
+#credit-banner{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;gap:12px;
+  align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 16px;
+  font-size:14px;font-weight:600;line-height:1.35;text-align:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#credit-banner.bad{background:#a4262c;color:#fff}
+#credit-banner.warn{background:#ffd24a;color:#3a2d00}
+#credit-banner .cb-fix{border:0;border-radius:6px;padding:6px 12px;font-weight:700;
+  cursor:pointer;background:rgba(255,255,255,.92);color:#222}
+body.has-credit-banner{padding-top:58px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 4.2</div>
+    <h1>Who Owns <span class="g">the Risk?</span></h1>
+    <p>Enter today's password to join. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <div class="week-tag">Week 4.2 · Surgical Devices</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">Six people sat down in a conference room in Evansville to settle a purchase that had been raised and tabled three times since January. Nobody in that room was wrong. Your job today is to work out who actually owns the decision.</div>
+    <div class="card">
+      <div class="field">
+        <label for="j-name">Your name</label>
+        <input id="j-name" type="text" placeholder="First and last" autocomplete="off" oninput="onJoin()">
+      </div>
+      <div class="field">
+        <label for="j-email">UC email</label>
+        <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
+        <div class="hint">Use your @mail.uc.edu address, the same one Canvas uses. Credit is matched on it.</div>
+      </div>
+      <div class="field">
+        <label for="j-group">Your group</label>
+        <select id="j-group" onchange="onJoin()">
+          <option value="">Pick your group…</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+        </select>
+      </div>
+      <button class="btn btn-go" id="join-btn" onclick="joinVerify()" disabled>Let's go →</button>
+      <div id="join-err" class="join-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BRIEF ═══════════════════════ -->
+<div id="brief-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Week 4.2 · The Buying Center</div>
+    <div class="screen-title">One purchase. Six jobs.</div>
+    <div class="screen-sub">When a business buys something expensive, no single person decides. Chapter 7 names six jobs that get done inside that purchase. Here they are in plain English:</div>
+
+    <div class="ladder">
+      <div class="row"><span class="n">1</span><span><span class="nm">Initiator</span><span class="pl">Starts it. Names the need out loud first.</span></span></div>
+      <div class="row"><span class="n">2</span><span><span class="nm">User</span><span class="pl">Will actually use the thing after it is bought.</span></span></div>
+      <div class="row"><span class="n">3</span><span><span class="nm">Influencer</span><span class="pl">Shapes what counts as a good answer. May hold no seat at all.</span></span></div>
+      <div class="row"><span class="n">4</span><span><span class="nm">Gatekeeper</span><span class="pl">Controls what gets through. Cannot approve, can stop.</span></span></div>
+      <div class="row"><span class="n">5</span><span><span class="nm">Buyer</span><span class="pl">Handles the terms and the paperwork.</span></span></div>
+      <div class="row"><span class="n">6</span><span><span class="nm">Decider</span><span class="pl">Signs. Owns the number afterward.</span></span></div>
+    </div>
+
+    <div class="mission">
+      Two things to hold onto. <b>A job is not a person.</b> One person can do two of these, and one job can be done by two people. And <b>the two who can stop it are not the one who can start it.</b>
+    </div>
+
+    <button class="btn btn-go" onclick="show('assign-screen')">Meet the room →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ASSIGN ═══════════════════════ -->
+<div id="assign-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('brief-screen')">← Back</button>
+    <div class="week-tag">Week 4.2 · Phase 1</div>
+    <div class="screen-title">Six people sat down in Evansville</div>
+    <div class="screen-sub">Tag every person with the job or jobs they are doing in this purchase. Some people are doing two. Say your answer out loud to your group before you tap, and argue it if you disagree.</div>
+
+    <div class="rule-out">
+      <b>You cannot move on</b> until every one of the six jobs has been claimed by somebody. If a job has nobody on it, you have missed a person, or you have missed a second job somebody is quietly doing.
+    </div>
+
+      <div class="person-card" id="pc-nandakumar">
+        <div class="pc-name">Dr. Priya Nandakumar</div>
+        <div class="pc-bio">Urologist. Operates on the da Vinci Xi most Wednesdays. She put the request in writing after the FDA cleared Medtronic's Hugo for urology on December 3, 2025. The machine she is asking for is the machine she will spend her own Wednesdays on.</div>
+        <div class="role-chips">
+          <button type="button" class="role-chip" data-p="nandakumar" data-r="INITIATOR" onclick="toggleRole('nandakumar','INITIATOR')">Initiator</button>
+          <button type="button" class="role-chip" data-p="nandakumar" data-r="USER" onclick="toggleRole('nandakumar','USER')">User</button>
+          <button type="button" class="role-chip" data-p="nandakumar" data-r="INFLUENCER" onclick="toggleRole('nandakumar','INFLUENCER')">Influencer</button>
+          <button type="button" class="role-chip" data-p="nandakumar" data-r="GATEKEEPER" onclick="toggleRole('nandakumar','GATEKEEPER')">Gatekeeper</button>
+          <button type="button" class="role-chip" data-p="nandakumar" data-r="BUYER" onclick="toggleRole('nandakumar','BUYER')">Buyer</button>
+          <button type="button" class="role-chip" data-p="nandakumar" data-r="DECIDER" onclick="toggleRole('nandakumar','DECIDER')">Decider</button>
+        </div>
+      </div>
+      <div class="person-card" id="pc-ellery">
+        <div class="pc-name">Dr. Wade Ellery</div>
+        <div class="pc-bio">About 1,400 robotic operations, nearly all on a da Vinci. Does hernias and gallbladders, which Hugo is not cleared for. He is not on the capital committee. Several of the twelve credentialed surgeons trained under him, and when he says a platform behaves unpredictably in a bleeding field, the room hears a fact.</div>
+        <div class="role-chips">
+          <button type="button" class="role-chip" data-p="ellery" data-r="INITIATOR" onclick="toggleRole('ellery','INITIATOR')">Initiator</button>
+          <button type="button" class="role-chip" data-p="ellery" data-r="USER" onclick="toggleRole('ellery','USER')">User</button>
+          <button type="button" class="role-chip" data-p="ellery" data-r="INFLUENCER" onclick="toggleRole('ellery','INFLUENCER')">Influencer</button>
+          <button type="button" class="role-chip" data-p="ellery" data-r="GATEKEEPER" onclick="toggleRole('ellery','GATEKEEPER')">Gatekeeper</button>
+          <button type="button" class="role-chip" data-p="ellery" data-r="BUYER" onclick="toggleRole('ellery','BUYER')">Buyer</button>
+          <button type="button" class="role-chip" data-p="ellery" data-r="DECIDER" onclick="toggleRole('ellery','DECIDER')">Decider</button>
+        </div>
+      </div>
+      <div class="person-card" id="pc-doyle">
+        <div class="pc-name">Marcy Doyle</div>
+        <div class="pc-bio">Manages the operating rooms at Gateway. Has offered no opinion on either machine, only a constraint: a second platform means a second set of instrument trays, a second sterile-processing workflow, and a second turnover routine. She can staff one platform well or two platforms badly.</div>
+        <div class="role-chips">
+          <button type="button" class="role-chip" data-p="doyle" data-r="INITIATOR" onclick="toggleRole('doyle','INITIATOR')">Initiator</button>
+          <button type="button" class="role-chip" data-p="doyle" data-r="USER" onclick="toggleRole('doyle','USER')">User</button>
+          <button type="button" class="role-chip" data-p="doyle" data-r="INFLUENCER" onclick="toggleRole('doyle','INFLUENCER')">Influencer</button>
+          <button type="button" class="role-chip" data-p="doyle" data-r="GATEKEEPER" onclick="toggleRole('doyle','GATEKEEPER')">Gatekeeper</button>
+          <button type="button" class="role-chip" data-p="doyle" data-r="BUYER" onclick="toggleRole('doyle','BUYER')">Buyer</button>
+          <button type="button" class="role-chip" data-p="doyle" data-r="DECIDER" onclick="toggleRole('doyle','DECIDER')">Decider</button>
+        </div>
+      </div>
+      <div class="person-card" id="pc-bell">
+        <div class="pc-name">Terrance Bell</div>
+        <div class="pc-bio">Runs biomedical engineering, and he is why the item keeps getting tabled. He will not sign off on equipment his own team is not permitted to service. Coverage runs $80,000 to $190,000 a year per machine, and those agreements have historically been voidable if an outside vendor touches the equipment.</div>
+        <div class="role-chips">
+          <button type="button" class="role-chip" data-p="bell" data-r="INITIATOR" onclick="toggleRole('bell','INITIATOR')">Initiator</button>
+          <button type="button" class="role-chip" data-p="bell" data-r="USER" onclick="toggleRole('bell','USER')">User</button>
+          <button type="button" class="role-chip" data-p="bell" data-r="INFLUENCER" onclick="toggleRole('bell','INFLUENCER')">Influencer</button>
+          <button type="button" class="role-chip" data-p="bell" data-r="GATEKEEPER" onclick="toggleRole('bell','GATEKEEPER')">Gatekeeper</button>
+          <button type="button" class="role-chip" data-p="bell" data-r="BUYER" onclick="toggleRole('bell','BUYER')">Buyer</button>
+          <button type="button" class="role-chip" data-p="bell" data-r="DECIDER" onclick="toggleRole('bell','DECIDER')">Decider</button>
+        </div>
+      </div>
+      <div class="person-card" id="pc-kessler">
+        <div class="pc-name">Dana Kessler</div>
+        <div class="pc-bio">Negotiates the contracts. Least emotional stake in the room and the worst news. She can negotiate the price of a console. She has never once been able to negotiate the instruments, and about 85% of what Intuitive collects comes from instruments, not robots.</div>
+        <div class="role-chips">
+          <button type="button" class="role-chip" data-p="kessler" data-r="INITIATOR" onclick="toggleRole('kessler','INITIATOR')">Initiator</button>
+          <button type="button" class="role-chip" data-p="kessler" data-r="USER" onclick="toggleRole('kessler','USER')">User</button>
+          <button type="button" class="role-chip" data-p="kessler" data-r="INFLUENCER" onclick="toggleRole('kessler','INFLUENCER')">Influencer</button>
+          <button type="button" class="role-chip" data-p="kessler" data-r="GATEKEEPER" onclick="toggleRole('kessler','GATEKEEPER')">Gatekeeper</button>
+          <button type="button" class="role-chip" data-p="kessler" data-r="BUYER" onclick="toggleRole('kessler','BUYER')">Buyer</button>
+          <button type="button" class="role-chip" data-p="kessler" data-r="DECIDER" onclick="toggleRole('kessler','DECIDER')">Decider</button>
+        </div>
+      </div>
+      <div class="person-card" id="pc-boone">
+        <div class="pc-name">Mark Boone</div>
+        <div class="pc-bio">Chairs the capital committee and has $4.1 million to allocate this year across the system. A robotic case runs about $3,300 in direct cost, more than $2,000 above the same operation done laparoscopically, and no payer reimburses the difference. He has to defend the number to the board in September.</div>
+        <div class="role-chips">
+          <button type="button" class="role-chip" data-p="boone" data-r="INITIATOR" onclick="toggleRole('boone','INITIATOR')">Initiator</button>
+          <button type="button" class="role-chip" data-p="boone" data-r="USER" onclick="toggleRole('boone','USER')">User</button>
+          <button type="button" class="role-chip" data-p="boone" data-r="INFLUENCER" onclick="toggleRole('boone','INFLUENCER')">Influencer</button>
+          <button type="button" class="role-chip" data-p="boone" data-r="GATEKEEPER" onclick="toggleRole('boone','GATEKEEPER')">Gatekeeper</button>
+          <button type="button" class="role-chip" data-p="boone" data-r="BUYER" onclick="toggleRole('boone','BUYER')">Buyer</button>
+          <button type="button" class="role-chip" data-p="boone" data-r="DECIDER" onclick="toggleRole('boone','DECIDER')">Decider</button>
+        </div>
+      </div>
+
+    <div id="role-tally" class="tally"></div>
+    <button class="btn btn-go" id="assign-btn" onclick="toReview()" disabled>Lock it in →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ REVIEW ═══════════════════════ -->
+<div id="review-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('assign-screen')">← Back</button>
+    <div class="week-tag">Week 4.2 · Your room</div>
+    <div class="screen-title">This is the room your group built</div>
+    <div class="screen-sub">Read it top to bottom before you go on. Look for the people carrying two jobs, and look at who is holding the job that can stop this.</div>
+    <div id="review-out"></div>
+    <button class="btn btn-go" onclick="show('gate-screen')">Now answer the question →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ GATE ═══════════════════════ -->
+<div id="gate-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('review-screen')">← Back</button>
+    <div class="week-tag">Week 4.2 · Phase 2</div>
+    <div class="screen-title">Who owns this?</div>
+    <div class="screen-sub">At the end of the June meeting the item was tabled again, pending additional utilization data. Nobody in that room was wrong. Your group has to agree on two names.</div>
+
+    <div class="pull">
+      <span class="cap">From the case</span>
+      Nandakumar filed the request. Ellery has the volume. Doyle has to staff it, Bell has to service it, Kessler has to sign the paper, and Boone has to defend the number to the board in September.
+    </div>
+
+    <div class="gate-q">Who owns the decision?</div>
+    <select id="owns-sel" class="sel-big" onchange="onGate()">
+      <option value="">Pick one…</option>
+          <option value="nandakumar">Dr. Priya Nandakumar</option>
+          <option value="ellery">Dr. Wade Ellery</option>
+          <option value="doyle">Marcy Doyle</option>
+          <option value="bell">Terrance Bell</option>
+          <option value="kessler">Dana Kessler</option>
+          <option value="boone">Mark Boone</option>
+    </select>
+
+    <div class="gate-q" style="margin-top:18px">If it goes badly two years from now, who owns that?</div>
+    <select id="blame-sel" class="sel-big" onchange="onGate()">
+      <option value="">Pick one…</option>
+          <option value="nandakumar">Dr. Priya Nandakumar</option>
+          <option value="ellery">Dr. Wade Ellery</option>
+          <option value="doyle">Marcy Doyle</option>
+          <option value="bell">Terrance Bell</option>
+          <option value="kessler">Dana Kessler</option>
+          <option value="boone">Mark Boone</option>
+    </select>
+
+    <div class="gate-q" style="margin-top:18px">Your group picked those two names. Say why, in your own words.</div>
+    <textarea id="gate-input" placeholder="If you picked the same person twice, defend it. If you picked two different people, explain how that happens." oninput="onGate()"></textarea>
+    <div id="gate-count" class="char-count">0 / 80 minimum</div>
+
+    <button class="btn btn-go" id="gate-btn" onclick="show('fix-screen')" disabled>Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ FIX ═══════════════════════ -->
+<div id="fix-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('gate-screen')">← Back</button>
+    <div class="week-tag">Week 4.2 · Phase 3</div>
+    <div class="screen-title">Now unstick it</div>
+    <div class="screen-sub">You sell for Medtronic. The Hugo is on the table at Deaconess and the item has been tabled three times since January. You get one phone call next week.</div>
+
+    <div class="rule-out">
+      <b>You may not drop the price.</b> Every competitor can do that, and the money in this deal was never in the console anyway. Win it on something else.
+    </div>
+
+    <div class="gate-q">Who do you call?</div>
+    <select id="call-sel" class="sel-big" onchange="onFix()">
+      <option value="">Pick one…</option>
+          <option value="nandakumar">Dr. Priya Nandakumar</option>
+          <option value="ellery">Dr. Wade Ellery</option>
+          <option value="doyle">Marcy Doyle</option>
+          <option value="bell">Terrance Bell</option>
+          <option value="kessler">Dana Kessler</option>
+          <option value="boone">Mark Boone</option>
+    </select>
+
+    <div class="gate-q" style="margin-top:18px">Write the first sentence you say to them.</div>
+    <textarea id="fix-input" placeholder="One sentence. It has to speak to what that specific person is responsible for, not to the hospital in general." oninput="onFix()"></textarea>
+    <div id="fix-count" class="char-count">0 / 80 minimum</div>
+
+    <button class="btn btn-go" id="submit-btn" onclick="submitAll()" disabled>Submit for credit →</button>
+    <div class="submit-note">One submission per student. Your group's answers, your own name.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="summary-screen" class="screen">
+  <div class="page-wrap">
+    <div class="week-tag">Week 4.2 — Summary</div>
+    <div class="screen-title">You mapped the room</div>
+    <div class="confirm-pill">✓ Participation recorded — you're all set</div>
+    <div id="student-tag" class="student-tag"></div>
+
+    <div class="verdict" id="sum-verdict"></div>
+
+    <p class="section-label">Why those two names</p>
+    <div class="answer-box" id="sum-gate"></div>
+
+    <p class="section-label">Your call, and your opening line</p>
+    <div class="answer-box" id="sum-fix"></div>
+
+    <div class="debrief-box">
+      <h3>Bring to the debrief</h3>
+      <ol>
+        <li>Which person did your group argue about longest, and which job did they end up with?</li>
+        <li>Who in that room can stop this purchase without ever being able to approve it?</li>
+        <li>Wade Ellery has no seat on the capital committee. Why does he matter anyway?</li>
+        <li>Mark Boone bought a $1,900 laptop on a Saturday without asking anybody. Same person, same week. What changed?</li>
+        <li>Nobody in that room was wrong. So who actually owns this decision, and if it goes badly, who owns that?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
+<script>
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
+/* The class code is NOT stored here. It ships to a PUBLIC repo.
+   The student types it; the Logic App checks it against Key Vault. */
+var PW = '';
+
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── DRY-RUN PASSTHROUGH ───────────────────────────────────────────────────
+   ?testKey=... on the URL turns this page into a dry run: the workflow skips
+   the class-window gate and answers on the join branch, so no grade is ever
+   written. Absent the parameter this is '' — which matches no secret — and the
+   page behaves exactly as it does for a student. ── */
+var TEST_KEY = (function(){
+  try { return new URLSearchParams(location.search).get('testKey') || ''; }
+  catch(e){ return ''; }
+})();
+
+/* ── participation credit (Logic App contract) ───────────────────────── */
+function creditAnswers(src){
+  const skip=['email','name','week','session','exerciseId','password','group','points','answers','timestamp','submittedAt','exercise'];
+  return Object.entries(src||{}).filter(([k])=>!skip.includes(k))
+    .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
+    .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
+}
+function creditFields(src){
+  var skip = ['email','name','week','session','exerciseId','password','group',
+              'points','answers','fields','timestamp','submittedAt','exercise'];
+  var out = {};
+  Object.keys(src || {}).forEach(function(k){
+    if (skip.indexOf(k) !== -1) return;
+    var v = src[k];
+    if (v === undefined || v === null) return;
+    out[k] = v;
+  });
+  return out;
+}
+async function postForCredit(c){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  if(TEST_KEY) c.testKey = TEST_KEY;
+  const set=(bg,bd,fg,html)=>{
+    let el=document.getElementById('credit-status');
+    if(!el){el=document.createElement('div');el.id='credit-status';}
+    var _anchor=document.querySelector('.confirm-pill,.credit-claim');
+    var _host=(_anchor&&_anchor.parentElement)||document.getElementById('summary-screen')
+      ||document.getElementById('sum-screen')||document.querySelector('.screen.active')||document.body;
+    if(el.parentElement!==_host){
+      if(_anchor&&_anchor.parentElement===_host) _host.insertBefore(el,_anchor.nextSibling);
+      else _host.appendChild(el);
+    }
+    el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML=html;
+  };
+  document.body.classList.add('awaiting-credit');
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
+    const d=await res.json();
+    if(d.code==='DRY_RUN_OK'){
+      document.body.classList.remove('awaiting-credit');
+      set('#eef4ff','#c3d4f7','#1e3a8a','<strong>Dry run.</strong> Every gate passed and the roster matched — '+
+        'nothing was written to Canvas. Remove ?testKey from the URL to run for real.');
+    } else if(d.accepted){
+      document.body.classList.remove('awaiting-credit');
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
+
+/* ── EXERCISE METADATA ── */
+const EX_WEEK = 4, EX_SESSION = 2, EX_ID = 'W04b-owns-the-risk', EX_POINTS = 12;
+
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function checkPw(){
+  var val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val.length >= 4){
+    PW = val;                       /* verified server-side at the join step */
+    document.getElementById('pw-err').textContent = '';
+    show('join-screen');
+  } else {
+    var box = document.querySelector('.pw-box');
+    if(box){ box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
+    document.getElementById('pw-err').textContent = "Enter today's class code.";
+  }
+}
+
+function onJoin(){
+  const name  = document.getElementById('j-name').value.trim();
+  const email = document.getElementById('j-email').value.trim().toLowerCase();
+  const group = document.getElementById('j-group').value;
+  const emailOk = ucEmailOk(email);
+  state.name = name; state.email = email; state.groupNum = group;
+  document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk && group);
+}
+
+
+/* ── THE ROOM ─────────────────────────────────────────────────────────────
+   Six people from the Week 4 case. No role assignment is stored here and no
+   answer is graded here. The reveal is a slide, under the professor's
+   control. This file only records what the group decided. ── */
+const PEOPLE = [
+  { id:'nandakumar', name:'Dr. Priya Nandakumar' },
+  { id:'ellery', name:'Dr. Wade Ellery' },
+  { id:'doyle', name:'Marcy Doyle' },
+  { id:'bell', name:'Terrance Bell' },
+  { id:'kessler', name:'Dana Kessler' },
+  { id:'boone', name:'Mark Boone' }
+];
+const ROLES  = [
+  { key:'INITIATOR', name:'Initiator' },
+  { key:'USER', name:'User' },
+  { key:'INFLUENCER', name:'Influencer' },
+  { key:'GATEKEEPER', name:'Gatekeeper' },
+  { key:'BUYER', name:'Buyer' },
+  { key:'DECIDER', name:'Decider' }
+];
+const PERSON_NAME = {}; PEOPLE.forEach(p => PERSON_NAME[p.id] = p.name);
+const ROLE_NAME   = {}; ROLES.forEach(r => ROLE_NAME[r.key] = r.name);
+
+let state = {
+  name:'', email:'', groupNum:'',
+  roles:{},              // personId -> [roleKey]
+  owns:'', blame:'', why:'',
+  callWho:'', opener:''
+};
+
+/* ── PHASE 1: tag the room ── */
+function toggleRole(pid, rk){
+  const cur = state.roles[pid] || [];
+  const i = cur.indexOf(rk);
+  if (i === -1) cur.push(rk); else cur.splice(i, 1);
+  state.roles[pid] = cur;
+  const btn = document.querySelector('.role-chip[data-p="'+pid+'"][data-r="'+rk+'"]');
+  if (btn) btn.classList.toggle('on', cur.indexOf(rk) !== -1);
+  renderTally();
+}
+
+function claimedRoles(){
+  const seen = {};
+  Object.keys(state.roles).forEach(pid =>
+    (state.roles[pid] || []).forEach(rk => { seen[rk] = true; }));
+  return seen;
+}
+
+function renderTally(){
+  const seen = claimedRoles();
+  const missing = ROLES.filter(r => !seen[r.key]);
+  const el = document.getElementById('role-tally');
+  if (missing.length === 0){
+    el.innerHTML = '<span class="got">All six jobs are claimed.</span> ' +
+      'Now check the other direction: is anybody in this room doing two of them?';
+  } else {
+    el.innerHTML = 'Still unclaimed: <span class="missing">' +
+      missing.map(r => r.name).join(', ') + '</span>';
+  }
+  document.getElementById('assign-btn').disabled = missing.length !== 0;
+}
+
+function toReview(){
+  const out = PEOPLE.map(p => {
+    const rs = state.roles[p.id] || [];
+    const chips = rs.length
+      ? '<div class="rv-roles">' + rs.map(rk =>
+          '<span class="rv-role">' + esc(ROLE_NAME[rk]) + '</span>').join('') + '</div>'
+      : '<div class="rv-none">Your group gave this person no job in the purchase.</div>';
+    const two = rs.length > 1 ? '<div class="rv-two">Carrying two jobs.</div>' : '';
+    return '<div class="rv-person"><div class="rv-name">' + esc(p.name) + '</div>' + chips + two + '</div>';
+  }).join('');
+  document.getElementById('review-out').innerHTML = out;
+  show('review-screen');
+}
+
+/* ── PHASE 2: who owns it ── */
+function onGate(){
+  state.owns  = document.getElementById('owns-sel').value;
+  state.blame = document.getElementById('blame-sel').value;
+  state.why   = document.getElementById('gate-input').value.trim();
+  const n = state.why.length;
+  const c = document.getElementById('gate-count');
+  c.textContent = n + ' / 80 minimum';
+  c.classList.toggle('ok', n >= 80);
+  document.getElementById('gate-btn').disabled = !(state.owns && state.blame && n >= 80);
+}
+
+/* ── PHASE 3: unstick it ── */
+function onFix(){
+  state.callWho = document.getElementById('call-sel').value;
+  state.opener  = document.getElementById('fix-input').value.trim();
+  const n = state.opener.length;
+  const c = document.getElementById('fix-count');
+  c.textContent = n + ' / 80 minimum';
+  c.classList.toggle('ok', n >= 80);
+  document.getElementById('submit-btn').disabled = !(state.callWho && n >= 80);
+}
+
+/* ── SUBMIT ── */
+function submitAll(){
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting…';   // no double submits
+
+  const roleMap = {};
+  PEOPLE.forEach(p => {
+    roleMap[p.name] = (state.roles[p.id] || []).map(rk => ROLE_NAME[rk]).join(' + ') || '(none)';
+  });
+
+  const payload = {
+    exercise: 'W4.2-owns-the-risk',
+    week: '4.2',
+    submittedAt: new Date().toISOString(),
+    name: state.name, email: state.email, group: state.groupNum,
+    roleMap: roleMap,
+    ownsDecision: PERSON_NAME[state.owns] || '',
+    ownsFailure:  PERSON_NAME[state.blame] || '',
+    whyThoseTwo:  state.why,
+    whoYouCall:   PERSON_NAME[state.callWho] || '',
+    openingLine:  state.opener
+  };
+
+  try{
+    if(/^https?:\/\//i.test(CREDIT_ENDPOINT)){
+      postForCredit({
+        email: state.email, name: state.name,
+        week: EX_WEEK, session: EX_SESSION, exerciseId: EX_ID,
+        password: PW, group: String(state.groupNum||''), points: EX_POINTS,
+        fields: creditFields(payload),
+        answers: creditAnswers(payload)
+      });
+    }
+  }catch(e){
+    console.warn('Credit POST error (non-blocking):', e);
+  }
+
+  buildSummary();
+  show('summary-screen');
+}
+
+/* ── SUMMARY ── */
+function buildSummary(){
+  document.getElementById('student-tag').textContent =
+    state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
+  document.getElementById('sum-verdict').innerHTML =
+    'Your group says <span class="fill">' + esc(PERSON_NAME[state.owns] || '—') +
+    '</span> owns the decision, and <span class="fill">' + esc(PERSON_NAME[state.blame] || '—') +
+    '</span> owns it if it goes wrong.';
+  document.getElementById('sum-gate').textContent = state.why;
+  document.getElementById('sum-fix').textContent =
+    'Calling ' + (PERSON_NAME[state.callWho] || '—') + '. "' + state.opener + '"';
+}
+
+/* ── INIT ── */
+renderTally();
+
+
+/* ── ROSTER GATE ─────────────────────────────────────────────────────────
+   The Logic App verifies enrollment server-side via mode:"join". EVERY
+   failure is a hard stop: nobody enters the exercise unverified, because a
+   student who walks in past a failed check gets no credit and does not find
+   out until the gradebook. ── */
+var JOIN_VERIFY_MS = 12000;
+function __joinNext(){ show('brief-screen'); }
+function __joinField(id, fallback){
+  var el = document.getElementById(id);
+  return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
+}
+async function joinVerify(){
+  var btn = document.getElementById('join-btn');
+  if(!btn || btn.disabled) return;
+  var orig = btn.textContent;
+  var release = function(){ btn.disabled = false; btn.textContent = orig; };
+  var email = __joinField('j-email', (window.state && state.email));
+  var name  = __joinField('j-name',  (window.state && state.name));
+  var group = __joinField('j-group', (window.state && (state.groupNum || state.group)));
+
+  /* local/unwired copy only — the published file always has a real endpoint */
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)){ __joinNext(); return; }
+
+  btn.disabled = true; btn.textContent = 'Checking…';
+  var ctl = (window.AbortController ? new AbortController() : null);
+  var timer = setTimeout(function(){ if(ctl) ctl.abort(); }, JOIN_VERIFY_MS);
+  var code = 'NO_ANSWER';
+  try{
+    var res = await fetch(CREDIT_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ mode:'join', email:email, name:name, testKey:TEST_KEY,
+        week:4, session:2, exerciseId:'W04b-owns-the-risk',
+        password:PW, group:group })
+    });
+    clearTimeout(timer);
+    var d = await res.json().catch(function(){ return null; });
+    code = (d && d.code) || ('HTTP_' + res.status);
+  }catch(e){
+    clearTimeout(timer); code = 'NO_ANSWER';
+  }
+  release();
+
+  if(code === 'JOIN_OK' || code === 'DRY_RUN_OK'){
+    if(code === 'DRY_RUN_OK'){
+      creditBanner('warn', 'DRY RUN — test key active. Every gate is being checked for real, but nothing will be written to Canvas.', 'retry');
+    } else {
+      creditBanner('clear');
+    }
+    __joinNext(); return;
+  }
+
+  if(code === 'NOT_ENROLLED'){
+    creditBanner('bad', 'That email is not on the class roster, so you cannot be given credit. Check it for a typo — it is your @mail.uc.edu address, the one Canvas uses. If it is correct, see Professor Hudnall now.', 'retry');
+  } else if(code === 'BAD_PASSWORD'){
+    creditBanner('bad', 'That is not today\'s class code. Get it from Professor Hudnall and enter it again.', 'pw');
+  } else if(code === 'WINDOW_CLOSED'){
+    creditBanner('bad', 'This exercise is only open during class.', 'retry');
+  } else {
+    creditBanner('warn', 'Could not reach the roster check (' + code + '). Try again. If it keeps failing, Professor Hudnall will tell the class what to do.', 'retry');
+  }
+}
+
+/* ── PERSISTENT BANNER ────────────────────────────────────────────────────
+   Lives on <body>, not inside a screen, so it survives every show() call.
+   It is the message on a BLOCKED screen — never a permission to continue. ── */
+function creditBanner(kind, text, action){
+  var el = document.getElementById('credit-banner');
+  if(kind === 'clear'){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    document.body.classList.remove('has-credit-banner');
+    return;
+  }
+  if(!el){ el = document.createElement('div'); el.id = 'credit-banner'; document.body.appendChild(el); }
+  el.className = kind;
+  el.innerHTML = '';
+  var span = document.createElement('span'); span.textContent = text; el.appendChild(span);
+  var toPw = (action === 'pw') && document.getElementById('pw-screen');
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cb-fix';
+  b.textContent = toPw ? 'Re-enter the code' : 'Try again';
+  b.onclick = function(){ if(toPw){ show('pw-screen'); } else { joinVerify(); } };
+  el.appendChild(b);
+  document.body.classList.add('has-credit-banner');
+}
+
+</script>
+</body>
+</html>
