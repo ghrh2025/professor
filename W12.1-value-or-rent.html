@@ -1526,7 +1526,7 @@ document.addEventListener('keydown', e => {
    Fail-closed ONLY on an explicit NOT_ENROLLED. Timeout, network error,
    WINDOW_CLOSED and BAD_PASSWORD all let the student through with a warning.
    Never lock a student out of a class activity because Azure hiccuped. ── */
-var JOIN_VERIFY_MS = 4500;
+var JOIN_VERIFY_MS = 12000;
 function __joinNext(){ doJoin(); }
 function __joinField(id, fallback){
   var el = document.getElementById(id);

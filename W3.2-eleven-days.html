@@ -807,7 +807,7 @@ function submitAll(){
    Fail-closed ONLY on an explicit NOT_ENROLLED. Timeout, network error,
    WINDOW_CLOSED and BAD_PASSWORD all stop the student with a banner rather
    than silently handing out no credit. ── */
-var JOIN_VERIFY_MS = 4500;
+var JOIN_VERIFY_MS = 12000;
 function __joinNext(){ show('brief-screen'); }
 function __joinField(id, fallback){
   var el = document.getElementById(id);
