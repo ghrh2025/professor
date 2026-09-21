@@ -275,6 +275,7 @@ body.has-credit-banner{padding-top:58px}
 <!-- ═══════════════════════ JOIN ═══════════════════════ -->
 <div id="join-screen" class="screen">
   <div class="page-wrap">
+    <button class="back-btn" onclick="show('pw-screen')">← Back</button>
     <div class="week-tag">Week 5.2 · Aldi</div>
     <div class="screen-title">Get set up</div>
     <div class="screen-sub">Aldi carries about 1,800 items and refuses to carry anything else. One in three American households shopped there last year. Your job today is to describe the shopper those four aisles were built for, without using how much money she makes.</div>
@@ -351,7 +352,7 @@ body.has-credit-banner{padding-top:58px}
       <button type="button" class="desc-chip" data-d="b2" onclick="pickDesc('b2')">Cannot afford the supermarket down the road.</button>
       <button type="button" class="desc-chip" data-d="d4" onclick="pickDesc('d4')">Walks in with a number in her head and wants to come in under it.</button>
       <button type="button" class="desc-chip" data-d="d5" onclick="pickDesc('d5')">Treats the rush at the register as part of the fun.</button>
-      <button type="button" class="desc-chip" data-d="d6" onclick="pickDesc('d6')">Would rather have one ketchup than thirty.</button>
+      <button type="button" class="desc-chip" data-d="d6" onclick="pickDesc('d6')">Would rather pick from two ketchups than thirty.</button>
       <button type="button" class="desc-chip" data-d="b3" onclick="pickDesc('b3')">Working class.</button>
       <button type="button" class="desc-chip" data-d="d7" onclick="pickDesc('d7')">Says “I'm not paying that,” and enjoys saying it.</button>
       <button type="button" class="desc-chip" data-d="d8" onclick="pickDesc('d8')">Will make a second stop for the things Aldi does not carry.</button>
@@ -615,7 +616,7 @@ const DESC = [
   { id:'d3', text:'Buys the store brand without thinking about it.' },
   { id:'d4', text:'Walks in with a number in her head and wants to come in under it.' },
   { id:'d5', text:'Treats the rush at the register as part of the fun.' },
-  { id:'d6', text:'Would rather have one ketchup than thirty.' },
+  { id:'d6', text:'Would rather pick from two ketchups than thirty.' },
   { id:'d7', text:"Says “I'm not paying that,” and enjoys saying it." },
   { id:'d8', text:'Will make a second stop for the things Aldi does not carry.' },
   { id:'d9', text:'Checks the Aisle of Shame every single week.' },
