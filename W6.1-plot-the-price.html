@@ -80,6 +80,19 @@ body{
 .btn-ghost:hover{border-color:var(--cm-blue)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 
+
+/* ── PHASE 1 MAP ── */
+.pm-prog{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
+.pm-price{font-size:22px;font-weight:800;line-height:1.35;margin:6px 0 18px}
+.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pm-btn{text-align:left;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:14px 14px;cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:800;color:var(--text);min-height:64px}
+.pm-btn.on{border-color:var(--cm-gold);background:rgba(255,194,32,.14)}
+.pm-nav{display:flex;gap:10px;margin-top:16px}
+.pm-nav .btn{flex:1}
+.pm-map{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pm-cell{border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.5;background:var(--surface)}
+.pm-cell b{display:block;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+
 /* ── PASSWORD SCREEN ── */
 .pw-box{
   background:var(--cm-blue);color:#fff;border-radius:16px;
@@ -249,12 +262,39 @@ body.has-credit-banner{padding-top:58px}
   </div>
 </div>
 
+<!-- ═══════════════════════ PHASE 1 MAP ═══════════════════════ -->
+<div id="map-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="mapBack()">← Back</button>
+    <div class="week-tag">Week 6.1 · Phase 1 · The Map</div>
+    <div class="screen-title">Eight prices. Four corners.</div>
+    <div class="screen-sub">It is 2009 and nobody has heard of Warby Parker. Read each price out loud with your group, agree where a buyer would put it, then tap it. Argue the ones that split you. Move any you get wrong.</div>
+    <div class="card" id="pm-card">
+      <div class="pm-prog" id="pm-prog"></div>
+      <div class="pm-price" id="pm-price"></div>
+      <div class="pm-grid" id="pm-grid"></div>
+      <div class="pm-nav">
+        <button class="btn btn-ghost" id="pm-prev" onclick="mapStep(-1)">← Previous</button>
+        <button class="btn btn-go" id="pm-next" onclick="mapStep(1)" disabled>Next →</button>
+      </div>
+    </div>
+    <div class="card" id="pm-done" style="display:none">
+      <div class="pm-prog">YOUR GROUP'S MAP</div>
+      <div class="pm-map" id="pm-map"></div>
+      <div class="pm-nav">
+        <button class="btn btn-ghost" onclick="mapReopen()">← Move a price</button>
+        <button class="btn btn-go" onclick="show('call-screen')">Phase 2 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════ JOIN ═══════════════════════ -->
 <div id="join-screen" class="screen">
   <div class="page-wrap">
     <div class="week-tag">Week 6.1 · Positioning</div>
     <div class="screen-title">Get set up</div>
-    <div class="screen-sub">You have just put eight prices on one map, from $8 to over $400. This takes about a minute: your group records the one it had to move, and the rule it landed on.</div>
+    <div class="screen-sub">Your group will put eight prices on one map, from $8 to over $400, then record the one it had to move and the rule it landed on.</div>
     <div class="card">
       <div class="field">
         <label for="j-name">Your name</label>
@@ -289,7 +329,7 @@ body.has-credit-banner{padding-top:58px}
 
 <div id="call-screen" class="screen">
   <div class="page-wrap">
-    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <button class="back-btn" onclick="show('map-screen')">← Back</button>
     <div class="week-tag">Week 6.1 · Plot the Price</div>
     <div class="screen-title">Two answers, then you are done</div>
     <div class="screen-sub">You just put eight prices on one map. Do not re-argue the placements here. Your group needs to agree on two things and type them once.</div>
@@ -336,6 +376,9 @@ body.has-credit-banner{padding-top:58px}
     <div class="screen-title">Your map, your rule</div>
     <div class="confirm-pill">✓ Participation recorded — you're all set</div>
     <div id="student-tag" class="student-tag"></div>
+
+    <p class="section-label">Your map</p>
+    <div class="pm-map" id="sum-map" style="margin-bottom:18px"></div>
 
     <p class="section-label">The price you had to move</p>
     <div class="verdict" id="sum-verdict"></div>
@@ -537,6 +580,7 @@ function buildSummary(){
     'Your group moved <span class="fill">' + esc(CARD_TEXT[state.card] || '—') +
     '</span> into <span class="fill">' + esc(QUAD_NAME[state.quad] || '—') + '</span>.';
   document.getElementById('sum-rule').textContent = state.rule;
+  document.getElementById('sum-map').innerHTML = mapCells();
 }
 
 
@@ -546,7 +590,46 @@ function buildSummary(){
    student who walks in past a failed check gets no credit and does not find
    out until the gradebook. ── */
 var JOIN_VERIFY_MS = 12000;
-function __joinNext(){ show('call-screen'); }
+function __joinNext(){ mapIdx=0; renderMap(); show('map-screen'); }
+/* ── PHASE 1 MAP: local only, never submitted, no answers shipped ── */
+var mapPick=new Array(CARDS.length).fill(null), mapIdx=0;
+function renderMap(){
+  document.getElementById('pm-card').style.display='';
+  document.getElementById('pm-done').style.display='none';
+  document.getElementById('pm-prog').textContent='PRICE '+(mapIdx+1)+' OF '+CARDS.length;
+  document.getElementById('pm-price').textContent=CARDS[mapIdx].text;
+  var g=document.getElementById('pm-grid'); g.innerHTML='';
+  QUADS.forEach(function(q){
+    var el=document.createElement('button'); el.className='pm-btn'+(mapPick[mapIdx]===q.id?' on':'');
+    el.textContent=q.name; el.onclick=function(){ mapPick[mapIdx]=q.id; renderMap(); };
+    g.appendChild(el);
+  });
+  document.getElementById('pm-prev').disabled=(mapIdx===0);
+  var nx=document.getElementById('pm-next'); nx.disabled=(mapPick[mapIdx]===null);
+  nx.textContent=(mapIdx===CARDS.length-1)?'See your map →':'Next →';
+}
+function mapStep(d){
+  if(d>0 && mapIdx===CARDS.length-1){ renderMapDone(); return; }
+  mapIdx=Math.max(0,Math.min(CARDS.length-1,mapIdx+d)); renderMap();
+}
+function mapBack(){
+  if(document.getElementById('pm-done').style.display!=='none'){ mapReopen(); }
+  else if(mapIdx===0){ show('join-screen'); }
+  else { mapStep(-1); }
+}
+function mapReopen(){ mapIdx=CARDS.length-1; renderMap(); }
+function mapCells(){
+  return QUADS.map(function(q){
+    var inQ=CARDS.filter(function(c,i){ return mapPick[i]===q.id; }).map(function(c){ return esc(c.text.split(' — ')[0]); });
+    return '<div class="pm-cell"><b>'+esc(q.name)+'</b>'+(inQ.length?inQ.join(' · '):'—')+'</div>';
+  }).join('');
+}
+function renderMapDone(){
+  document.getElementById('pm-map').innerHTML=mapCells();
+  document.getElementById('pm-card').style.display='none';
+  document.getElementById('pm-done').style.display='';
+  window.scrollTo(0,0);
+}
 function __joinField(id, fallback){
   var el = document.getElementById(id);
   return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
