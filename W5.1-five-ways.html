@@ -80,6 +80,18 @@ body{
 .btn-ghost:hover{border-color:var(--cm-blue)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 
+
+/* ── SORT (Phase 1) ── */
+.sort-prog{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
+.sort-fact{font-size:22px;font-weight:800;line-height:1.35;margin:6px 0 18px}
+.base-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.base-btn{text-align:left;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:14px 16px;cursor:pointer;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;color:var(--text)}
+.base-btn small{display:block;font-weight:500;font-size:12.5px;color:var(--muted);margin-top:2px}
+.base-btn.on{border-color:var(--cm-gold);background:rgba(255,194,32,.14)}
+.sort-nav{display:flex;gap:10px;margin-top:16px}
+.sort-nav .btn{flex:1}
+.tally-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-weight:700}
+
 /* ── PASSWORD SCREEN ── */
 .pw-box{
   background:var(--cm-blue);color:#fff;border-radius:16px;
@@ -255,7 +267,7 @@ body.has-credit-banner{padding-top:58px}
   <div class="page-wrap">
     <div class="week-tag">Week 5.1 · Segmentation</div>
     <div class="screen-title">Get set up</div>
-    <div class="screen-sub">You have just sorted ten facts about Aldi into the five segmentation bases. This takes about a minute: your group records which base it trusts and what the count told you.</div>
+    <div class="screen-sub">Your group will sort ten facts about Aldi into the five segmentation bases, then record which base it trusts and what the count told you.</div>
     <div class="card">
       <div class="field">
         <label for="j-name">Your name</label>
@@ -288,10 +300,37 @@ body.has-credit-banner{padding-top:58px}
   </div>
 </div>
 
+<!-- ═══════════════════════ SORT ═══════════════════════ -->
+<div id="sort-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="sortBack()">← Back</button>
+    <div class="week-tag">Week 5.1 · Phase 1 · The Sort</div>
+    <div class="screen-title">Ten facts. Five bases.</div>
+    <div class="screen-sub">Read each fact out loud with your group. Agree on the base, then tap it. Argue the ones that split you.</div>
+    <div class="card" id="sort-card">
+      <div class="sort-prog" id="sort-prog"></div>
+      <div class="sort-fact" id="sort-fact"></div>
+      <div class="base-grid" id="base-grid"></div>
+      <div class="sort-nav">
+        <button class="btn btn-ghost" id="sort-prev" onclick="sortStep(-1)">← Previous</button>
+        <button class="btn btn-go" id="sort-next" onclick="sortStep(1)" disabled>Next →</button>
+      </div>
+    </div>
+    <div class="card" id="tally-card" style="display:none">
+      <div class="sort-prog">YOUR GROUP'S SORT</div>
+      <div id="tally-rows"></div>
+      <div class="sort-nav">
+        <button class="btn btn-ghost" onclick="sortReopen()">← Change a card</button>
+        <button class="btn btn-go" onclick="show('call-screen')">Phase 2 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════ CALL ═══════════════════════ -->
 <div id="call-screen" class="screen">
   <div class="page-wrap">
-    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <button class="back-btn" onclick="show('sort-screen')">← Back</button>
     <div class="week-tag">Week 5.1 · Five Ways to Cut a Market</div>
     <div class="screen-title">Two answers, then you are done</div>
     <div class="screen-sub">You just sorted ten facts about Aldi into the five segmentation bases. Do not re-argue the sort here. Your group needs to agree on two things and type them once.</div>
@@ -561,7 +600,40 @@ function buildSummary(){
    student who walks in past a failed check gets no credit and does not find
    out until the gradebook. ── */
 var JOIN_VERIFY_MS = 12000;
-function __joinNext(){ show('call-screen'); }
+function __joinNext(){ sortIdx=0; renderSort(); show('sort-screen'); }
+/* ── PHASE 1 SORT: local only, never submitted, no answers shipped ── */
+var SORT_FACTS=["\u201cShe brings her own bags and expects to.\u201d","\u201c2,800 stores, entering Maine as its 40th state this year.\u201d","\u201cOne ketchup on the shelf is one decision already made.\u201d","\u201cI'm not paying that,\u201d and she enjoys saying it.","\u201cShe checks the Aisle of Shame every single week.\u201d","\u201cOne in three American households shopped at Aldi last year.\u201d","\u201cA trip runs about 36% cheaper than the same trip elsewhere.\u201d","\u201cNinety own-brands collapsed into 26 and her visits kept climbing.\u201d","\u201cFifty stores going into Colorado over the next five years.\u201d","\u201cThe rush at the register is part of the fun, not a toll.\u201d"];
+var SORT_BASES=[["Geographic","Where they are"],["Demographic","Who they are"],["Psychographic","What they believe and value"],["Behavioural","What they actually do"],["Benefit","What they are getting out of it"]];
+var sortPick=new Array(10).fill(null), sortIdx=0;
+function renderSort(){
+  document.getElementById('sort-card').style.display='';
+  document.getElementById('tally-card').style.display='none';
+  document.getElementById('sort-prog').textContent='CARD '+(sortIdx+1)+' OF 10';
+  document.getElementById('sort-fact').textContent=SORT_FACTS[sortIdx];
+  var g=document.getElementById('base-grid'); g.innerHTML='';
+  SORT_BASES.forEach(function(b,i){
+    var el=document.createElement('button'); el.className='base-btn'+(sortPick[sortIdx]===i?' on':'');
+    el.innerHTML=esc(b[0])+'<small>'+esc(b[1])+'</small>';
+    el.onclick=function(){ sortPick[sortIdx]=i; renderSort(); };
+    g.appendChild(el);
+  });
+  document.getElementById('sort-prev').disabled=(sortIdx===0);
+  var nx=document.getElementById('sort-next'); nx.disabled=(sortPick[sortIdx]===null);
+  nx.textContent=(sortIdx===9)?'See your count →':'Next →';
+}
+function sortStep(d){
+  if(d>0 && sortIdx===9){ renderTally(); return; }
+  sortIdx=Math.max(0,Math.min(9,sortIdx+d)); renderSort();
+}
+function sortBack(){ if(document.getElementById('tally-card').style.display!=='none'||sortIdx===0){ if(document.getElementById('tally-card').style.display!=='none'){ sortReopen(); } else { show('join-screen'); } } else { sortStep(-1); } }
+function sortReopen(){ sortIdx=9; renderSort(); }
+function renderTally(){
+  var c=[0,0,0,0,0]; sortPick.forEach(function(p){ if(p!==null) c[p]++; });
+  document.getElementById('tally-rows').innerHTML=SORT_BASES.map(function(b,i){ return '<div class="tally-row"><span>'+esc(b[0])+'</span><span>'+c[i]+'</span></div>'; }).join('');
+  document.getElementById('sort-card').style.display='none';
+  document.getElementById('tally-card').style.display='';
+  window.scrollTo(0,0);
+}
 function __joinField(id, fallback){
   var el = document.getElementById(id);
   return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
