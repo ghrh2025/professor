@@ -488,7 +488,9 @@ async function postPractice(c){
     var res = await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
     var d = await res.json().catch(function(){ return null; });
     var code = (d && d.code) || ('HTTP_' + res.status);
-    if(code === 'NO_ASSIGNMENT' || code === 'DRY_RUN_OK'){
+    if(code === 'DRY_RUN_OK'){
+      set('#eef4ff','#c3d4f7','#1e3a8a','<strong>Dry run.</strong> Every gate passed and the roster matched. Nothing was recorded. Remove ?testKey from the URL to run for real.');
+    } else if(code === 'NO_ASSIGNMENT'){
       set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Sent.</strong> Your professor has your answers. You may close this page.');
     } else if(code === 'BAD_PASSWORD' || code === 'WINDOW_CLOSED' || code === 'NOT_ENROLLED' || code === 'INCOMPLETE'){
       set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not sent.</strong> ' + ((d && d.message) || code));
