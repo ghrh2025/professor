@@ -220,7 +220,8 @@ const weeks = [
   {
     num: 5, case: "Aldi", chapter: "Ch 9a", framework: "Segmentation + Targeting", icon: "🛒",
     day1: { date: "2026-09-21", focus: "Five ways to cut a market",                 link: "W5.1-five-ways.html" },
-    day2: { date: "2026-09-23", focus: "Choosing who not to serve",                 link: "W5.2-whole-list.html" }
+    day2: { date: "2026-09-23", focus: "Choosing who not to serve",                 link: "W5.2-whole-list.html" },
+    extra: { date: "2026-09-23", focus: "5.2b Midterm prep: segment and target",    link: "W5.2b-midterm-prep.html", label: "Wednesday" }
   },
   {
     num: 6, case: "Warby Parker", chapter: "Ch 9b", framework: "Positioning", icon: "👓",
@@ -414,6 +415,7 @@ function renderTimeline() {
         <div class="day-cards">
           ${dayCard(w.day1, "Monday")}
           ${dayCard(w.day2, "Wednesday")}
+          ${w.extra ? dayCard(w.extra, w.extra.label).replace('class="day-card"', 'class="day-card" style="grid-column:1/-1"') : ""}
         </div>
       </li>`;
   }).join("");
