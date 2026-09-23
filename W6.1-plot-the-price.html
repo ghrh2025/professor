@@ -362,7 +362,7 @@ body.has-credit-banner{padding-top:58px}
     </select>
 
     <div class="gate-q" style="margin-top:18px">Write your group's rule for when a low price helps you and when it hurts you.</div>
-    <textarea id="rule-input" placeholder="A rule, not an example. It has to explain why $45 was a worse idea than $95 for the same pair of glasses." oninput="onCall()"></textarea>
+    <textarea id="rule-input" placeholder="A rule, not an example. Test it on $45 and $95 for the same pair of glasses before you submit." oninput="onCall()"></textarea>
     <div id="rule-count" class="char-count">0 / 80 minimum</div>
 
     <button class="btn btn-go" id="submit-btn" onclick="submitAll()" disabled>Submit for credit →</button>
@@ -548,7 +548,8 @@ function onCall(){
 
 function submitAll(){
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.textContent = 'Submitting…';   // no double submits
+  if (btn.disabled) return;                                // no double submits
+  btn.disabled = true; btn.textContent = 'Submitting…';
   const payload = {
     exercise: 'W6.1-plot-the-price',
     week: '6.1',

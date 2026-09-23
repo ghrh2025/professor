@@ -451,8 +451,8 @@ body.has-credit-banner{padding-top:58px}
         </div>
       </div>
 
-    <div class="gate-q" style="margin-top:18px">Both of the people you just marked as lost were lost on purpose. Why was that worth it?</div>
-    <textarea id="why-input" placeholder="Answer in terms of what Warby Parker would have had to become to keep each of them, and what that would have cost the buyer it was actually built for." oninput="onWho()"></textarea>
+    <div class="gate-q" style="margin-top:18px">For each buyer you marked as lost, why was losing them worth it? If you kept someone, say what keeping them would have cost.</div>
+    <textarea id="why-input" placeholder="Answer in terms of what Warby Parker would have had to become to keep them, and what that would have cost." oninput="onWho()"></textarea>
     <div id="why-count" class="char-count">0 / 100 minimum</div>
 
     <button class="btn btn-go" id="who-btn" onclick="show('stmt-screen')" disabled>Write the statement →</button>
@@ -465,32 +465,28 @@ body.has-credit-banner{padding-top:58px}
     <button class="back-btn" onclick="show('who-screen')">← Back</button>
     <div class="week-tag">Week 6.2 · Phase 3</div>
     <div class="screen-title">Now write the sentence</div>
-    <div class="screen-sub">This is the Week 1 template, and you have been filling its slots all semester. Week 5 gave you the target. Week 3 gave you the alternative your buyer actually compares against. Write it for Warby Parker in February 2010.</div>
+    <div class="screen-sub">This is the positioning statement from the Chapter 9 infographic, the same four parts your Friday brief uses. It is not the Week 1 value proposition. That was a promise to the customer. This is where you want to sit in the buyer's head, next to what they compare you against. Week 5 gave you the target. Week 3 gave you the set they compare against. Write it for Warby Parker in February 2010.</div>
 
     <div class="pull">
       <span class="cap">The template</span>
-      For <b>[target]</b>, who <b>[constraint]</b>, we <b>[offering]</b> so they can <b>[job]</b>, unlike <b>[alternative]</b>.
+      For <b>[target]</b>, Warby Parker is the <b>[frame of reference]</b> that <b>[point of difference]</b>, because <b>[reason to believe]</b>.
     </div>
 
       <div class="slot">
-        <label for="s-target"><span class="slot-key">For</span> <span class="slot-hint">who the glasses are for, in the buyer's own terms</span></label>
+        <label for="s-target"><span class="slot-key">Target</span> <span class="slot-hint">who the glasses are for, described without income</span></label>
         <input id="s-target" type="text" autocomplete="off" oninput="onStatement()">
       </div>
       <div class="slot">
-        <label for="s-constraint"><span class="slot-key">who</span> <span class="slot-hint">the constraint or frustration that buyer is living with</span></label>
-        <input id="s-constraint" type="text" autocomplete="off" oninput="onStatement()">
+        <label for="s-frame"><span class="slot-key">Frame of reference</span> <span class="slot-hint">the category they compete in, worded to follow &ldquo;is the&rdquo;, and the set it gets compared against</span></label>
+        <input id="s-frame" type="text" autocomplete="off" oninput="onStatement()">
       </div>
       <div class="slot">
-        <label for="s-offering"><span class="slot-key">we</span> <span class="slot-hint">what Warby Parker actually is and does</span></label>
-        <input id="s-offering" type="text" autocomplete="off" oninput="onStatement()">
+        <label for="s-difference"><span class="slot-key">Point of difference</span> <span class="slot-hint">why this buyer picks them over the others in that set</span></label>
+        <input id="s-difference" type="text" autocomplete="off" oninput="onStatement()">
       </div>
       <div class="slot">
-        <label for="s-job"><span class="slot-key">so they can</span> <span class="slot-hint">the job it gets done for them</span></label>
-        <input id="s-job" type="text" autocomplete="off" oninput="onStatement()">
-      </div>
-      <div class="slot">
-        <label for="s-unlike"><span class="slot-key">unlike</span> <span class="slot-hint">the named alternative they are being compared against</span></label>
-        <input id="s-unlike" type="text" autocomplete="off" oninput="onStatement()">
+        <label for="s-reason"><span class="slot-key">Reason to believe</span> <span class="slot-hint">the proof that makes the difference true, not just claimed</span></label>
+        <input id="s-reason" type="text" autocomplete="off" oninput="onStatement()">
       </div>
 
     <div id="stmt-preview" class="stmt-preview"></div>
@@ -652,7 +648,7 @@ function onJoin(){
 
 
 /* ── The six prices and three buyers. No read, call or statement is graded here.
-   The reveal is slide 10 of the 6.2 deck. ── */
+   The reveals are slides 13 to 15 of the 6.2 deck. ── */
 const PRICES = [
   { id:'p8', amt:'$8' },
   { id:'p45', amt:'$45' },
@@ -673,12 +669,12 @@ const PEOPLE = [
   { id:'between', name:'The buyer in between' }
 ];
 const SLOTS  = [
-  { key:'target' },
-  { key:'constraint' },
-  { key:'offering' },
-  { key:'job' },
-  { key:'unlike' }
+  { key:'target',     label:'target' },
+  { key:'frame',      label:'frame of reference' },
+  { key:'difference', label:'point of difference' },
+  { key:'reason',     label:'reason to believe' }
 ];
+const SLOT_LABEL = {}; SLOTS.forEach(s => SLOT_LABEL[s.key] = s.label);
 const PRICE_AMT = {}; PRICES.forEach(p => PRICE_AMT[p.id] = p.amt);
 const READ_NAME = {}; READS.forEach(r => READ_NAME[r.id] = r.name);
 const PERSON_NAME = {}; PEOPLE.forEach(p => PERSON_NAME[p.id] = p.name);
@@ -733,11 +729,11 @@ function onStatement(){
   const piece = k => {
     const v = state.slots[k];
     return v ? '<span class="fill">' + esc(v) + '</span>'
-             : '<span class="blank">[' + k + ']</span>';
+             : '<span class="blank">[' + SLOT_LABEL[k] + ']</span>';
   };
   document.getElementById('stmt-preview').innerHTML =
-    'For ' + piece('target') + ', who ' + piece('constraint') + ', we ' + piece('offering') +
-    ' so they can ' + piece('job') + ', unlike ' + piece('unlike') + '.';
+    'For ' + piece('target') + ', Warby Parker is the ' + piece('frame') + ' that ' +
+    piece('difference') + ', because ' + piece('reason') + '.';
 
   const allSlots = SLOTS.every(s => (state.slots[s.key] || '').length >= 3);
   document.getElementById('submit-btn').disabled = !(allSlots && n >= 80);
@@ -746,7 +742,8 @@ function onStatement(){
 /* ── SUBMIT ── */
 function submitAll(){
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.textContent = 'Submitting…';   // no double submits
+  if (btn.disabled) return;                                // no double submits
+  btn.disabled = true; btn.textContent = 'Submitting…';
 
   const reads = {};
   PRICES.forEach(p => { reads[p.amt] = READ_NAME[state.reads[p.id]] || ''; });
@@ -754,9 +751,8 @@ function submitAll(){
   PEOPLE.forEach(p => {
     calls[p.name] = state.calls[p.id] === 'for' ? '$95 is for them' : '$95 loses them';
   });
-  const statement = 'For ' + state.slots.target + ', who ' + state.slots.constraint +
-    ', we ' + state.slots.offering + ' so they can ' + state.slots.job +
-    ', unlike ' + state.slots.unlike + '.';
+  const statement = 'For ' + state.slots.target + ', Warby Parker is the ' + state.slots.frame +
+    ' that ' + state.slots.difference + ', because ' + state.slots.reason + '.';
 
   const payload = {
     exercise: 'W6.2-price-they-almost-charged',
@@ -792,10 +788,9 @@ function buildSummary(){
   document.getElementById('student-tag').textContent =
     state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
   document.getElementById('sum-stmt').innerHTML =
-    'For <span class="fill">' + esc(state.slots.target) + '</span>, who <span class="fill">' +
-    esc(state.slots.constraint) + '</span>, we <span class="fill">' + esc(state.slots.offering) +
-    '</span> so they can <span class="fill">' + esc(state.slots.job) +
-    '</span>, unlike <span class="fill">' + esc(state.slots.unlike) + '</span>.';
+    'For <span class="fill">' + esc(state.slots.target) + '</span>, Warby Parker is the <span class="fill">' +
+    esc(state.slots.frame) + '</span> that <span class="fill">' + esc(state.slots.difference) +
+    '</span>, because <span class="fill">' + esc(state.slots.reason) + '</span>.';
   document.getElementById('sum-map').innerHTML =
     PRICES.map(p => esc(p.amt) + ' — ' + esc(READ_NAME[state.reads[p.id]] || '')).join('<br>');
   document.getElementById('sum-who').innerHTML =
