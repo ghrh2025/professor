@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>W6.2 — The Price They Almost Charged</title>
+<title>W6.2 — Write the Sentence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -268,6 +268,40 @@ body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:no
   cursor:pointer;background:rgba(255,255,255,.92);color:#222}
 body.has-credit-banner{padding-top:58px}
 </style>
+<style>/* ── W6.2 Write the Sentence (rebuilt 2026-09-29) ── */
+.tmpl{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:17px;line-height:1.7;margin-bottom:14px}
+.tmpl .fill{color:var(--cm-gold);font-weight:800}
+.slotdef{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.slotdef div{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-size:13.5px;line-height:1.5}
+.slotdef b{display:block;color:var(--cm-blue);font-size:14px;margin-bottom:2px}
+.stem{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:14px 16px;font-size:15.5px;line-height:1.6;margin-bottom:14px}
+.stem .blank{color:var(--cm-gold-d);font-weight:800}
+.opt-list{display:grid;gap:8px;margin-bottom:16px}
+.opt-btn{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;
+  border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.45;color:var(--text);transition:all .12s}
+.opt-btn:hover{border-color:var(--cm-blue)}
+.opt-btn .l{font-family:'Space Mono',monospace;font-weight:700;color:var(--cm-gold-d);flex:0 0 auto}
+.opt-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.opt-btn.on .l{color:var(--cm-gold)}
+.opt-btn.close,.opt-btn.close.on{background:#FFF1C9;border-color:#C9962B;color:var(--text)}
+.opt-btn.close .l,.opt-btn.close.on .l{color:#8A6100}
+.opt-btn:disabled{opacity:.35;cursor:not-allowed}
+.step-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--cm-gold-d);margin:4px 0 8px}
+.stmt-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:13px}
+.stmt-card .num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:1.5px;color:var(--cm-gold-d);margin-bottom:6px}
+.stmt-card .txt{font-size:15px;line-height:1.6;margin-bottom:11px}
+.sort-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:10px}
+.sort-card .txt{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+.bin-row{display:flex;gap:7px;flex-wrap:wrap}
+.pick-row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--border)}
+.pick-row:first-of-type{border-top:none}
+.pick-row .lab{font-weight:800;font-size:15px}
+@media(max-width:680px){.slotdef{grid-template-columns:1fr}.pick-row{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 
@@ -275,7 +309,7 @@ body.has-credit-banner{padding-top:58px}
 <div id="pw-screen" class="screen active">
   <div class="pw-box">
     <div class="lockup">MKTG 2080 · Week 6.2</div>
-    <h1>The Price They <span class="g">Almost Charged</span></h1>
+    <h1>Write the <span class="g">Sentence</span></h1>
     <p>Enter today's password to join. It records your participation for class credit.</p>
     <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
            autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
@@ -287,9 +321,10 @@ body.has-credit-banner{padding-top:58px}
 <!-- ═══════════════════════ JOIN ═══════════════════════ -->
 <div id="join-screen" class="screen">
   <div class="page-wrap">
+    <button class="back-btn" onclick="show('pw-screen')">← Back</button>
     <div class="week-tag">Week 6.2 · Warby Parker</div>
     <div class="screen-title">Get set up</div>
-    <div class="screen-sub">Four students planned to sell glasses for $45. A Wharton professor told them it would not fly, and his reason had nothing to do with margin. They launched at $95. Your job today is to work out who that number was for.</div>
+    <div class="screen-sub">Monday you mapped the prices. Today you write the sentence that says where Warby Parker sits in the buyer's head, then test it the way a competitor would.</div>
     <div class="card">
       <div class="field">
         <label for="j-name">Your name</label>
@@ -322,180 +357,106 @@ body.has-credit-banner{padding-top:58px}
   </div>
 </div>
 
-<!-- ═══════════════════════ BRIEF ═══════════════════════ -->
+<!-- ═══════════════════════ REFRESHER ═══════════════════════ -->
 <div id="brief-screen" class="screen">
   <div class="page-wrap">
     <button class="back-btn" onclick="show('join-screen')">← Back</button>
     <div class="week-tag">Week 6.2 · Positioning</div>
-    <div class="screen-title">Positioning happens in someone else's head</div>
-    <div class="screen-sub">Not in yours. A price is not just a number you charge, it is a sentence the buyer reads about what you are. Warby Parker found that out before it sold anything.</div>
+    <div class="screen-title">Monday you found the cliff. Today the map becomes a sentence.</div>
+    <div class="screen-sub">Buyers doubted the cheapest glasses, interest climbed with price, and it fell off a cliff at $100. Warby Parker launched at $95. A map shows where you are. A positioning statement says it in words a competitor cannot copy.</div>
 
-    <div class="ladder">
-      <div class="row"><span class="n">1</span><span><span class="nm">A place, not a claim</span><span class="pl">Positioning is the slot you occupy in a buyer's mind, relative to the things they compare you against.</span></span></div>
-      <div class="row"><span class="n">2</span><span><span class="nm">Always relative</span><span class="pl">You cannot position against nobody. Name the alternative or you have not positioned anything.</span></span></div>
-      <div class="row"><span class="n">3</span><span><span class="nm">Price talks</span><span class="pl">Buyers read a price as evidence. Cheap can mean a deal, and it can mean worse. The seller does not choose which.</span></span></div>
+    <div class="tmpl">For <span class="fill">[target]</span>, Warby Parker is the <span class="fill">[frame of reference]</span> that <span class="fill">[point of difference]</span>, because <span class="fill">[reason to believe]</span>.</div>
+    <div class="slotdef">
+      <div><b>Target segment</b>The specific group of people you serve.</div>
+      <div><b>Frame of reference</b>The category you compete in, and who you get compared against.</div>
+      <div><b>Point of difference</b>The reason this target picks you over the others in that frame.</div>
+      <div><b>Reason to believe</b>The proof that makes the difference true, not just claimed.</div>
     </div>
 
     <div class="mission">
-      The plan was <b>$45</b>. Jagmohan Raju told them it would not fly, and the reason was not margin. Your job is to work out what $45 would have said about them, and then to write down what $95 says instead.
+      <b>This is built to be hard.</b> Every card in Phase 1 is something a smart group would defend. Pick one, then name the card that came <b>closest</b> and say why it loses. Use the case, not your gut.
     </div>
-
-    <button class="btn btn-go" onclick="show('map-screen')">Read the prices →</button>
+    <div class="ladder">
+      <div class="row"><span class="n">1</span><span><span class="nm">Build the sentence</span><span class="pl">Four slots, five cards each. Pick, then beat the runner-up.</span></span></div>
+      <div class="row"><span class="n">2</span><span><span class="nm">The competitor test</span><span class="pl">Four finished statements. Who else could sign each one?</span></span></div>
+      <div class="row"><span class="n">3</span><span><span class="nm">STP in three words</span><span class="pl">Segmentation, targeting and positioning, all in one place.</span></span></div>
+    </div>
+    <button class="btn btn-go" style="margin-top:16px" onclick="goSlot(0)">Start Phase 1 →</button>
   </div>
 </div>
 
-<!-- ═══════════════════════ MAP ═══════════════════════ -->
-<div id="map-screen" class="screen">
+<!-- ═══════════════════════ PHASE 1 (one screen, four slots) ═══════════════════════ -->
+<div id="slot-screen" class="screen">
   <div class="page-wrap">
-    <button class="back-btn" onclick="show('brief-screen')">← Back</button>
-    <div class="week-tag">Week 6.2 · Phase 1</div>
-    <div class="screen-title">What did each price say?</div>
-    <div class="screen-sub">Not whether it was a good deal. What a 2009 buyer, who had never heard of these four students, would have concluded about the glasses from the number alone. Six prices, one read each.</div>
+    <button class="back-btn" onclick="slotBack()">← Back</button>
+    <div class="week-tag" id="slot-tag">Week 6.2 · Phase 1 · Slot 1 of 4</div>
+    <div class="screen-title" id="slot-title"></div>
+    <div class="screen-sub" id="slot-sub"></div>
+    <div class="stem" id="slot-stem"></div>
 
-      <div class="price-card">
-        <div class="pc-head"><span class="pc-amt">$8</span></div>
-        <div class="pc-note">Zenni Optical, prescription glasses on the internet, reviewed by Kiplinger's in January 2009.</div>
-        <div class="read-row">
-          <button type="button" class="read-btn" data-p="p8" data-r="distrust" onclick="setRead('p8','distrust')">Too cheap to trust</button>
-          <button type="button" class="read-btn" data-p="p8" data-r="rising" onclick="setRead('p8','rising')">Interest rising</button>
-          <button type="button" class="read-btn" data-p="p8" data-r="peak" onclick="setRead('p8','peak')">Peak interest</button>
-          <button type="button" class="read-btn" data-p="p8" data-r="cliff" onclick="setRead('p8','cliff')">Over the cliff</button>
-        </div>
-      </div>
-      <div class="price-card">
-        <div class="pc-head"><span class="pc-amt">$45</span></div>
-        <div class="pc-note">The plan the four of them worked on for a year and a half before they sold anything.</div>
-        <div class="read-row">
-          <button type="button" class="read-btn" data-p="p45" data-r="distrust" onclick="setRead('p45','distrust')">Too cheap to trust</button>
-          <button type="button" class="read-btn" data-p="p45" data-r="rising" onclick="setRead('p45','rising')">Interest rising</button>
-          <button type="button" class="read-btn" data-p="p45" data-r="peak" onclick="setRead('p45','peak')">Peak interest</button>
-          <button type="button" class="read-btn" data-p="p45" data-r="cliff" onclick="setRead('p45','cliff')">Over the cliff</button>
-        </div>
-      </div>
-      <div class="price-card">
-        <div class="pc-head"><span class="pc-amt">$93</span></div>
-        <div class="pc-note">Came up, and David Bell ruled it out for a reason that had nothing to do with margin.</div>
-        <div class="read-row">
-          <button type="button" class="read-btn" data-p="p93" data-r="distrust" onclick="setRead('p93','distrust')">Too cheap to trust</button>
-          <button type="button" class="read-btn" data-p="p93" data-r="rising" onclick="setRead('p93','rising')">Interest rising</button>
-          <button type="button" class="read-btn" data-p="p93" data-r="peak" onclick="setRead('p93','peak')">Peak interest</button>
-          <button type="button" class="read-btn" data-p="p93" data-r="cliff" onclick="setRead('p93','cliff')">Over the cliff</button>
-        </div>
-      </div>
-      <div class="price-card">
-        <div class="pc-head"><span class="pc-amt">$95</span></div>
-        <div class="pc-note">What the site actually launched at on February 15, 2010, lenses included.</div>
-        <div class="read-row">
-          <button type="button" class="read-btn" data-p="p95" data-r="distrust" onclick="setRead('p95','distrust')">Too cheap to trust</button>
-          <button type="button" class="read-btn" data-p="p95" data-r="rising" onclick="setRead('p95','rising')">Interest rising</button>
-          <button type="button" class="read-btn" data-p="p95" data-r="peak" onclick="setRead('p95','peak')">Peak interest</button>
-          <button type="button" class="read-btn" data-p="p95" data-r="cliff" onclick="setRead('p95','cliff')">Over the cliff</button>
-        </div>
-      </div>
-      <div class="price-card">
-        <div class="pc-head"><span class="pc-amt">$99</span></div>
-        <div class="pc-note">On the table, and worth $4 more a pair than what they chose.</div>
-        <div class="read-row">
-          <button type="button" class="read-btn" data-p="p99" data-r="distrust" onclick="setRead('p99','distrust')">Too cheap to trust</button>
-          <button type="button" class="read-btn" data-p="p99" data-r="rising" onclick="setRead('p99','rising')">Interest rising</button>
-          <button type="button" class="read-btn" data-p="p99" data-r="peak" onclick="setRead('p99','peak')">Peak interest</button>
-          <button type="button" class="read-btn" data-p="p99" data-r="cliff" onclick="setRead('p99','cliff')">Over the cliff</button>
-        </div>
-      </div>
-      <div class="price-card">
-        <div class="pc-head"><span class="pc-amt">$400+</span></div>
-        <div class="pc-note">A Prada frame with lenses at a mall optical shop in West Chester, autumn 2009.</div>
-        <div class="read-row">
-          <button type="button" class="read-btn" data-p="p400" data-r="distrust" onclick="setRead('p400','distrust')">Too cheap to trust</button>
-          <button type="button" class="read-btn" data-p="p400" data-r="rising" onclick="setRead('p400','rising')">Interest rising</button>
-          <button type="button" class="read-btn" data-p="p400" data-r="peak" onclick="setRead('p400','peak')">Peak interest</button>
-          <button type="button" class="read-btn" data-p="p400" data-r="cliff" onclick="setRead('p400','cliff')">Over the cliff</button>
-        </div>
-      </div>
+    <div class="step-label">1 · Your group's pick</div>
+    <div class="opt-list" id="slot-opts"></div>
 
-    <div id="map-msg" class="tally"></div>
-    <button class="btn btn-go" id="map-btn" onclick="show('who-screen')" disabled>Lock in the six →</button>
+    <div class="step-label">2 · Which other card came closest?</div>
+    <div class="opt-list" id="slot-close"></div>
+
+    <div class="step-label">3 · Why does that card lose? Use the case.</div>
+    <textarea id="slot-why" placeholder="The runner-up loses because…" oninput="onSlotWhy()"></textarea>
+    <div class="char-count" id="slot-count">0 / 50 minimum</div>
+
+    <button class="btn btn-go" id="slot-btn" style="margin-top:14px" onclick="slotNext()" disabled>Next slot →</button>
   </div>
 </div>
 
-<!-- ═══════════════════════ WHO ═══════════════════════ -->
-<div id="who-screen" class="screen">
+<!-- ═══════════════════════ PHASE 2 ═══════════════════════ -->
+<div id="test-screen" class="screen">
   <div class="page-wrap">
-    <button class="back-btn" onclick="show('map-screen')">← Back</button>
+    <button class="back-btn" onclick="goSlot(3)">← Back</button>
     <div class="week-tag">Week 6.2 · Phase 2</div>
-    <div class="screen-title">Who was $95 for?</div>
-    <div class="screen-sub">Three buyers. Warby Parker set its price between two of them on purpose, and neither of those two was ever going to buy. Make the call on all three.</div>
-
-      <div class="person-card">
-        <div class="pc-name">Dana Whitlock</div>
-        <div class="pc-bio">Bought the Prada frame with lenses for a little over four hundred dollars and did not think about it again. She liked the frames, and she liked knowing they were Prada.</div>
-        <div class="call-row">
-          <button type="button" class="call-btn" data-s="dana" data-v="for" onclick="callPerson('dana','for')">$95 is for them</button>
-          <button type="button" class="call-btn" data-s="dana" data-v="lost" onclick="callPerson('dana','lost')">$95 loses them</button>
-        </div>
-      </div>
-      <div class="person-card">
-        <div class="pc-name">Wes Cordray</div>
-        <div class="pc-bio">Had been buying glasses online for about $30 a pair. Did not love them, replaced them when they broke, and considered that the arrangement.</div>
-        <div class="call-row">
-          <button type="button" class="call-btn" data-s="wes" data-v="for" onclick="callPerson('wes','for')">$95 is for them</button>
-          <button type="button" class="call-btn" data-s="wes" data-v="lost" onclick="callPerson('wes','lost')">$95 loses them</button>
-        </div>
-      </div>
-      <div class="person-card">
-        <div class="pc-name">The buyer in between</div>
-        <div class="pc-bio">Would not touch the cheapest glasses on the internet, and was gone by the time a price reached three digits.</div>
-        <div class="call-row">
-          <button type="button" class="call-btn" data-s="between" data-v="for" onclick="callPerson('between','for')">$95 is for them</button>
-          <button type="button" class="call-btn" data-s="between" data-v="lost" onclick="callPerson('between','lost')">$95 loses them</button>
-        </div>
-      </div>
-
-    <div class="gate-q" style="margin-top:18px">For each buyer you marked as lost, why was losing them worth it? If you kept someone, say what keeping them would have cost.</div>
-    <textarea id="why-input" placeholder="Answer in terms of what Warby Parker would have had to become to keep them, and what that would have cost." oninput="onWho()"></textarea>
-    <div id="why-count" class="char-count">0 / 100 minimum</div>
-
-    <button class="btn btn-go" id="who-btn" onclick="show('stmt-screen')" disabled>Write the statement →</button>
+    <div class="screen-title">The competitor test</div>
+    <div class="screen-sub">A positioning statement fails if a competitor could sign it too. Four finished statements for Warby Parker, February 2010. For each one, who else could put their name on it? Read every slot. One word can give it away.</div>
+    <div id="stmt-list"></div>
+    <div class="step-label">Fix one</div>
+    <div class="gate-q">Pick the statement that fooled your group, or nearly did. Name the slot that gave it away, then rewrite that one slot so only Warby Parker could sign it.</div>
+    <textarea id="fix-input" placeholder="Statement __ fooled us. The ____ slot gave it away. Rewritten: …" oninput="onTest()"></textarea>
+    <div class="char-count" id="fix-count">0 / 80 minimum</div>
+    <button class="btn btn-go" id="test-btn" style="margin-top:14px" onclick="show('stp-screen')" disabled>On to Phase 3 →</button>
   </div>
 </div>
 
-<!-- ═══════════════════════ STATEMENT ═══════════════════════ -->
-<div id="stmt-screen" class="screen">
+<!-- ═══════════════════════ PHASE 3A ═══════════════════════ -->
+<div id="stp-screen" class="screen">
   <div class="page-wrap">
-    <button class="back-btn" onclick="show('who-screen')">← Back</button>
+    <button class="back-btn" onclick="show('test-screen')">← Back</button>
     <div class="week-tag">Week 6.2 · Phase 3</div>
-    <div class="screen-title">Now write the sentence</div>
-    <div class="screen-sub">This is the positioning statement from the Chapter 9 infographic, the same four parts your Friday brief uses. It is not the Week 1 value proposition. That was a promise to the customer. This is where you want to sit in the buyer's head, next to what they compare you against. Week 5 gave you the target. Week 3 gave you the set they compare against. Write it for Warby Parker in February 2010.</div>
+    <div class="screen-title">STP in three words</div>
+    <div class="screen-sub">Weeks 5 and 6 were one framework: segmentation, targeting, positioning. Each step does one job, and each job fits in one word.</div>
 
-    <div class="pull">
-      <span class="cap">The template</span>
-      For <b>[target]</b>, Warby Parker is the <b>[frame of reference]</b> that <b>[point of difference]</b>, because <b>[reason to believe]</b>.
+    <div class="card">
+      <div class="step-label">A · One word for each step</div>
+      <div id="word-rows"></div>
     </div>
 
-      <div class="slot">
-        <label for="s-target"><span class="slot-key">Target</span> <span class="slot-hint">who the glasses are for, described without income</span></label>
-        <input id="s-target" type="text" autocomplete="off" oninput="onStatement()">
-      </div>
-      <div class="slot">
-        <label for="s-frame"><span class="slot-key">Frame of reference</span> <span class="slot-hint">the category they compete in, worded to follow &ldquo;is the&rdquo;, and the set it gets compared against</span></label>
-        <input id="s-frame" type="text" autocomplete="off" oninput="onStatement()">
-      </div>
-      <div class="slot">
-        <label for="s-difference"><span class="slot-key">Point of difference</span> <span class="slot-hint">why this buyer picks them over the others in that set</span></label>
-        <input id="s-difference" type="text" autocomplete="off" oninput="onStatement()">
-      </div>
-      <div class="slot">
-        <label for="s-reason"><span class="slot-key">Reason to believe</span> <span class="slot-hint">the proof that makes the difference true, not just claimed</span></label>
-        <input id="s-reason" type="text" autocomplete="off" oninput="onStatement()">
-      </div>
+    <div class="step-label">B · Sort nine Warby Parker facts. Which step is each one doing?</div>
+    <div id="sort-list"></div>
+    <div class="tally" id="sort-tally"></div>
+    <button class="btn btn-go" id="stp-btn" onclick="show('name-screen')" disabled>Last step →</button>
+  </div>
+</div>
 
-    <div id="stmt-preview" class="stmt-preview"></div>
-
-    <div class="gate-q" style="margin-top:14px">$95 could not win on price alone. Name one thing Warby Parker had to add because of that.</div>
-    <textarea id="add-input" placeholder="Something concrete from the case, and say what it was doing for the position." oninput="onStatement()"></textarea>
-    <div id="add-count" class="char-count">0 / 80 minimum</div>
-
-    <button class="btn btn-go" id="submit-btn" onclick="submitAll()" disabled>Submit for credit →</button>
+<!-- ═══════════════════════ PHASE 3B ═══════════════════════ -->
+<div id="name-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('stp-screen')">← Back</button>
+    <div class="week-tag">Week 6.2 · Phase 3</div>
+    <div class="screen-title">Name the tool</div>
+    <div class="screen-sub">Segmentation groups people on a base. Targeting chooses a group by testing how attractive it is. Name the base or the test each fact is using.</div>
+    <div id="name-list"></div>
+    <div class="step-label">C · The $45 plan</div>
+    <div class="gate-q">At $45, which of the three words did Warby Parker get wrong: grouping, choosing, or differentiating? Say why.</div>
+    <textarea id="at45-input" placeholder="At $45 they got ____ wrong, because…" oninput="onName()"></textarea>
+    <div class="char-count" id="at45-count">0 / 60 minimum</div>
+    <button class="btn btn-go" id="submit-btn" style="margin-top:14px" onclick="submitAll()" disabled>Submit for credit →</button>
     <div class="submit-note">One submission per student. Your group's answers, your own name.</div>
   </div>
 </div>
@@ -503,36 +464,36 @@ body.has-credit-banner{padding-top:58px}
 <!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
 <div id="summary-screen" class="screen">
   <div class="page-wrap">
+    <button class="back-btn" onclick="show('name-screen')">← Back</button>
     <div class="week-tag">Week 6.2 — Summary</div>
     <div class="screen-title">You wrote the sentence</div>
-    <div class="confirm-pill">✓ Participation recorded — you're all set</div>
-    <div id="student-tag" class="student-tag"></div>
+    <div class="confirm-pill credit-claim">✓ Participation recorded — you're all set</div>
+    <div class="student-tag" id="student-tag"></div>
 
+    <div class="section-label">Your sentence, built from your four picks</div>
     <div class="verdict" id="sum-stmt"></div>
 
-    <p class="section-label">How your group read the six prices</p>
-    <div class="answer-box" id="sum-map"></div>
+    <div class="section-label">The runner-up in each slot, and why it lost</div>
+    <div class="answer-box" id="sum-close"></div>
 
-    <p class="section-label">Who $95 was for, and who it lost</p>
-    <div class="answer-box" id="sum-who"></div>
+    <div class="section-label">The competitor test</div>
+    <div class="answer-box" id="sum-test"></div>
 
-    <p class="section-label">What they had to add</p>
-    <div class="answer-box" id="sum-add"></div>
+    <div class="section-label">STP in three words</div>
+    <div class="answer-box" id="sum-stp"></div>
 
     <div class="debrief-box">
       <h3>Bring to the debrief</h3>
       <ol>
-        <li>Which price did your group argue about longest?</li>
-        <li>Raju said $45 would leave no money for brand building. What was his second objection, and why did it matter more?</li>
-        <li>Dana Whitlock bought her Prada frames four months before the site went live. In what sense was she never theirs to lose?</li>
-        <li>David Bell ruled out $93 because it &ldquo;sounds more like a Walmart price.&rdquo; What is he actually saying a price does?</li>
-        <li>So who was $95 for, and who was Warby Parker willing to lose in order to get them?</li>
+        <li>“A fraction of what the mall charges” is true. Why is it the wrong point of difference?</li>
+        <li>The home try-on is real, and it is in the case. Why is it not the reason to believe?</li>
+        <li>Statement 1 says Warby Parker designs its frames in house. Why could the mall sign it anyway?</li>
+        <li>At $45, which word did Warby Parker get wrong: grouping, choosing, or differentiating?</li>
       </ol>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
 <script>
 function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
 
@@ -647,124 +608,279 @@ function onJoin(){
 }
 
 
-/* ── The six prices and three buyers. No read, call or statement is graded here.
-   The reveals are slides 14 to 16 of the 6.2 deck. ── */
-const PRICES = [
-  { id:'p8', amt:'$8' },
-  { id:'p45', amt:'$45' },
-  { id:'p93', amt:'$93' },
-  { id:'p95', amt:'$95' },
-  { id:'p99', amt:'$99' },
-  { id:'p400', amt:'$400+' }
+
+/* ── W6.2 Write the Sentence. Rebuilt 2026-09-29.
+   NOTHING HERE IS GRADED AND NO OPTION IS MARKED. The reveals are the answer
+   slides in the 6.2 deck and the Professor Key.
+   Distractor rule (feedback_distractor_design): options in a slot sit within
+   about 8 characters of each other, and the index the key calls best varies
+   by slot. Change an option here and change the key and the deck the same day. ── */
+const SLOTS = [
+  { key:'target', label:'target', title:'Slot 1 · Target segment',
+    sub:'Who is the sentence for? Described by what they think and do, not by income.',
+    opts:[
+      'Anyone who wears glasses and would rather pay less for them',
+      'Online buyers already happy paying about $30 for a pair',
+      'Buyers who distrust cheap glasses but resent a $400 logo',
+      'Label lovers who want a designer name on the front of the frame',
+      'Recent college grads starting careers and watching every dollar' ] },
+  { key:'frame', label:'frame of reference', title:'Slot 2 · Frame of reference',
+    sub:'What category does the buyer file Warby Parker in, and who does it get compared against?',
+    opts:[
+      'online glasses site, judged against Zenni and its $8 pairs',
+      'prescription glasses brand, judged against the mall shops',
+      'designer eyewear label, judged against Prada and Ray-Ban',
+      'discount eyewear seller, judged against Walmart prices',
+      'online startup, judged against other brands sold online' ] },
+  { key:'difference', label:'point of difference', title:'Slot 3 · Point of difference',
+    sub:'Why does this buyer pick Warby Parker over the others in that frame?',
+    opts:[
+      'costs a fraction of what the mall charges for the same frames',
+      'puts a designer-looking frame on you without a designer price',
+      'lets you order from your couch instead of driving to the mall',
+      'gives a pair to someone in need for every pair that you buy',
+      'sells mall-quality frames for under $100, lenses included' ] },
+  { key:'reason', label:'reason to believe', title:'Slot 4 · Reason to believe',
+    sub:'What proof makes the point of difference true, and not just a claim?',
+    opts:[
+      'they design in house and sell direct: no logo fee, no markup',
+      'they mail five pairs to try at home, free, for five full days',
+      'they pay for a pair for someone in need with every pair sold',
+      'four Wharton students built it, and a professor invested in it',
+      'they priced at $95 instead of $45 so it would not look cheap' ] }
 ];
-const READS  = [
-  { id:'distrust', name:'Too cheap to trust' },
-  { id:'rising', name:'Interest rising' },
-  { id:'peak', name:'Peak interest' },
-  { id:'cliff', name:'Over the cliff' }
+const LETTERS = ['A','B','C','D','E'];
+
+const STATEMENTS = [
+  'For people who want good glasses without the hassle, Warby Parker is the prescription eyewear brand that makes well-built, stylish frames, because it designs every one of its frames in house.',
+  'For people who want better than bargain-site glasses but refuse to pay for a logo, Warby Parker is the prescription glasses brand that matches the mall’s frames for $95, lenses included, because it designs its own frames and sells them direct, with no licensing fee and no store in between.',
+  'For budget-minded glasses buyers, Warby Parker is the online eyewear brand that cuts out the middleman, because it sells direct to customers over the internet with no store at all.',
+  'For style-conscious shoppers, Warby Parker is the eyewear brand that gives back, because for every pair sold, a pair goes to someone who needs glasses.'
 ];
-const PEOPLE = [
-  { id:'dana', name:'Dana Whitlock' },
-  { id:'wes', name:'Wes Cordray' },
-  { id:'between', name:'The buyer in between' }
+const TAGS = ['Zenni could sign it','The mall could sign it','Anyone could sign it','Only Warby Parker'];
+
+const STEPS = ['Segmentation','Targeting','Positioning'];
+const WORDS = ['Choosing','Placing','Grouping','Pricing','Differentiating'];
+
+const SORT = [
+  'Wes Cordray keeps buying $30 pairs online, and Warby Parker lets him go.',
+  'Some buyers read an $8 price as a bargain. Others read it as proof the glasses are worse.',
+  'Frames are designed in house and sold direct, with no licensing fee in between.',
+  'At $95 there is money left for brand building. At $45, Raju said, there is none.',
+  'Some people already buy glasses online. Others have only ever bought them at a mall shop.',
+  'The name comes from two characters in Jack Kerouac’s unpublished journals.',
+  'These buyers already shop online, so a company with no stores can still get to them.',
+  'Some buyers want a designer name on the frame. Others just want a good frame without paying for one.',
+  'The price is $95, not $93, because $93 “sounds more like a Walmart price.”'
 ];
-const SLOTS  = [
-  { key:'target',     label:'target' },
-  { key:'frame',      label:'frame of reference' },
-  { key:'difference', label:'point of difference' },
-  { key:'reason',     label:'reason to believe' }
+
+const BASES = ['Geographic','Demographic','Psychographic','Benefit','Behavioral'];
+const TESTS = ['Identifiable','Substantial','Reachable','Responsive','Profitable'];
+const NAMES = [
+  { q:'“Some buyers read an $8 price as a bargain. Others read it as proof the glasses are worse.”', kind:'base', opts:BASES },
+  { q:'“Some buyers want a designer name on the frame. Others just want a good frame without paying for one.”', kind:'base', opts:BASES },
+  { q:'“At $95 there is money left for brand building. At $45, Raju said, there is none.”', kind:'test', opts:TESTS },
+  { q:'“These buyers already shop online, so a company with no stores can still get to them.”', kind:'test', opts:TESTS }
 ];
-const SLOT_LABEL = {}; SLOTS.forEach(s => SLOT_LABEL[s.key] = s.label);
-const PRICE_AMT = {}; PRICES.forEach(p => PRICE_AMT[p.id] = p.amt);
-const READ_NAME = {}; READS.forEach(r => READ_NAME[r.id] = r.name);
-const PERSON_NAME = {}; PEOPLE.forEach(p => PERSON_NAME[p.id] = p.name);
 
 let state = {
   name:'', email:'', groupNum:'',
-  reads:{}, calls:{}, why:'', slots:{}, added:''
+  pick:{}, close:{}, why:{},
+  tags:{}, fix:'',
+  words:{}, sort:{}, names:{}, at45:''
 };
+let curSlot = 0;
+function lc(t){ return t ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
 
 /* ── PHASE 1 ── */
-function setRead(pid, rk){
-  state.reads[pid] = rk;
-  document.querySelectorAll('.read-btn[data-p="'+pid+'"]').forEach(b =>
-    b.classList.toggle('on', b.getAttribute('data-r') === rk));
-  const done = PRICES.filter(p => state.reads[p.id]).length;
-  const el = document.getElementById('map-msg');
-  if (done === PRICES.length){
-    el.innerHTML = '<span class="got">All six read.</span> Now look at them in order, cheapest first. ' +
-      'Does your line only go one way?';
-  } else {
-    el.innerHTML = 'Read so far: <span class="missing">' + done + ' of ' + PRICES.length + '</span>';
-  }
-  document.getElementById('map-btn').disabled = done !== PRICES.length;
+function stemHTML(i){
+  const piece = (k, j) => {
+    const v = state.pick[k];
+    if (j === i) return '<span class="blank">[' + SLOTS[j].label + ']</span>';
+    return v != null ? esc(lc(SLOTS[j].opts[v])) + (k === 'frame' ? ',' : '') : '[' + SLOTS[j].label + ']';
+  };
+  return 'For ' + piece('target',0) + ', Warby Parker is the ' + piece('frame',1) + ' that ' +
+    piece('difference',2) + ', because ' + piece('reason',3) + '.';
 }
+function goSlot(i){
+  curSlot = i;
+  const s = SLOTS[i];
+  document.getElementById('slot-tag').textContent = 'Week 6.2 · Phase 1 · Slot ' + (i+1) + ' of 4';
+  document.getElementById('slot-title').textContent = s.title;
+  document.getElementById('slot-sub').textContent = s.sub;
+  document.getElementById('slot-btn').textContent = i < 3 ? 'Next slot →' : 'Lock the sentence →';
+  renderSlot();
+  document.getElementById('slot-why').value = state.why[s.key] || '';
+  onSlotWhy();
+  show('slot-screen');
+}
+function renderSlot(){
+  const s = SLOTS[curSlot];
+  document.getElementById('slot-stem').innerHTML = stemHTML(curSlot);
+  const p = state.pick[s.key], c = state.close[s.key];
+  const mk = (container, onPick, isClose) => {
+    const box = document.getElementById(container); box.innerHTML = '';
+    s.opts.forEach((o, j) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'opt-btn';
+      const l = document.createElement('span'); l.className = 'l'; l.textContent = LETTERS[j];
+      const t = document.createElement('span'); t.textContent = o;
+      b.appendChild(l); b.appendChild(t);
+      if (!isClose && p === j) b.classList.add('on');
+      if (isClose){
+        if (p == null || p === j) b.disabled = true;
+        if (c === j) b.classList.add('close','on');
+      }
+      b.onclick = () => onPick(j);
+      box.appendChild(b);
+    });
+  };
+  mk('slot-opts', j => {
+    state.pick[s.key] = j;
+    if (state.close[s.key] === j) delete state.close[s.key];
+    renderSlot(); onSlotWhy();
+  }, false);
+  mk('slot-close', j => { state.close[s.key] = j; renderSlot(); onSlotWhy(); }, true);
+}
+function onSlotWhy(){
+  const s = SLOTS[curSlot];
+  state.why[s.key] = document.getElementById('slot-why').value.trim();
+  const n = state.why[s.key].length;
+  const c = document.getElementById('slot-count');
+  c.textContent = n + ' / 50 minimum'; c.classList.toggle('ok', n >= 50);
+  document.getElementById('slot-btn').disabled =
+    !(state.pick[s.key] != null && state.close[s.key] != null && n >= 50);
+}
+function slotNext(){
+  if (document.getElementById('slot-btn').disabled) return;
+  if (curSlot < 3) goSlot(curSlot + 1); else { renderTest(); show('test-screen'); }
+}
+function slotBack(){ if (curSlot === 0) show('brief-screen'); else goSlot(curSlot - 1); }
 
 /* ── PHASE 2 ── */
-function callPerson(pid, v){
-  state.calls[pid] = v;
-  document.querySelectorAll('.call-btn[data-s="'+pid+'"]').forEach(b =>
-    b.classList.toggle('on', b.getAttribute('data-v') === v));
-  onWho();
+function renderTest(){
+  const box = document.getElementById('stmt-list'); box.innerHTML = '';
+  STATEMENTS.forEach((st, i) => {
+    const card = document.createElement('div'); card.className = 'stmt-card';
+    const n = document.createElement('div'); n.className = 'num'; n.textContent = 'STATEMENT ' + (i+1);
+    const t = document.createElement('div'); t.className = 'txt'; t.textContent = st;
+    const row = document.createElement('div'); row.className = 'read-row';
+    TAGS.forEach((tg, j) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'read-btn';
+      if (state.tags[i] === j) b.classList.add('on');
+      b.textContent = tg;
+      b.onclick = () => { state.tags[i] = j; renderTest(); onTest(); };
+      row.appendChild(b);
+    });
+    card.appendChild(n); card.appendChild(t); card.appendChild(row); box.appendChild(card);
+  });
+  onTest();
 }
-function onWho(){
-  state.why = document.getElementById('why-input').value.trim();
-  const n = state.why.length;
-  const c = document.getElementById('why-count');
-  c.textContent = n + ' / 100 minimum';
-  c.classList.toggle('ok', n >= 100);
-  const all = Object.keys(state.calls).length === PEOPLE.length;
-  document.getElementById('who-btn').disabled = !(all && n >= 100);
+function onTest(){
+  state.fix = document.getElementById('fix-input').value.trim();
+  const n = state.fix.length, c = document.getElementById('fix-count');
+  c.textContent = n + ' / 80 minimum'; c.classList.toggle('ok', n >= 80);
+  const all = STATEMENTS.every((_, i) => state.tags[i] != null);
+  document.getElementById('test-btn').disabled = !(all && n >= 80);
 }
 
 /* ── PHASE 3 ── */
-function onStatement(){
-  SLOTS.forEach(s => { state.slots[s.key] = document.getElementById('s-' + s.key).value.trim(); });
-  state.added = document.getElementById('add-input').value.trim();
-  const n = state.added.length;
-  const c = document.getElementById('add-count');
-  c.textContent = n + ' / 80 minimum';
-  c.classList.toggle('ok', n >= 80);
+function renderStp(){
+  const wr = document.getElementById('word-rows'); wr.innerHTML = '';
+  STEPS.forEach(st => {
+    const row = document.createElement('div'); row.className = 'pick-row';
+    const lab = document.createElement('div'); lab.className = 'lab'; lab.textContent = st;
+    const btns = document.createElement('div'); btns.className = 'read-row';
+    WORDS.forEach(w => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'read-btn';
+      if (state.words[st] === w) b.classList.add('on');
+      b.textContent = w;
+      b.onclick = () => { state.words[st] = w; renderStp(); };
+      btns.appendChild(b);
+    });
+    row.appendChild(lab); row.appendChild(btns); wr.appendChild(row);
+  });
+  const sl = document.getElementById('sort-list'); sl.innerHTML = '';
+  SORT.forEach((f, i) => {
+    const card = document.createElement('div'); card.className = 'sort-card';
+    const t = document.createElement('div'); t.className = 'txt'; t.textContent = (i+1) + '. ' + f;
+    const row = document.createElement('div'); row.className = 'bin-row';
+    STEPS.forEach(st => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'read-btn';
+      if (state.sort[i] === st) b.classList.add('on');
+      b.textContent = st;
+      b.onclick = () => { state.sort[i] = st; renderStp(); };
+      row.appendChild(b);
+    });
+    card.appendChild(t); card.appendChild(row); sl.appendChild(card);
+  });
+  const nw = STEPS.filter(s => state.words[s]).length;
+  const ns = SORT.filter((_, i) => state.sort[i]).length;
+  const tal = document.getElementById('sort-tally');
+  tal.innerHTML = '';
+  const sp = document.createElement('span');
+  sp.className = (nw === 3 && ns === SORT.length) ? 'got' : 'missing';
+  sp.textContent = 'Words ' + nw + ' of 3 · Facts sorted ' + ns + ' of ' + SORT.length;
+  tal.appendChild(sp);
+  document.getElementById('stp-btn').disabled = !(nw === 3 && ns === SORT.length);
+}
+function renderNames(){
+  const box = document.getElementById('name-list'); box.innerHTML = '';
+  NAMES.forEach((it, i) => {
+    const card = document.createElement('div'); card.className = 'sort-card';
+    const k = document.createElement('div'); k.className = 'step-label';
+    k.textContent = it.kind === 'base' ? 'Which segmentation base?' : 'Which targeting test?';
+    const t = document.createElement('div'); t.className = 'txt'; t.textContent = it.q;
+    const row = document.createElement('div'); row.className = 'bin-row';
+    it.opts.forEach(o => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'read-btn';
+      if (state.names[i] === o) b.classList.add('on');
+      b.textContent = o;
+      b.onclick = () => { state.names[i] = o; renderNames(); onName(); };
+      row.appendChild(b);
+    });
+    card.appendChild(k); card.appendChild(t); card.appendChild(row); box.appendChild(card);
+  });
+}
+function onName(){
+  state.at45 = document.getElementById('at45-input').value.trim();
+  const n = state.at45.length, c = document.getElementById('at45-count');
+  c.textContent = n + ' / 60 minimum'; c.classList.toggle('ok', n >= 60);
+  const all = NAMES.every((_, i) => state.names[i]);
+  const btn = document.getElementById('submit-btn');
+  if (btn.dataset.sent === '1') return;
+  btn.disabled = !(all && n >= 60);
+}
 
-  const piece = k => {
-    const v = state.slots[k];
-    return v ? '<span class="fill">' + esc(v) + '</span>'
-             : '<span class="blank">[' + SLOT_LABEL[k] + ']</span>';
-  };
-  document.getElementById('stmt-preview').innerHTML =
-    'For ' + piece('target') + ', Warby Parker is the ' + piece('frame') + ' that ' +
-    piece('difference') + ', because ' + piece('reason') + '.';
-
-  const allSlots = SLOTS.every(s => (state.slots[s.key] || '').length >= 3);
-  document.getElementById('submit-btn').disabled = !(allSlots && n >= 80);
+function sentence(){
+  const g = k => { const s = SLOTS.find(x => x.key === k); return lc(s.opts[state.pick[k]] || ''); };
+  return 'For ' + g('target') + ', Warby Parker is the ' + g('frame') + ', that ' +
+    g('difference') + ', because ' + g('reason') + '.';
 }
 
 /* ── SUBMIT ── */
 function submitAll(){
   const btn = document.getElementById('submit-btn');
-  if (btn.disabled) return;                                // no double submits
-  btn.disabled = true; btn.textContent = 'Submitting…';
-
-  const reads = {};
-  PRICES.forEach(p => { reads[p.amt] = READ_NAME[state.reads[p.id]] || ''; });
-  const calls = {};
-  PEOPLE.forEach(p => {
-    calls[p.name] = state.calls[p.id] === 'for' ? '$95 is for them' : '$95 loses them';
-  });
-  const statement = 'For ' + state.slots.target + ', Warby Parker is the ' + state.slots.frame +
-    ' that ' + state.slots.difference + ', because ' + state.slots.reason + '.';
+  if (btn.disabled || btn.dataset.sent === '1') return;           // no double submits
+  btn.disabled = true; btn.dataset.sent = '1'; btn.textContent = 'Submitting…';
 
   const payload = {
-    exercise: 'W6.2-price-they-almost-charged',
+    exercise: 'W6.2-write-the-sentence',
     week: '6.2',
     submittedAt: new Date().toISOString(),
     name: state.name, email: state.email, group: state.groupNum,
-    priceReads: reads,
-    buyerCalls: calls,
-    whyLosingThemWasWorthIt: state.why,
-    positioningStatement: statement,
-    whatTheyHadToAdd: state.added
+    positioningStatement: sentence()
   };
+  SLOTS.forEach(s => {
+    payload['pick_' + s.key]    = s.opts[state.pick[s.key]] || '';
+    payload['closest_' + s.key] = s.opts[state.close[s.key]] || '';
+    payload['why_' + s.key]     = state.why[s.key] || '';
+  });
+  STATEMENTS.forEach((_, i) => { payload['test_statement' + (i+1)] = TAGS[state.tags[i]] || ''; });
+  payload.test_fix = state.fix;
+  STEPS.forEach(st => { payload['word_' + st.toLowerCase()] = state.words[st] || ''; });
+  SORT.forEach((_, i) => { payload['sort_fact' + (i+1)] = state.sort[i] || ''; });
+  NAMES.forEach((_, i) => { payload['name_' + (i+1)] = state.names[i] || ''; });
+  payload.at45 = state.at45;
 
   try{
     if(/^https?:\/\//i.test(CREDIT_ENDPOINT)){
@@ -784,24 +900,34 @@ function submitAll(){
   show('summary-screen');
 }
 
+function line(parent, bold, rest){
+  const d = document.createElement('div'); d.style.marginBottom = '10px';
+  const b = document.createElement('b'); b.textContent = bold; d.appendChild(b);
+  if (rest){ d.appendChild(document.createElement('br')); d.appendChild(document.createTextNode(rest)); }
+  parent.appendChild(d);
+}
 function buildSummary(){
   document.getElementById('student-tag').textContent =
     state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
-  document.getElementById('sum-stmt').innerHTML =
-    'For <span class="fill">' + esc(state.slots.target) + '</span>, Warby Parker is the <span class="fill">' +
-    esc(state.slots.frame) + '</span> that <span class="fill">' + esc(state.slots.difference) +
-    '</span>, because <span class="fill">' + esc(state.slots.reason) + '</span>.';
-  document.getElementById('sum-map').innerHTML =
-    PRICES.map(p => esc(p.amt) + ' — ' + esc(READ_NAME[state.reads[p.id]] || '')).join('<br>');
-  document.getElementById('sum-who').innerHTML =
-    PEOPLE.map(p => esc(p.name) + ': ' +
-      (state.calls[p.id] === 'for' ? 'for them' : 'loses them')).join('<br>') +
-    '<br><br>' + esc(state.why);
-  document.getElementById('sum-add').textContent = state.added;
+  document.getElementById('sum-stmt').textContent = sentence();
+
+  const sc = document.getElementById('sum-close'); sc.innerHTML = '';
+  SLOTS.forEach(s => line(sc, s.title.replace(/^Slot \d · /,'') + ': runner-up was “' +
+    (s.opts[state.close[s.key]] || '') + '”', state.why[s.key] || ''));
+
+  const st = document.getElementById('sum-test'); st.innerHTML = '';
+  STATEMENTS.forEach((_, i) => line(st, 'Statement ' + (i+1) + ': ' + (TAGS[state.tags[i]] || ''), ''));
+  line(st, 'Your fix', state.fix);
+
+  const sp = document.getElementById('sum-stp'); sp.innerHTML = '';
+  line(sp, STEPS.map(x => x + ' = ' + (state.words[x] || '?')).join(' · '), '');
+  line(sp, 'Your sort', SORT.map((_, i) => (i+1) + ' ' + (state.sort[i] || '?')).join(' · '));
+  line(sp, 'Bases and tests', NAMES.map((_, i) => (i+1) + ' ' + (state.names[i] || '?')).join(' · '));
+  line(sp, 'At $45', state.at45);
 }
 
-/* ── INIT: show the template with its blanks before anything is typed ── */
-onStatement();
+/* ── INIT ── */
+renderStp(); renderNames(); onName();
 
 
 /* ── ROSTER GATE ─────────────────────────────────────────────────────────
