@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W8.2 · The One Question</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Week 8.2 palette (LEGO red + yellow). Same values as the 8.2 deck title slide. */
+  --cm-blue:   #B40C0E;
+  --cm-ink:    #1A1A1A;
+  --cm-gold:   #FFCF00;
+  --cm-gold-d: #A3080A;
+
+  --bg:      #F3F5F8;
+  --surface: #FFFFFF;
+  --border:  #DFE4EC;
+  --text:    #1A1A1A;
+  --muted:   #6B7280;
+  --radius:  10px;
+  --shadow:  0 2px 14px rgba(0,0,0,0.08);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── SCREENS — ID specificity keeps pw centered without breaking others ── */
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:820px;margin:0 auto;padding:22px 20px 90px}
+
+.week-tag{
+  font-family:'Space Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;color:var(--cm-gold-d);
+}
+.screen-title{font-size:29px;font-weight:900;line-height:1.15;margin-bottom:6px}
+.screen-sub{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:4px;background:transparent;
+  border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-radius:6px;
+  cursor:pointer;margin-bottom:16px;transition:all .15s;
+}
+.back-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* ── PRIMARY BUTTON ── */
+.btn{
+  display:inline-block;width:100%;border:none;border-radius:9px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:.3px;
+  padding:15px 20px;transition:transform .08s, box-shadow .15s, opacity .15s;
+}
+.btn-go{background:var(--cm-gold);color:var(--cm-ink)}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(255,207,0,.5);transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--cm-blue);font-size:14px;padding:12px 18px}
+.btn-ghost:hover{border-color:var(--cm-blue)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── PASSWORD SCREEN ── */
+.pw-box{
+  background:var(--cm-blue);color:#fff;border-radius:16px;
+  border-bottom:6px solid var(--cm-gold);
+  padding:40px 34px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:var(--cm-gold);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.pw-box h1 .g{color:var(--cm-gold)}
+.pw-box p{font-size:14px;color:#F6D3D3;margin-bottom:22px;line-height:1.5}
+.pw-input{
+  width:100%;background:#7E0709;border:2px solid #D9474A;border-radius:10px;
+  color:#fff;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;
+  letter-spacing:3px;text-align:center;text-transform:uppercase;padding:14px;margin-bottom:6px;
+  outline:none;transition:border-color .15s;
+}
+.pw-input:focus{border-color:var(--cm-gold)}
+.pw-input::placeholder{color:#E89A9B;letter-spacing:2px}
+.pw-err{color:#FCA5A5;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field select{
+  width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:12px 13px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--cm-blue)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ── STAGE LADDER (brief) ── */
+.ladder{background:var(--cm-blue);color:#fff;border-radius:12px;padding:18px 20px;
+  border-left:5px solid var(--cm-gold);margin-bottom:8px}
+.ladder .row{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.ladder .row:last-child{border-bottom:none}
+.ladder .n{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--cm-gold);min-width:22px}
+.ladder .nm{font-size:15.5px;font-weight:800;margin-right:8px;white-space:nowrap}
+.ladder .pl{font-size:13px;color:#F6D3D3;margin-top:2px}
+
+.mission{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;margin:14px 0}
+.mission b{color:var(--cm-blue)}
+
+/* ── SORT ── */
+.sort-progress{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.moment-card{
+  background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:24px 24px;box-shadow:var(--shadow);margin-bottom:18px;
+  font-size:18px;line-height:1.55;font-weight:500;min-height:120px;display:flex;align-items:center;
+}
+.stage-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.stage-btn{
+  display:block;width:100%;text-align:left;background:var(--cm-blue);color:#fff;
+  border:none;border-radius:10px;padding:13px 16px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:transform .1s, box-shadow .15s;
+}
+.stage-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(120,8,10,.3)}
+.stage-btn .q{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--cm-gold)}
+.stage-btn .n{font-size:16px;font-weight:900;margin-top:2px}
+.stage-btn .ax{font-size:12px;opacity:.8;margin-top:2px}
+
+/* ── REVIEW TIMELINE ── */
+.tl-stage{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;margin-bottom:10px}
+.tl-head{display:flex;align-items:baseline;gap:9px;margin-bottom:6px}
+.tl-num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:1px;color:var(--cm-gold-d);text-transform:uppercase}
+.tl-name{font-size:16px;font-weight:800}
+.tl-stage ul{margin:0;padding:0;list-style:none}
+.tl-stage li{font-size:14px;line-height:1.5;padding:7px 0 7px 26px;position:relative;
+  border-top:1px solid var(--border)}
+.tl-stage li:first-child{border-top:none}
+.tl-stage li .mark{position:absolute;left:0;top:7px;font-weight:800}
+.tl-stage li.hit .mark{color:#1B7F4B}
+.tl-stage li.miss .mark{color:#B4232A}
+.tl-stage li .why{display:block;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+.tl-empty{font-size:13px;color:var(--muted);font-style:italic;padding:4px 0}
+.score-pill{display:inline-block;background:#FDECEC;color:var(--cm-blue);border:1px solid #F2BFC0;
+  font-size:13px;font-weight:800;padding:8px 16px;border-radius:20px;margin-bottom:14px}
+
+/* ── GATE ── */
+.gate-q{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:18px 20px;font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px}
+.pull{background:var(--cm-blue);color:#fff;border-radius:10px;padding:15px 18px;
+  font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.pull .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--cm-gold);display:block;margin-bottom:6px}
+textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;color:var(--text);
+  padding:14px;outline:none;resize:vertical;min-height:120px;transition:border-color .15s;
+}
+textarea:focus{border-color:var(--cm-blue)}
+.char-count{font-size:12px;color:var(--muted);margin-top:6px;text-align:right}
+.char-count.ok{color:#1B7F4B;font-weight:700}
+.submit-note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+.rule-out{background:#FFF6E0;border:1px solid #F0DBA6;border-radius:8px;padding:12px 15px;
+  font-size:13.5px;line-height:1.55;color:#6B5200;margin-bottom:16px}
+.rule-out b{color:#4A3800}
+
+/* ── SUMMARY ── */
+.confirm-pill{display:inline-block;background:#E7F3EC;color:#14512F;border:1px solid #A9D6BC;
+  font-size:13px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:20px;margin-bottom:16px}
+.student-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.section-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--cm-gold-d);margin-bottom:8px}
+.answer-box{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:15px 18px;font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.verdict{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:16px;line-height:1.7;margin-bottom:18px}
+.verdict .fill{color:var(--cm-gold);font-weight:700}
+.debrief-box{background:#F7F9FC;border:1px solid var(--border);border-top:4px solid var(--cm-gold);
+  border-radius:12px;padding:20px 22px;margin-top:8px}
+.debrief-box h3{font-size:16px;font-weight:800;margin-bottom:12px}
+.debrief-box ol{margin:0 0 0 20px}
+.debrief-box li{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+
+@media(max-width:680px){
+  .screen-title{font-size:24px}
+  .moment-card{font-size:16px}
+  .verdict{font-size:15px}
+}
+
+/* ── W6 additions ── */
+.price-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px}
+.pc-head{display:flex;align-items:baseline;gap:10px}
+.pc-amt{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--cm-blue)}
+.pc-note{font-size:13.5px;line-height:1.5;color:#3A3A3A;margin:6px 0 11px}
+.read-row{display:flex;flex-wrap:wrap;gap:7px}
+.read-btn{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;
+  background:#fff;border:1.5px solid var(--border);color:var(--muted);
+  border-radius:999px;padding:7px 13px;cursor:pointer;transition:all .12s}
+.read-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+.read-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.person-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:13px}
+.pc-name{font-size:18px;font-weight:900;margin-bottom:6px}
+.pc-bio{font-size:14px;line-height:1.55;color:#3A3A3A;margin-bottom:12px}
+.call-row{display:flex;gap:9px;flex-wrap:wrap}
+.call-btn{font-family:'Inter',sans-serif;font-size:13.5px;font-weight:700;background:#fff;
+  border:1.5px solid var(--border);color:var(--muted);border-radius:8px;padding:9px 15px;
+  cursor:pointer;transition:all .12s}
+.call-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+.call-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.tally{font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.6;
+  background:#F7F9FC;border:1px solid var(--border);border-radius:8px;
+  padding:12px 15px;margin:14px 0;color:var(--muted)}
+.tally .got{color:#1B7F4B;font-weight:700}
+.tally .missing{color:#B4232A;font-weight:700}
+.slot{margin-bottom:12px}
+.slot label{display:block;font-size:13px;margin-bottom:6px}
+.slot-key{font-weight:800;color:var(--cm-blue);text-transform:none}
+.slot-hint{color:var(--muted);font-weight:500}
+.slot input{width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:11px 13px;outline:none}
+.slot input:focus{border-color:var(--cm-blue)}
+.stmt-preview{background:var(--cm-blue);color:#fff;border-radius:10px;border-left:5px solid var(--cm-gold);
+  padding:16px 18px;font-size:15.5px;line-height:1.65;margin:14px 0;min-height:30px}
+.stmt-preview .fill{color:var(--cm-gold);font-weight:700}
+.stmt-preview .blank{opacity:.45;font-style:italic}
+</style>
+<style>/* credit-fix 2026-08-21: never claim credit before the server answers */
+body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
+#credit-status{margin:18px auto !important}
+/* roster gate message (added 2026-08-25) */
+.join-msg{margin-top:10px;font-size:14px;line-height:1.45;min-height:1px}
+.join-msg.bad{color:#a4262c;font-weight:600}
+.join-msg.warn{color:#7a5c00}
+
+/* persistent credit banner (2026-08-25) */
+#credit-banner{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;gap:12px;
+  align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 16px;
+  font-size:14px;font-weight:600;line-height:1.35;text-align:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#credit-banner.bad{background:#a4262c;color:#fff}
+#credit-banner.warn{background:#ffd24a;color:#3a2d00}
+#credit-banner .cb-fix{border:0;border-radius:6px;padding:6px 12px;font-weight:700;
+  cursor:pointer;background:rgba(255,255,255,.92);color:#222}
+body.has-credit-banner{padding-top:58px}
+</style>
+
+<style>/* ── shared option/sort styles, from the W6.2 chassis ── */
+.tmpl{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:17px;line-height:1.7;margin-bottom:14px}
+.tmpl .fill{color:var(--cm-gold);font-weight:800}
+.slotdef{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.slotdef div{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-size:13.5px;line-height:1.5}
+.slotdef b{display:block;color:var(--cm-blue);font-size:14px;margin-bottom:2px}
+.stem{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:14px 16px;font-size:15.5px;line-height:1.6;margin-bottom:14px}
+.stem .blank{color:var(--cm-gold-d);font-weight:800}
+.opt-list{display:grid;gap:8px;margin-bottom:16px}
+.opt-btn{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;
+  border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.45;color:var(--text);transition:all .12s}
+.opt-btn:hover{border-color:var(--cm-blue)}
+.opt-btn .l{font-family:'Space Mono',monospace;font-weight:700;color:var(--cm-gold-d);flex:0 0 auto}
+.opt-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.opt-btn.on .l{color:var(--cm-gold)}
+.opt-btn.close,.opt-btn.close.on{background:#FFF1C9;border-color:#C9962B;color:var(--text)}
+.opt-btn.close .l,.opt-btn.close.on .l{color:#8A6100}
+.opt-btn:disabled{opacity:.35;cursor:not-allowed}
+.step-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--cm-gold-d);margin:4px 0 8px}
+.stmt-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:13px}
+.stmt-card .num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:1.5px;color:var(--cm-gold-d);margin-bottom:6px}
+.stmt-card .txt{font-size:15px;line-height:1.6;margin-bottom:11px}
+.sort-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:10px}
+.sort-card .txt{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+.bin-row{display:flex;gap:7px;flex-wrap:wrap}
+.pick-row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--border)}
+.pick-row:first-of-type{border-top:none}
+.pick-row .lab{font-weight:800;font-size:15px}
+@media(max-width:680px){.slotdef{grid-template-columns:1fr}.pick-row{grid-template-columns:1fr}}
+</style>
+<style>/* ── W8.2 The One Question (built 2026-10-05) ── */
+.adv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.adv-btn{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);
+  border-radius:10px;padding:13px 15px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.adv-btn:hover{border-color:var(--cm-blue)}
+.adv-btn .t{font-size:15px;font-weight:800;color:var(--text)}
+.adv-btn .s{font-size:12.5px;color:var(--muted);margin-top:3px}
+.adv-btn.on{background:var(--cm-blue);border-color:var(--cm-blue)}
+.adv-btn.on .t{color:#fff}.adv-btn.on .s{color:#F6D3D3}
+.held{background:var(--surface);border:1px solid var(--border);border-top:6px solid var(--cm-gold);
+  border-radius:12px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+.held .who{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--cm-gold-d);margin-bottom:6px}
+.held h3{font-size:20px;font-weight:900;margin-bottom:10px}
+.held .quote{border-left:4px solid var(--cm-gold);padding:6px 0 6px 14px;font-size:15px;
+  line-height:1.55;font-style:italic;margin-bottom:12px}
+.held .arg{font-size:14.5px;line-height:1.6;margin-bottom:12px}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.facts div{background:#F7F9FC;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:12.5px;line-height:1.4}
+.facts b{display:block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.facts .cant{grid-column:1 / -1;background:#FFF6E0;border-color:#F0DBA6}
+.stop{background:var(--cm-ink);color:#fff;border-radius:12px;padding:18px 20px;margin:6px 0 16px;
+  border-left:6px solid var(--cm-gold)}
+.stop .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2.5px;color:var(--cm-gold);display:block;margin-bottom:6px}
+.stop p{font-size:15px;line-height:1.55}
+.src-card{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 14px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px;transition:all .12s}
+.src-card:hover{border-color:var(--cm-blue)}
+.src-card .t{font-size:15px;font-weight:800}
+.src-card .m{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+.src-card.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.src-card.on .m{color:#F6D3D3}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.yn-row{display:flex;gap:10px;margin:8px 0 12px}
+.yn-row .call-btn{flex:1}
+.back-to-1{background:#FFF1C9;border:1px solid #C9962B;border-radius:10px;padding:14px 16px;
+  font-size:15px;line-height:1.55;margin-bottom:14px;display:none}
+.back-to-1.show{display:block}
+.back-to-1 b{color:#7A4F00}
+@media(max-width:680px){.adv-grid,.grid2{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 8.2</div>
+    <h1>The One <span class="g">Question</span></h1>
+    <p>Enter today's password, given in class. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('pw-screen')">← Back</button>
+    <div class="week-tag">Week 8.2 · LEGO</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">LEGO has about $200,000 and time for one study before the 2005 range is locked. Your group decides what that money finds out, and who LEGO has to ask.</div>
+    <div class="card">
+      <div class="field">
+        <label for="j-name">Your name</label>
+        <input id="j-name" type="text" placeholder="First and last" autocomplete="off" oninput="onJoin()">
+      </div>
+      <div class="field">
+        <label for="j-email">UC email</label>
+        <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
+        <div class="hint">Use your @mail.uc.edu address, the same one Canvas uses. Credit is matched on it.</div>
+      </div>
+      <div class="field">
+        <label for="j-group">Your group</label>
+        <select id="j-group" onchange="onJoin()">
+          <option value="">Pick your group…</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+        </select>
+      </div>
+      <button class="btn btn-go" id="join-btn" onclick="joinVerify()" disabled>Let's go →</button>
+      <div id="join-err" class="join-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BRIEF ═══════════════════════ -->
+<div id="brief-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Week 8.2 · Marketing Research</div>
+    <div class="screen-title">LEGO can afford to answer one question.</div>
+    <div class="screen-sub">Billund, late November 2004. Sales fell about 29% in 2003 and another 7% in 2004. The folder holds a test of children that came back clean, a box of postcards, about 4,000 letters, and a report that blames screens. Four people have each argued for a different way to spend the money.</div>
+    <div class="mission">
+      <b>Everyone holds one card.</b> Your group has four advocates and only one budget. Each of you makes one advocate's case. Then the group picks <b>one question</b>, names <b>who LEGO has to ask</b>, and proves the answer would change what LEGO does.
+    </div>
+    <div class="ladder">
+      <div class="row"><span class="n">0</span><span><span class="nm">Your card</span><span class="pl">Take one advocate. Make their case to your group in 30 seconds.</span></span></div>
+      <div class="row"><span class="n">1</span><span><span class="nm">Define the question</span><span class="pl">One question, and the people who can answer it.</span></span></div>
+      <div class="row"><span class="n">2</span><span><span class="nm">Design the plan</span><span class="pl">Primary or secondary? Qualitative or quantitative?</span></span></div>
+      <div class="row"><span class="n">3</span><span><span class="nm">The action test</span><span class="pl">What does LEGO do with the answer, and without it?</span></span></div>
+    </div>
+    <button class="btn btn-go" style="margin-top:16px" onclick="renderAdv(); show('card-screen')">Take your card →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PHASE 0 · YOUR CARD ═══════════════════════ -->
+<div id="card-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('brief-screen')">← Back</button>
+    <div class="week-tag">Week 8.2 · Your card</div>
+    <div class="screen-title">Pick the card you hold</div>
+    <div class="screen-sub">Split the four cards across your group, one each. Fewer than four of you? Someone holds two, and argues the second one too. More than four? Two people can share a card.</div>
+    <div class="adv-grid" id="adv-grid"></div>
+    <div id="held"></div>
+    <div id="pitch-wrap" style="display:none">
+      <div class="step-label">Your 30-second case, in one or two sentences</div>
+      <textarea id="pitch-input" placeholder="Spend the money on my study, because it is the only one that finds out…" oninput="onPitch()"></textarea>
+      <div class="char-count" id="pitch-count">0 / 50 minimum</div>
+      <div class="stop" style="margin-top:16px">
+        <span class="cap">Stop · Turn to your group</span>
+        <p>Go around the group. Every card gets its 30 seconds before anyone decides anything. Listen for what each study <b>cannot</b> tell LEGO.</p>
+      </div>
+      <button class="btn btn-go" id="card-btn" onclick="renderP1(); show('p1-screen')" disabled>Our group heard all four →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PHASE 1 · DEFINE ═══════════════════════ -->
+<div id="p1-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('card-screen')">← Back</button>
+    <div class="week-tag">Week 8.2 · Phase 1 · Define the question</div>
+    <div class="screen-title">Which one question does LEGO pay to answer?</div>
+    <div class="screen-sub">Every one of these is a fair question, and every one has somebody in the folder asking it. You can afford one. Agree as a group.</div>
+    <div class="step-label">1 · The question</div>
+    <div class="opt-list" id="q-opts"></div>
+    <div class="step-label">2 · Who would LEGO have to ask?</div>
+    <div id="src-opts"></div>
+    <div class="step-label">3 · Why can those people answer that question? Use the case.</div>
+    <textarea id="p1-why" placeholder="These people can answer it because…" oninput="onP1()"></textarea>
+    <div class="char-count" id="p1-count">0 / 60 minimum</div>
+    <button class="btn btn-go" id="p1-btn" style="margin-top:14px" onclick="renderP2(); show('p2-screen')" disabled>On to Phase 2 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PHASE 2 · DESIGN ═══════════════════════ -->
+<div id="p2-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('p1-screen')">← Back</button>
+    <div class="week-tag">Week 8.2 · Phase 2 · Design the plan</div>
+    <div class="screen-title">Label every source in the folder</div>
+    <div class="screen-sub">Primary data is collected new, for this question. Secondary data already exists, gathered for some other reason. Qualitative explores why. Quantitative measures how many. Label each one the way LEGO would use it now, in November 2004.</div>
+    <div id="p2-list"></div>
+    <div class="tally" id="p2-tally"></div>
+    <div class="step-label">The one your group argued about most</div>
+    <div class="gate-q">Which source was hardest to label, and what made it hard?</div>
+    <textarea id="p2-why" placeholder="The hardest one was ____, because…" oninput="onP2()"></textarea>
+    <div class="char-count" id="p2-count">0 / 50 minimum</div>
+    <button class="btn btn-go" id="p2-btn" style="margin-top:14px" onclick="renderP3(); show('p3-screen')" disabled>On to Phase 3 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PHASE 3 · ACT ═══════════════════════ -->
+<div id="p3-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('p2-screen')">← Back</button>
+    <div class="week-tag">Week 8.2 · Phase 3 · The action test</div>
+    <div class="screen-title">What does LEGO do with the answer?</div>
+    <div class="screen-sub">Research is only worth paying for if the answer changes what happens next. Your question could come back two ways. Say what LEGO does each time.</div>
+    <div class="pull"><span class="cap">Your group's question</span><span id="p3-q"></span></div>
+    <div class="grid2">
+      <div>
+        <div class="step-label">If the answer comes back one way…</div>
+        <textarea id="act-a" placeholder="If we find ____, LEGO will ____." oninput="onP3()"></textarea>
+        <div class="char-count" id="act-a-count">0 / 40 minimum</div>
+      </div>
+      <div>
+        <div class="step-label">…and if it comes back the other way</div>
+        <textarea id="act-b" placeholder="If we find ____ instead, LEGO will ____." oninput="onP3()"></textarea>
+        <div class="char-count" id="act-b-count">0 / 40 minimum</div>
+      </div>
+    </div>
+    <div class="step-label" style="margin-top:12px">Is LEGO doing something different in each case?</div>
+    <div class="yn-row">
+      <button type="button" class="call-btn" id="yn-yes" onclick="setSame(false)">Yes, the actions are different</button>
+      <button type="button" class="call-btn" id="yn-no" onclick="setSame(true)">No, LEGO does the same thing</button>
+    </div>
+    <div class="back-to-1" id="back-to-1">
+      <b>If those two are the same, pick a different question.</b> Money spent on an answer that changes nothing is money LEGO did not have to spend. Go back to Phase 1 and try another one.
+      <div style="margin-top:10px"><button type="button" class="btn btn-ghost" onclick="redo()">← Back to Phase 1</button></div>
+    </div>
+    <div id="p3-rest" style="display:none">
+      <div class="step-label">90 days after LEGO acts, what could it count to know the move worked?</div>
+      <textarea id="act-count" placeholder="LEGO would count…" oninput="onP3()" style="min-height:90px"></textarea>
+      <div class="char-count" id="act-count-count">0 / 30 minimum</div>
+      <button class="btn btn-go" id="submit-btn" style="margin-top:14px" onclick="submitAll()" disabled>Submit for credit →</button>
+      <div class="submit-note">One submission per student. Your group's answers, your own name.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="summary-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('p3-screen')">← Back</button>
+    <div class="week-tag">Week 8.2 · Summary</div>
+    <div class="screen-title">You spent the $200,000</div>
+    <div class="confirm-pill credit-claim">✓ Participation recorded, you're all set</div>
+    <div class="student-tag" id="student-tag"></div>
+
+    <div class="section-label">The card you held</div>
+    <div class="answer-box" id="sum-card"></div>
+
+    <div class="section-label">Phase 1 · Your question, and who LEGO has to ask</div>
+    <div class="verdict" id="sum-q"></div>
+
+    <div class="section-label">Phase 2 · How you labeled the folder</div>
+    <div class="answer-box" id="sum-p2"></div>
+
+    <div class="section-label">Phase 3 · The action test</div>
+    <div class="answer-box" id="sum-p3"></div>
+
+    <div class="debrief-box">
+      <h3>Bring to the debrief</h3>
+      <ol>
+        <li>LEGO's test of children came back clean. Why did it not settle anything?</li>
+        <li>Which question did your group pay to answer, and who did LEGO have to ask?</li>
+        <li>The mail came in for free. Why is reading it still not free?</li>
+        <li>Name one question in the folder that is not worth paying to answer. Why not?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<script>
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
+/* The class code is NOT stored here. It ships to a PUBLIC repo.
+   The student types it; the Logic App checks it against Key Vault. */
+var PW = '';
+
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── DRY-RUN PASSTHROUGH ───────────────────────────────────────────────────
+   ?testKey=... on the URL turns this page into a dry run: the workflow skips
+   the class-window gate and answers on the join branch, so no grade is ever
+   written. Absent the parameter this is '' — which matches no secret — and the
+   page behaves exactly as it does for a student. ── */
+var TEST_KEY = (function(){
+  try { return new URLSearchParams(location.search).get('testKey') || ''; }
+  catch(e){ return ''; }
+})();
+
+/* ── participation credit (Logic App contract) ───────────────────────── */
+function creditAnswers(src){
+  const skip=['email','name','week','session','exerciseId','password','group','points','answers','timestamp','submittedAt','exercise'];
+  return Object.entries(src||{}).filter(([k])=>!skip.includes(k))
+    .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
+    .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
+}
+function creditFields(src){
+  var skip = ['email','name','week','session','exerciseId','password','group',
+              'points','answers','fields','timestamp','submittedAt','exercise'];
+  var out = {};
+  Object.keys(src || {}).forEach(function(k){
+    if (skip.indexOf(k) !== -1) return;
+    var v = src[k];
+    if (v === undefined || v === null) return;
+    out[k] = v;
+  });
+  return out;
+}
+async function postForCredit(c){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  if(TEST_KEY) c.testKey = TEST_KEY;
+  const set=(bg,bd,fg,html)=>{
+    let el=document.getElementById('credit-status');
+    if(!el){el=document.createElement('div');el.id='credit-status';}
+    var _anchor=document.querySelector('.confirm-pill,.credit-claim');
+    var _host=(_anchor&&_anchor.parentElement)||document.getElementById('summary-screen')
+      ||document.getElementById('sum-screen')||document.querySelector('.screen.active')||document.body;
+    if(el.parentElement!==_host){
+      if(_anchor&&_anchor.parentElement===_host) _host.insertBefore(el,_anchor.nextSibling);
+      else _host.appendChild(el);
+    }
+    el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML=html;
+  };
+  document.body.classList.add('awaiting-credit');
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
+    const d=await res.json();
+    if(d.code==='DRY_RUN_OK'){
+      document.body.classList.remove('awaiting-credit');
+      set('#eef4ff','#c3d4f7','#1e3a8a','<strong>Dry run.</strong> Every gate passed and the roster matched — '+
+        'nothing was written to Canvas. Remove ?testKey from the URL to run for real.');
+    } else if(d.accepted){
+      document.body.classList.remove('awaiting-credit');
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
+
+/* ── EXERCISE METADATA ── */
+const EX_WEEK = 8, EX_SESSION = 2, EX_ID = 'W08b-one-question', EX_POINTS = 12;
+
+/* ── W8.2 The One Question. Built 2026-10-05 from Week 8, LEGO - CASE.docx.
+   NOTHING HERE IS GRADED AND NO OPTION IS MARKED. The reveals are the answer
+   slides in the 8.2 deck and the Professor Key.
+   Every advocate fact below is copied from the case's estimates table.
+   Distractor rule (feedback_distractor_design): the five questions sit within
+   4 characters of each other. Change an option here and change the key and the
+   deck the same day. ── */
+const ADVOCATES = [
+  { key:'children', title:'Ask children, at scale', who:'Mads Nipper · runs new product work',
+    quote:'“We had started to make fire trucks that look like spaceships, building systems that no customer could truly appreciate.”',
+    arg:'LEGO’s own report names children as the thing to be afraid of. A large study of children would put the products in an order.',
+    ask:'About 2,000 children aged 6 to 12, US and Germany', cost:'About $175,000', weeks:'About 12',
+    cant:'Anything about a buyer over 14. It asks none.' },
+  { key:'watch', title:'Watch children build, at home', who:'The 2004 home-visit team',
+    quote:'In early 2004 a research team sat with an 11 year old boy in a mid-sized German city and watched him play.',
+    arg:'Watching turns up things a form cannot think to ask for. It turns them up in small numbers of houses.',
+    ask:'About 40 families, 2 countries', cost:'About $95,000', weeks:'About 9',
+    cant:'A share of anything. Forty houses size nothing.' },
+  { key:'mail', title:'Read and sort the mail', who:'Jake McKee and Tormod Askildsen',
+    quote:'“Half the people who bought the set were not in our target group. They were adults!”',
+    arg:'The mail is already in the building. The Mindstorms cards are the one incoming tool that ever gave LEGO a hard finding.',
+    ask:'About 4,000 posts, letters and cards', cost:'About $18,000', weeks:'About 6',
+    cant:'Why children stopped. The children did not write.' },
+  { key:'records', title:'Pull the sales and returns records', who:'Jørgen Vig Knudstorp · took charge October 2004',
+    quote:'“I believe that the focus on electronic competition was really a blame game.”',
+    arg:'The records are in the building and cover all 1,500 items. No outside person has to be found to make them.',
+    ask:'No buyer at all. The records are in-house', cost:'About $30,000', weeks:'About 5',
+    cant:'Why any item sold or did not sell.' }
+];
+
+const QUESTIONS = [
+  'Are screens pulling children away from bricks at a younger age?',
+  'Which of the 1,500 items earn money, and which only cost money?',
+  'Who actually buys LEGO sets, and are we building sets for them?',
+  'Do children prefer the new shade of gray to the one it replaced?',
+  'What would adult fans buy if LEGO built a set just for them?'
+];
+const LETTERS = ['A','B','C','D','E'];
+
+const SOURCES = [
+  'A new survey of about 2,000 children aged 6 to 12',
+  'The 1999 Mindstorms postcards, already counted',
+  'The 4,000 letters and posts in the folder, read and sorted',
+  'The sales and returns records for all 1,500 items',
+  'Forty families, watched building at home'
+];
+const KIND1 = ['Primary','Secondary'];
+const KIND2 = ['Qualitative','Quantitative'];
+
+let state = {
+  name:'', email:'', groupNum:'',
+  card:null, pitch:'',
+  q:null, src:null, p1why:'',
+  p2a:{}, p2b:{}, p2why:'',
+  actA:'', actB:'', same:null, actCount:'',
+  tries:[]
+};
+
+function el(tag, cls, text){ const e = document.createElement(tag); if(cls) e.className = cls; if(text!=null) e.textContent = text; return e; }
+
+/* ── PHASE 0 ── */
+function renderAdv(){
+  const g = document.getElementById('adv-grid'); g.innerHTML = '';
+  ADVOCATES.forEach((a, i) => {
+    const b = el('button', 'adv-btn' + (state.card === i ? ' on' : '')); b.type = 'button';
+    b.appendChild(el('div', 't', a.title)); b.appendChild(el('div', 's', a.who));
+    b.onclick = () => { state.card = i; renderAdv(); };
+    g.appendChild(b);
+  });
+  const h = document.getElementById('held'); h.innerHTML = '';
+  if (state.card == null) { document.getElementById('pitch-wrap').style.display = 'none'; return; }
+  const a = ADVOCATES[state.card];
+  const c = el('div', 'held');
+  c.appendChild(el('div', 'who', 'You hold · ' + a.who));
+  c.appendChild(el('h3', null, a.title));
+  c.appendChild(el('div', 'quote', a.quote));
+  c.appendChild(el('div', 'arg', a.arg));
+  const f = el('div', 'facts');
+  [['Who LEGO asks', a.ask], ['Cost', a.cost], ['Weeks', a.weeks]].forEach(([k, v]) => {
+    const d = el('div'); d.appendChild(el('b', null, k)); d.appendChild(document.createTextNode(v)); f.appendChild(d);
+  });
+  const blank = el('div'); blank.appendChild(el('b', null, 'Budget')); blank.appendChild(document.createTextNode('About $200,000, one study')); f.appendChild(blank);
+  const cant = el('div', 'cant'); cant.appendChild(el('b', null, 'What it cannot tell you')); cant.appendChild(document.createTextNode(a.cant)); f.appendChild(cant);
+  c.appendChild(f); h.appendChild(c);
+  document.getElementById('pitch-wrap').style.display = 'block';
+  document.getElementById('pitch-input').value = state.pitch;
+  onPitch();
+}
+function onPitch(){
+  state.pitch = document.getElementById('pitch-input').value.trim();
+  const n = state.pitch.length, c = document.getElementById('pitch-count');
+  c.textContent = n + ' / 50 minimum'; c.classList.toggle('ok', n >= 50);
+  document.getElementById('card-btn').disabled = !(state.card != null && n >= 50);
+}
+
+/* ── PHASE 1 ── */
+function renderP1(){
+  const qb = document.getElementById('q-opts'); qb.innerHTML = '';
+  QUESTIONS.forEach((q, j) => {
+    const b = el('button', 'opt-btn' + (state.q === j ? ' on' : '')); b.type = 'button';
+    b.appendChild(el('span', 'l', LETTERS[j])); b.appendChild(el('span', null, q));
+    b.onclick = () => { state.q = j; renderP1(); };
+    qb.appendChild(b);
+  });
+  const sb = document.getElementById('src-opts'); sb.innerHTML = '';
+  ADVOCATES.forEach((a, j) => {
+    const b = el('button', 'src-card' + (state.src === j ? ' on' : '')); b.type = 'button';
+    b.appendChild(el('div', 't', a.title));
+    b.appendChild(el('div', 'm', a.ask + ' · ' + a.cost + ' · ' + a.weeks + ' weeks · Cannot tell you: ' + a.cant));
+    b.onclick = () => { state.src = j; renderP1(); };
+    sb.appendChild(b);
+  });
+  document.getElementById('p1-why').value = state.p1why;
+  onP1();
+}
+function onP1(){
+  state.p1why = document.getElementById('p1-why').value.trim();
+  const n = state.p1why.length, c = document.getElementById('p1-count');
+  c.textContent = n + ' / 60 minimum'; c.classList.toggle('ok', n >= 60);
+  document.getElementById('p1-btn').disabled = !(state.q != null && state.src != null && n >= 60);
+}
+
+/* ── PHASE 2 ── */
+function renderP2(){
+  const box = document.getElementById('p2-list'); box.innerHTML = '';
+  SOURCES.forEach((s, i) => {
+    const card = el('div', 'sort-card');
+    card.appendChild(el('div', 'txt', (i+1) + '. ' + s));
+    const row = el('div', 'bin-row');
+    KIND1.forEach(k => {
+      const b = el('button', 'read-btn' + (state.p2a[i] === k ? ' on' : ''), k); b.type = 'button';
+      b.onclick = () => { state.p2a[i] = k; renderP2(); }; row.appendChild(b);
+    });
+    row.appendChild(el('span', null, '  '));
+    KIND2.forEach(k => {
+      const b = el('button', 'read-btn' + (state.p2b[i] === k ? ' on' : ''), k); b.type = 'button';
+      b.onclick = () => { state.p2b[i] = k; renderP2(); }; row.appendChild(b);
+    });
+    card.appendChild(row); box.appendChild(card);
+  });
+  document.getElementById('p2-why').value = state.p2why;
+  onP2();
+}
+function onP2(){
+  state.p2why = document.getElementById('p2-why').value.trim();
+  const n = state.p2why.length, c = document.getElementById('p2-count');
+  c.textContent = n + ' / 50 minimum'; c.classList.toggle('ok', n >= 50);
+  const done = SOURCES.filter((_, i) => state.p2a[i] && state.p2b[i]).length;
+  const t = document.getElementById('p2-tally'); t.innerHTML = '';
+  t.appendChild(el('span', done === SOURCES.length ? 'got' : 'missing', 'Labeled ' + done + ' of ' + SOURCES.length));
+  document.getElementById('p2-btn').disabled = !(done === SOURCES.length && n >= 50);
+}
+
+/* ── PHASE 3 ── */
+function renderP3(){
+  document.getElementById('p3-q').textContent = (state.q != null ? QUESTIONS[state.q] : '') +
+    (state.src != null ? '  Who LEGO asks: ' + ADVOCATES[state.src].title.toLowerCase() + '.' : '');
+  document.getElementById('act-a').value = state.actA;
+  document.getElementById('act-b').value = state.actB;
+  document.getElementById('act-count').value = state.actCount;
+  paintSame(); onP3();
+}
+function setSame(v){ state.same = v; paintSame(); onP3(); }
+function paintSame(){
+  document.getElementById('yn-yes').classList.toggle('on', state.same === false);
+  document.getElementById('yn-no').classList.toggle('on', state.same === true);
+  document.getElementById('back-to-1').classList.toggle('show', state.same === true);
+  document.getElementById('p3-rest').style.display = state.same === false ? 'block' : 'none';
+}
+function redo(){
+  state.tries.push({ question: QUESTIONS[state.q] || '', ifOneWay: state.actA, ifOther: state.actB });
+  state.q = null; state.same = null; state.actA = ''; state.actB = '';
+  renderP1(); show('p1-screen');
+}
+function onP3(){
+  state.actA = document.getElementById('act-a').value.trim();
+  state.actB = document.getElementById('act-b').value.trim();
+  state.actCount = document.getElementById('act-count').value.trim();
+  const cnt = (id, n, min) => { const c = document.getElementById(id); c.textContent = n + ' / ' + min + ' minimum'; c.classList.toggle('ok', n >= min); };
+  cnt('act-a-count', state.actA.length, 40); cnt('act-b-count', state.actB.length, 40);
+  cnt('act-count-count', state.actCount.length, 30);
+  const btn = document.getElementById('submit-btn');
+  if (btn.dataset.sent === '1') return;
+  btn.disabled = !(state.actA.length >= 40 && state.actB.length >= 40 && state.same === false && state.actCount.length >= 30);
+}
+
+/* ── SUBMIT ── */
+function submitAll(){
+  const btn = document.getElementById('submit-btn');
+  if (btn.disabled || btn.dataset.sent === '1') return;           // no double submits
+  btn.disabled = true; btn.dataset.sent = '1'; btn.textContent = 'Submitting…';
+
+  const payload = {
+    exercise: 'W8.2-one-question',
+    week: '8.2',
+    submittedAt: new Date().toISOString(),
+    name: state.name, email: state.email, group: state.groupNum,
+    card_held: state.card != null ? ADVOCATES[state.card].title : '',
+    card_pitch: state.pitch,
+    p1_question: state.q != null ? QUESTIONS[state.q] : '',
+    p1_who_to_ask: state.src != null ? ADVOCATES[state.src].title : '',
+    p1_why: state.p1why
+  };
+  SOURCES.forEach((_, i) => {
+    payload['p2_source' + (i+1)] = (state.p2a[i] || '') + ' / ' + (state.p2b[i] || '');
+  });
+  payload.p2_hardest = state.p2why;
+  payload.p3_if_one_way = state.actA;
+  payload.p3_if_other_way = state.actB;
+  payload.p3_count_at_90_days = state.actCount;
+  payload.p3_questions_dropped = state.tries.map(t => t.question).join(' | ');
+
+  try{
+    if(/^https?:\/\//i.test(CREDIT_ENDPOINT)){
+      postForCredit({
+        email: state.email, name: state.name,
+        week: EX_WEEK, session: EX_SESSION, exerciseId: EX_ID,
+        password: PW, group: String(state.groupNum||''), points: EX_POINTS,
+        fields: creditFields(payload),
+        answers: creditAnswers(payload)
+      });
+    }
+  }catch(e){
+    console.warn('Credit POST error (non-blocking):', e);
+  }
+
+  buildSummary();
+  show('summary-screen');
+}
+
+function line(parent, bold, rest){
+  const d = document.createElement('div'); d.style.marginBottom = '10px';
+  const b = document.createElement('b'); b.textContent = bold; d.appendChild(b);
+  if (rest){ d.appendChild(document.createElement('br')); d.appendChild(document.createTextNode(rest)); }
+  parent.appendChild(d);
+}
+function buildSummary(){
+  document.getElementById('student-tag').textContent =
+    state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
+
+  const sc = document.getElementById('sum-card'); sc.innerHTML = '';
+  line(sc, state.card != null ? ADVOCATES[state.card].title + ' (' + ADVOCATES[state.card].who + ')' : '', state.pitch);
+
+  const sq = document.getElementById('sum-q'); sq.innerHTML = '';
+  sq.appendChild(el('div', null, state.q != null ? QUESTIONS[state.q] : ''));
+  const w = el('div'); w.style.marginTop = '8px';
+  w.appendChild(el('span', 'fill', 'Who LEGO asks: ')); w.appendChild(document.createTextNode(state.src != null ? ADVOCATES[state.src].title : ''));
+  sq.appendChild(w);
+  const why = el('div'); why.style.marginTop = '8px'; why.style.fontSize = '14.5px'; why.textContent = state.p1why; sq.appendChild(why);
+
+  const s2 = document.getElementById('sum-p2'); s2.innerHTML = '';
+  SOURCES.forEach((s, i) => line(s2, s + ': ' + (state.p2a[i] || '?') + ' / ' + (state.p2b[i] || '?'), ''));
+  line(s2, 'Hardest to label', state.p2why);
+
+  const s3 = document.getElementById('sum-p3'); s3.innerHTML = '';
+  line(s3, 'If it comes back one way', state.actA);
+  line(s3, 'If it comes back the other way', state.actB);
+  line(s3, 'What LEGO counts 90 days later', state.actCount);
+  if (state.tries.length) line(s3, 'Questions you dropped because the action did not change', state.tries.map(t => t.question).join('  ·  '));
+}
+
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function checkPw(){
+  var val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val.length >= 4){
+    PW = val;                       /* verified server-side at the join step */
+    document.getElementById('pw-err').textContent = '';
+    show('join-screen');
+  } else {
+    var box = document.querySelector('.pw-box');
+    if(box){ box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
+    document.getElementById('pw-err').textContent = "Enter today's class code.";
+  }
+}
+
+function onJoin(){
+  const name  = document.getElementById('j-name').value.trim();
+  const email = document.getElementById('j-email').value.trim().toLowerCase();
+  const group = document.getElementById('j-group').value;
+  const emailOk = ucEmailOk(email);
+  state.name = name; state.email = email; state.groupNum = group;
+  document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk && group);
+}
+
+/* ── ROSTER GATE ─────────────────────────────────────────────────────────
+   The Logic App verifies enrollment server-side via mode:"join". EVERY
+   failure is a hard stop: nobody enters the exercise unverified, because a
+   student who walks in past a failed check gets no credit and does not find
+   out until the gradebook. ── */
+var JOIN_VERIFY_MS = 12000;
+function __joinNext(){ show('brief-screen'); }
+function __joinField(id, fallback){
+  var el = document.getElementById(id);
+  return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
+}
+async function joinVerify(){
+  var btn = document.getElementById('join-btn');
+  if(!btn || btn.disabled) return;
+  var orig = btn.textContent;
+  var release = function(){ btn.disabled = false; btn.textContent = orig; };
+  var email = __joinField('j-email', (window.state && state.email));
+  var name  = __joinField('j-name',  (window.state && state.name));
+  var group = __joinField('j-group', (window.state && (state.groupNum || state.group)));
+
+  /* local/unwired copy only — the published file always has a real endpoint */
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)){ __joinNext(); return; }
+
+  btn.disabled = true; btn.textContent = 'Checking…';
+  var ctl = (window.AbortController ? new AbortController() : null);
+  var timer = setTimeout(function(){ if(ctl) ctl.abort(); }, JOIN_VERIFY_MS);
+  var code = 'NO_ANSWER';
+  try{
+    var res = await fetch(CREDIT_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ mode:'join', email:email, name:name, testKey:TEST_KEY,
+        week:EX_WEEK, session:EX_SESSION, exerciseId:EX_ID,
+        password:PW, group:group })
+    });
+    clearTimeout(timer);
+    var d = await res.json().catch(function(){ return null; });
+    code = (d && d.code) || ('HTTP_' + res.status);
+  }catch(e){
+    clearTimeout(timer); code = 'NO_ANSWER';
+  }
+  release();
+
+  if(code === 'JOIN_OK' || code === 'DRY_RUN_OK'){
+    if(code === 'DRY_RUN_OK'){
+      creditBanner('warn', 'DRY RUN — test key active. Every gate is being checked for real, but nothing will be written to Canvas.', 'retry');
+    } else {
+      creditBanner('clear');
+    }
+    __joinNext(); return;
+  }
+
+  if(code === 'NOT_ENROLLED'){
+    creditBanner('bad', 'That email is not on the class roster, so you cannot be given credit. Check it for a typo — it is your @mail.uc.edu address, the one Canvas uses. If it is correct, see Professor Hudnall now.', 'retry');
+  } else if(code === 'BAD_PASSWORD'){
+    creditBanner('bad', 'That is not today\'s class code. Get it from Professor Hudnall and enter it again.', 'pw');
+  } else if(code === 'WINDOW_CLOSED'){
+    creditBanner('bad', 'This exercise is only open during class.', 'retry');
+  } else {
+    creditBanner('warn', 'Could not reach the roster check (' + code + '). Try again. If it keeps failing, Professor Hudnall will tell the class what to do.', 'retry');
+  }
+}
+
+/* ── PERSISTENT BANNER ────────────────────────────────────────────────────
+   Lives on <body>, not inside a screen, so it survives every show() call.
+   It is the message on a BLOCKED screen — never a permission to continue. ── */
+function creditBanner(kind, text, action){
+  var el = document.getElementById('credit-banner');
+  if(kind === 'clear'){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    document.body.classList.remove('has-credit-banner');
+    return;
+  }
+  if(!el){ el = document.createElement('div'); el.id = 'credit-banner'; document.body.appendChild(el); }
+  el.className = kind;
+  el.innerHTML = '';
+  var span = document.createElement('span'); span.textContent = text; el.appendChild(span);
+  var toPw = (action === 'pw') && document.getElementById('pw-screen');
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cb-fix';
+  b.textContent = toPw ? 'Re-enter the code' : 'Try again';
+  b.onclick = function(){ if(toPw){ show('pw-screen'); } else { joinVerify(); } };
+  el.appendChild(b);
+  document.body.classList.add('has-credit-banner');
+}
+</script>
+</body>
+</html>
