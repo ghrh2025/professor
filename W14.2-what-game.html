@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W14.2 — What Game Are You Playing?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Week 14 palette (matches W14.1 / W14.2) */
+  --cm-blue:   #1E3A5F;
+  --cm-ink:    #10213A;
+  --cm-gold:   #F59E0B;
+  --cm-gold-d: #B45309;
+
+  --bg:#F3F5F8; --surface:#FFFFFF; --border:#DFE4EC; --text:#1A1A1A; --muted:#6B7280;
+  --radius:10px; --shadow:0 2px 14px rgba(0,0,0,0.08);
+
+  --sk-red:#D7263D; --sk-orange:#F28C28; --sk-yellow:#F2C230; --sk-green:#3FA34D; --sk-purple:#6B3FA0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+
+.page-wrap{max-width:820px;margin:0 auto;padding:22px 20px 90px}
+.week-tag{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;color:var(--cm-gold-d)}
+.screen-title{font-size:29px;font-weight:900;line-height:1.15;margin-bottom:6px}
+.screen-sub{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+.back-btn{display:inline-flex;align-items:center;gap:4px;background:transparent;border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-radius:6px;
+  cursor:pointer;margin-bottom:16px;transition:all .15s}
+.back-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+.btn{display:inline-block;width:100%;border:none;border-radius:9px;cursor:pointer;font-family:'Inter',sans-serif;font-size:16px;font-weight:800;
+  letter-spacing:.3px;padding:15px 20px;transition:transform .08s, box-shadow .15s, opacity .15s}
+.btn-go{background:var(--cm-gold);color:var(--cm-ink)}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(245,158,11,.45);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.pw-box{background:var(--cm-blue);color:#fff;border-radius:16px;border-bottom:6px solid var(--cm-gold);padding:40px 34px;max-width:440px;width:100%;
+  text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cm-gold);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.pw-box h1 .g{color:var(--cm-gold)}
+.pw-box p{font-size:14px;color:#B9C4D4;margin-bottom:22px;line-height:1.5}
+.pw-input{width:100%;background:#0E2244;border:2px solid #2A4A78;border-radius:10px;color:#fff;font-family:'Space Mono',monospace;font-size:20px;
+  font-weight:700;letter-spacing:3px;text-align:center;text-transform:uppercase;padding:14px;margin-bottom:6px;outline:none;transition:border-color .15s}
+.pw-input:focus{border-color:var(--cm-gold)}
+.pw-input::placeholder{color:#4A6B94;letter-spacing:2px}
+.pw-err{color:#FCA5A5;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field select{width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-family:'Inter',sans-serif;font-size:15px;
+  color:var(--text);padding:12px 13px;outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus{border-color:var(--cm-blue)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ── COLOR COUNTER ── */
+.sk-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.sk-row:last-child{border-bottom:none}
+.sk-dot{width:26px;height:26px;border-radius:50%;flex:0 0 auto;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.sk-name{flex:1;font-size:15.5px;font-weight:700}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:40px;height:40px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:20px;font-weight:800;cursor:pointer;color:var(--cm-blue)}
+.stepper button:active{background:#EEF2F7}
+.stepper .n{min-width:34px;text-align:center;font-family:'Space Mono',monospace;font-size:18px;font-weight:700}
+.total-line{display:flex;justify-content:space-between;font-size:15px;font-weight:800;margin-top:12px;padding-top:12px;border-top:2px solid var(--border)}
+
+.pick-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+.pick{border:2px solid var(--border);border-radius:10px;background:#fff;padding:10px 4px;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:800;color:var(--text)}
+.pick .sk-dot{margin:0 auto 6px}
+.pick.on{border-color:var(--cm-blue);background:#EEF3FA}
+
+.opt-list{display:grid;gap:9px}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:700;color:var(--text);line-height:1.4}
+.opt small{display:block;font-weight:500;color:var(--muted);font-size:13px;margin-top:3px}
+.opt.on{border-color:var(--cm-blue);background:#EEF3FA}
+
+/* ── RULES ── */
+.rules{background:var(--cm-blue);color:#fff;border-radius:12px;padding:18px 20px;border-left:5px solid var(--cm-gold);margin-bottom:16px}
+.rules .row{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.rules .row:last-child{border-bottom:none}
+.rules .n{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--cm-gold);min-width:22px}
+.rules .t{font-size:15.5px;line-height:1.5}
+.rules .t b{color:var(--cm-gold)}
+.wait{background:#FFF6E0;border:1px solid #F0DBA6;border-radius:8px;padding:12px 15px;font-size:14px;line-height:1.55;color:#6B5200;margin-bottom:16px}
+.wait b{color:#4A3800}
+
+.num-field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.num-field:last-child{border-bottom:none}
+.num-field .lbl{font-size:15px;font-weight:700;line-height:1.35}
+.num-field .lbl small{display:block;font-weight:500;color:var(--muted);font-size:12.5px}
+
+.gate-q{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);border-radius:10px;padding:18px 20px;font-size:17px;
+  font-weight:700;line-height:1.5;margin-bottom:12px}
+.stop{background:var(--cm-blue);color:#fff;border-radius:12px;padding:20px 22px;margin-bottom:18px;text-align:center}
+.stop .big{font-size:24px;font-weight:900;letter-spacing:.5px;color:var(--cm-gold);margin-bottom:6px}
+.stop p{font-size:15px;line-height:1.55}
+textarea{width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;
+  color:var(--text);padding:14px;outline:none;resize:vertical;min-height:110px;transition:border-color .15s}
+textarea:focus{border-color:var(--cm-blue)}
+.char-count{font-size:12px;color:var(--muted);margin-top:6px;text-align:right}
+.char-count.ok{color:#1B7F4B;font-weight:700}
+.submit-note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+
+/* ── SUMMARY ── */
+.confirm-pill{display:inline-block;background:#E7F3EC;color:#14512F;border:1px solid #A9D6BC;font-size:13px;font-weight:800;letter-spacing:.3px;
+  padding:8px 16px;border-radius:20px;margin-bottom:16px}
+.student-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.section-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--cm-gold-d);margin-bottom:8px}
+.ledger{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.ledger .cell{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.ledger .k{font-size:11.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.ledger .v{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;margin-top:2px}
+.answer-box{background:#fff;border:1px solid var(--border);border-radius:10px;padding:15px 18px;font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.debrief-box{background:#F7F9FC;border:1px solid var(--border);border-top:4px solid var(--cm-gold);border-radius:12px;padding:20px 22px;margin-top:8px}
+.debrief-box h3{font-size:16px;font-weight:800;margin-bottom:12px}
+.debrief-box ol{margin:0 0 0 20px}
+.debrief-box li{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+@media(max-width:680px){
+  .screen-title{font-size:24px}
+  .pick-grid{grid-template-columns:repeat(3,1fr)}
+  .ledger{grid-template-columns:1fr 1fr}
+}
+</style>
+<style>/* credit-fix 2026-08-21: never claim credit before the server answers */
+body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
+#credit-status{margin:18px auto !important}
+/* roster gate message (added 2026-08-25) */
+.join-msg{margin-top:10px;font-size:14px;line-height:1.45;min-height:1px}
+.join-msg.bad{color:#a4262c;font-weight:600}
+.join-msg.warn{color:#7a5c00}
+
+/* persistent credit banner (2026-08-25) */
+#credit-banner{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;gap:12px;
+  align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 16px;
+  font-size:14px;font-weight:600;line-height:1.35;text-align:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#credit-banner.bad{background:#a4262c;color:#fff}
+#credit-banner.warn{background:#ffd24a;color:#3a2d00}
+#credit-banner .cb-fix{border:0;border-radius:6px;padding:6px 12px;font-weight:700;
+  cursor:pointer;background:rgba(255,255,255,.92);color:#222}
+body.has-credit-banner{padding-top:58px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 14.2</div>
+    <h1>What Game Are <span class="g">You Playing?</span></h1>
+    <p>Enter today's password, given in class. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('pw-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · Digital Marketing</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">You will get a bag of Skittles and two rounds of trading. This page is your scorecard. Keep it open.</div>
+    <div class="card">
+      <div class="field">
+        <label for="j-name">Your name</label>
+        <input id="j-name" type="text" placeholder="First and last" autocomplete="off" oninput="onJoin()">
+      </div>
+      <div class="field">
+        <label for="j-email">UC email</label>
+        <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
+        <div class="hint">Use your @mail.uc.edu address, the same one Canvas uses. Credit is matched on it.</div>
+      </div>
+      <div class="field">
+        <label for="j-group">Your group</label>
+        <select id="j-group" onchange="onJoin()">
+          <option value="">Pick your group…</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+        </select>
+      </div>
+      <button class="btn btn-go" id="join-btn" onclick="joinVerify()" disabled>Let's go →</button>
+      <div id="join-err" class="join-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ COUNT THE BAG ═══════════════════════ -->
+<div id="count-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · Before you trade</div>
+    <div class="screen-title">Count your bag</div>
+    <div class="screen-sub">Open it and sort by color. Do not eat any. Then pick the one color you will collect.</div>
+    <div class="card" id="count-card"></div>
+    <div class="card">
+      <div class="section-label">The color you will collect</div>
+      <div class="pick-grid" id="pick-grid"></div>
+    </div>
+    <button class="btn btn-go" id="count-btn" onclick="show('r1-screen')" disabled>I'm ready →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 1 RULES ═══════════════════════ -->
+<div id="r1-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('count-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · Round 1</div>
+    <div class="screen-title">Round 1: Trade</div>
+    <div class="screen-sub">Read the rules with your group. The professor starts the clock.</div>
+    <div class="rules">
+      <div class="row"><div class="n">01</div><div class="t"><b>Goal:</b> finish with the most Skittles of your color.</div></div>
+      <div class="row"><div class="n">02</div><div class="t">Trade anything for anything. One for one, two for one, whatever you and the other person agree to.</div></div>
+      <div class="row"><div class="n">03</div><div class="t"><b>Every trade goes through the professor.</b> Bring it to the front. It only counts once he approves it.</div></div>
+      <div class="row"><div class="n">04</div><div class="t"><b>Every approved trade costs one Skittle</b>, paid to the professor. You and your partner decide who pays. Any color.</div></div>
+      <div class="row"><div class="n">05</div><div class="t">No eating until the professor says the exercise is over.</div></div>
+    </div>
+    <div class="wait"><b>Keep count as you go:</b> how many trades you make, and how many Skittles you pay. You will enter both when time is called.</div>
+    <button class="btn btn-go" onclick="show('r1log-screen')">Time is up. Log Round 1 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 1 LOG ═══════════════════════ -->
+<div id="r1log-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('r1-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · Round 1</div>
+    <div class="screen-title">Log Round 1</div>
+    <div class="screen-sub">Honest numbers. Nobody is graded on how well they traded.</div>
+    <div class="card" id="r1log-card"></div>
+    <button class="btn btn-go" onclick="show('r2-screen')">On to Round 2 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 2 RULES ═══════════════════════ -->
+<div id="r2-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('r1log-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · Round 2</div>
+    <div class="screen-title">Round 2: Your call</div>
+    <div class="screen-sub">Same goal. This round you choose how to play, and you can change your mind at any time.</div>
+    <div class="rules">
+      <div class="row"><div class="n">A</div><div class="t"><b>Keep trading through the professor.</b> Same rules, same one-Skittle fee.</div></div>
+      <div class="row"><div class="n">B</div><div class="t"><b>Trade directly with anyone.</b> No approval and no fee.</div></div>
+      <div class="row"><div class="n">C</div><div class="t"><b>Stop.</b> Keep what you have and sit the round out.</div></div>
+    </div>
+    <div class="wait"><b>Still no eating.</b> Keep counting trades and fees.</div>
+    <button class="btn btn-go" onclick="show('r2log-screen')">Time is up. Log Round 2 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 2 LOG ═══════════════════════ -->
+<div id="r2log-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('r2-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · Round 2</div>
+    <div class="screen-title">Log Round 2</div>
+    <div class="screen-sub">First, what did you mostly do this round?</div>
+    <div class="opt-list" id="r2choice-list"></div>
+    <div class="card" id="r2log-card" style="margin-top:16px"></div>
+    <div class="card">
+      <div class="section-label">Count your whole pile again, every color</div>
+      <div id="end-count"></div>
+    </div>
+    <button class="btn btn-go" id="r2-btn" onclick="show('gate-screen')" disabled>Done counting →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ GATE + REFLECTION ═══════════════════════ -->
+<div id="gate-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('r2log-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · Before the reveal</div>
+    <div class="stop">
+      <div class="big">STOP. Turn to your group.</div>
+      <p>Put your piles next to each other. Compare where you started with where you ended. Then answer these three on your own.</p>
+    </div>
+
+    <div class="gate-q">1. Who will end today with the most Skittles of any single color?</div>
+    <div class="opt-list" id="predict-list"></div>
+
+    <div class="gate-q" style="margin-top:18px">2. Before Round 1 started, did you ask why the goal was the most of one color?</div>
+    <div class="opt-list" id="asked-list"></div>
+
+    <div class="gate-q" style="margin-top:18px">3. Name one game in your own life where someone else wrote the rules and gets paid on every move you make. Who is the house?</div>
+    <textarea id="life-input" placeholder="Be specific. Name the game, then name who collects." oninput="onGate()"></textarea>
+    <div id="life-count" class="char-count">0 / 60 minimum</div>
+
+    <button class="btn btn-go" id="submit-btn" onclick="submitAll()" disabled style="margin-top:14px">Submit for credit →</button>
+    <div class="submit-note">One submission per student. Then wait for the reveal.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="summary-screen" class="screen">
+  <div class="page-wrap">
+    <div class="week-tag">Week 14.2 · Summary</div>
+    <div class="screen-title">Your scorecard</div>
+    <div class="confirm-pill">✓ Participation recorded, you're all set</div>
+    <div id="student-tag" class="student-tag"></div>
+
+    <p class="section-label">The numbers</p>
+    <div class="ledger" id="sum-ledger"></div>
+
+    <p class="section-label">How you played</p>
+    <div class="answer-box" id="sum-play"></div>
+
+    <p class="section-label">The game you named</p>
+    <div class="answer-box" id="sum-life"></div>
+
+    <div class="debrief-box">
+      <h3>Bring to the debrief</h3>
+      <ol>
+        <li>Who ended class with the most Skittles? Who was trying to?</li>
+        <li>Who wrote the goal you were chasing? Did anyone ask why?</li>
+        <li>Count your total. Where did the missing Skittles go?</li>
+        <li>In Round 2 you could keep paying, go direct, or stop. What did you pick, and why?</li>
+        <li>River Pools was spending $250,000 a year to be seen. Whose game was that, and what were its other choices?</li>
+        <li>Name one game you are playing right now. Who is the house? Will you keep playing?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+<script>
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
+/* The class code is NOT stored here. It ships to a PUBLIC repo.
+   The student types it; the Logic App checks it against Key Vault. */
+var PW = '';
+
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── DRY-RUN PASSTHROUGH ───────────────────────────────────────────────────
+   ?testKey=... on the URL turns this page into a dry run: the workflow skips
+   the class-window gate and answers on the join branch, so no grade is ever
+   written. Absent the parameter this is '' — which matches no secret — and the
+   page behaves exactly as it does for a student. ── */
+var TEST_KEY = (function(){
+  try { return new URLSearchParams(location.search).get('testKey') || ''; }
+  catch(e){ return ''; }
+})();
+
+/* ── participation credit (Logic App contract) ───────────────────────── */
+function creditAnswers(src){
+  const skip=['email','name','week','session','exerciseId','password','group','points','answers','timestamp','submittedAt','exercise'];
+  return Object.entries(src||{}).filter(([k])=>!skip.includes(k))
+    .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
+    .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
+}
+function creditFields(src){
+  var skip = ['email','name','week','session','exerciseId','password','group',
+              'points','answers','fields','timestamp','submittedAt','exercise'];
+  var out = {};
+  Object.keys(src || {}).forEach(function(k){
+    if (skip.indexOf(k) !== -1) return;
+    var v = src[k];
+    if (v === undefined || v === null) return;
+    out[k] = v;
+  });
+  return out;
+}
+async function postForCredit(c){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  if(TEST_KEY) c.testKey = TEST_KEY;
+  const set=(bg,bd,fg,html)=>{
+    let el=document.getElementById('credit-status');
+    if(!el){el=document.createElement('div');el.id='credit-status';}
+    var _anchor=document.querySelector('.confirm-pill,.credit-claim');
+    var _host=(_anchor&&_anchor.parentElement)||document.getElementById('summary-screen')
+      ||document.getElementById('sum-screen')||document.querySelector('.screen.active')||document.body;
+    if(el.parentElement!==_host){
+      if(_anchor&&_anchor.parentElement===_host) _host.insertBefore(el,_anchor.nextSibling);
+      else _host.appendChild(el);
+    }
+    el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML=html;
+  };
+  document.body.classList.add('awaiting-credit');
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
+    const d=await res.json();
+    if(d.code==='DRY_RUN_OK'){
+      document.body.classList.remove('awaiting-credit');
+      set('#eef4ff','#c3d4f7','#1e3a8a','<strong>Dry run.</strong> Every gate passed and the roster matched — '+
+        'nothing was written to Canvas. Remove ?testKey from the URL to run for real.');
+    } else if(d.accepted){
+      document.body.classList.remove('awaiting-credit');
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
+
+/* ── EXERCISE METADATA ──
+   exerciseId is REUSED from the retired W14.2 Content Map on purpose: it inherits
+   that exercise's Key Vault password and its "W14.2 Case Participation" Canvas
+   routing. This is not drift. */
+const EX_WEEK = 14, EX_SESSION = 2, EX_ID = 'W14b-content-map', EX_POINTS = 12;
+
+const COLORS = [
+  { id:'red',    name:'Red',    css:'var(--sk-red)' },
+  { id:'orange', name:'Orange', css:'var(--sk-orange)' },
+  { id:'yellow', name:'Yellow', css:'var(--sk-yellow)' },
+  { id:'green',  name:'Green',  css:'var(--sk-green)' },
+  { id:'purple', name:'Purple', css:'var(--sk-purple)' }
+];
+const COLOR_NAME = {}; COLORS.forEach(c => COLOR_NAME[c.id] = c.name);
+
+const R2_CHOICES = [
+  { id:'dealer', text:'Kept trading through the professor', sub:'Same rules, same fee' },
+  { id:'direct', text:'Traded directly with classmates', sub:'No approval, no fee' },
+  { id:'mixed',  text:'Did some of both', sub:'' },
+  { id:'stop',   text:'Stopped and kept what I had', sub:'Sat the round out' }
+];
+const PREDICT = [
+  { id:'me',    text:'Me' },
+  { id:'group', text:'Someone in my group' },
+  { id:'room',  text:'Someone else in the room' },
+  { id:'prof',  text:'The professor' }
+];
+const ASKED = [
+  { id:'yes',     text:'Yes, out loud' },
+  { id:'thought', text:'I wondered, but I did not ask' },
+  { id:'no',      text:'No, it did not come up' }
+];
+function textOf(list, id){ var f = list.filter(function(x){ return x.id === id; })[0]; return f ? f.text : ''; }
+
+function zeroColors(){ var o = {}; COLORS.forEach(function(c){ o[c.id] = 0; }); return o; }
+let state = {
+  name:'', email:'', groupNum:'',
+  start: zeroColors(), end: zeroColors(), target:'',
+  r1: { trades:0, fees:0 }, r2: { trades:0, fees:0 }, r2choice:'',
+  predict:'', asked:'', life:''
+};
+function total(o){ return COLORS.reduce(function(s,c){ return s + (o[c.id]||0); }, 0); }
+
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function checkPw(){
+  var val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val.length >= 4){
+    PW = val;                       /* verified server-side at the join step */
+    document.getElementById('pw-err').textContent = '';
+    show('join-screen');
+  } else {
+    var box = document.querySelector('.pw-box');
+    if(box){ box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
+    document.getElementById('pw-err').textContent = "Enter today's class code.";
+  }
+}
+function onJoin(){
+  const name  = document.getElementById('j-name').value.trim();
+  const email = document.getElementById('j-email').value.trim().toLowerCase();
+  const group = document.getElementById('j-group').value;
+  state.name = name; state.email = email; state.groupNum = group;
+  document.getElementById('join-btn').disabled = !(name.length >= 3 && ucEmailOk(email) && group);
+}
+
+/* ── STEPPERS ── */
+function bump(bucket, key, d){
+  var o = state[bucket];
+  o[key] = Math.max(0, Math.min(99, (o[key]||0) + d));
+  renderAll();
+}
+function stepperHtml(bucket, key){
+  return '<div class="stepper">' +
+    '<button type="button" aria-label="minus" onclick="bump(\'' + bucket + '\',\'' + key + '\',-1)">−</button>' +
+    '<span class="n">' + (state[bucket][key]||0) + '</span>' +
+    '<button type="button" aria-label="plus" onclick="bump(\'' + bucket + '\',\'' + key + '\',1)">+</button></div>';
+}
+function colorCounterHtml(bucket){
+  return COLORS.map(function(c){
+    return '<div class="sk-row"><span class="sk-dot" style="background:' + c.css + '"></span>' +
+      '<span class="sk-name">' + c.name + '</span>' + stepperHtml(bucket, c.id) + '</div>';
+  }).join('') + '<div class="total-line"><span>Total</span><span>' + total(state[bucket]) + '</span></div>';
+}
+function numFieldHtml(bucket, key, label, sub){
+  return '<div class="num-field"><div class="lbl">' + label + (sub ? '<small>' + sub + '</small>' : '') + '</div>' +
+    stepperHtml(bucket, key) + '</div>';
+}
+function optsHtml(list, current, fn){
+  return list.map(function(o){
+    return '<button type="button" class="opt' + (current === o.id ? ' on' : '') + '" onclick="' + fn + '(\'' + o.id + '\')">' +
+      esc(o.text) + (o.sub ? '<small>' + esc(o.sub) + '</small>' : '') + '</button>';
+  }).join('');
+}
+function pickTarget(id){ state.target = id; renderAll(); }
+function pickR2(id){ state.r2choice = id; renderAll(); }
+function pickPredict(id){ state.predict = id; renderAll(); }
+function pickAsked(id){ state.asked = id; renderAll(); }
+
+function renderAll(){
+  document.getElementById('count-card').innerHTML = colorCounterHtml('start');
+  document.getElementById('pick-grid').innerHTML = COLORS.map(function(c){
+    return '<button type="button" class="pick' + (state.target === c.id ? ' on' : '') + '" onclick="pickTarget(\'' + c.id + '\')">' +
+      '<span class="sk-dot" style="display:block;background:' + c.css + '"></span>' + c.name + '</button>';
+  }).join('');
+  document.getElementById('count-btn').disabled = !(total(state.start) > 0 && state.target);
+
+  document.getElementById('r1log-card').innerHTML =
+    numFieldHtml('r1', 'trades', 'Trades you made', 'Count each approved trade once') +
+    numFieldHtml('r1', 'fees', 'Skittles you paid in fees', 'Only the ones you handed over yourself');
+
+  document.getElementById('r2choice-list').innerHTML = optsHtml(R2_CHOICES, state.r2choice, 'pickR2');
+  document.getElementById('r2log-card').innerHTML =
+    numFieldHtml('r2', 'trades', 'Trades you made in Round 2', 'Direct trades count too') +
+    numFieldHtml('r2', 'fees', 'Skittles you paid in fees in Round 2', 'Zero if you never went to the professor');
+  document.getElementById('end-count').innerHTML = colorCounterHtml('end');
+  document.getElementById('r2-btn').disabled = !(state.r2choice && total(state.end) > 0);
+
+  document.getElementById('predict-list').innerHTML = optsHtml(PREDICT, state.predict, 'pickPredict');
+  document.getElementById('asked-list').innerHTML = optsHtml(ASKED, state.asked, 'pickAsked');
+  onGate();
+}
+function onGate(){
+  state.life = document.getElementById('life-input').value.trim();
+  const n = state.life.length;
+  const c = document.getElementById('life-count');
+  c.textContent = n + ' / 60 minimum';
+  c.classList.toggle('ok', n >= 60);
+  document.getElementById('submit-btn').disabled = !(state.predict && state.asked && n >= 60);
+}
+
+function colorLine(o){ return COLORS.map(function(c){ return c.name + ' ' + (o[c.id]||0); }).join(', '); }
+
+function submitAll(){
+  const btn = document.getElementById('submit-btn');
+  if (btn.disabled) return;                                // no double submits
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  const payload = {
+    exercise: 'W14.2-what-game',
+    submittedAt: new Date().toISOString(),
+    name: state.name, email: state.email, group: state.groupNum,
+    targetColor: COLOR_NAME[state.target] || '',
+    startByColor: colorLine(state.start),
+    startTotal: total(state.start),
+    targetStart: state.start[state.target] || 0,
+    r1Trades: state.r1.trades, r1Fees: state.r1.fees,
+    r2Choice: textOf(R2_CHOICES, state.r2choice),
+    r2Trades: state.r2.trades, r2Fees: state.r2.fees,
+    endByColor: colorLine(state.end),
+    endTotal: total(state.end),
+    targetEnd: state.end[state.target] || 0,
+    prediction: textOf(PREDICT, state.predict),
+    askedWhy: textOf(ASKED, state.asked),
+    lifeGame: state.life
+  };
+  try{
+    if(/^https?:\/\//i.test(CREDIT_ENDPOINT)){
+      postForCredit({
+        email: state.email, name: state.name,
+        week: EX_WEEK, session: EX_SESSION, exerciseId: EX_ID,
+        password: PW, group: String(state.groupNum||''), points: EX_POINTS,
+        fields: creditFields(payload),
+        answers: creditAnswers(payload)
+      });
+    }
+  }catch(e){ console.warn('Credit POST error (non-blocking):', e); }
+  buildSummary(payload);
+  show('summary-screen');
+}
+
+function buildSummary(p){
+  document.getElementById('student-tag').textContent =
+    state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
+  var change = p.endTotal - p.startTotal;
+  var cells = [
+    ['Started with', p.startTotal],
+    ['Ending with', p.endTotal],
+    ['Change', (change > 0 ? '+' : '') + change],
+    ['Trades made', p.r1Trades + p.r2Trades],
+    ['Fees you paid', p.r1Fees + p.r2Fees],
+    [esc(p.targetColor), p.targetStart + ' → ' + p.targetEnd]
+  ];
+  document.getElementById('sum-ledger').innerHTML = cells.map(function(c){
+    return '<div class="cell"><div class="k">' + c[0] + '</div><div class="v">' + c[1] + '</div></div>';
+  }).join('');
+  document.getElementById('sum-play').innerHTML =
+    'You collected <b>' + esc(p.targetColor) + '</b>. ' +
+    'In Round 2 you <b>' + esc(p.r2Choice.toLowerCase()) + '</b>. ' +
+    'You predicted the most of one color would end up with <b>' + esc(p.prediction.toLowerCase()) + '</b>. ' +
+    'Asked why the goal was one color: <b>' + esc(p.askedWhy.toLowerCase()) + '</b>.';
+  document.getElementById('sum-life').textContent = p.lifeGame;
+}
+
+/* after a verified join */
+function __joinNext(){ renderAll(); show('count-screen'); }
+/* ── ROSTER GATE ─────────────────────────────────────────────────────────
+   The Logic App verifies enrollment server-side via mode:"join". EVERY
+   failure is a hard stop: nobody enters the exercise unverified, because a
+   student who walks in past a failed check gets no credit and does not find
+   out until the gradebook. ── */
+var JOIN_VERIFY_MS = 12000;
+function __joinField(id, fallback){
+  var el = document.getElementById(id);
+  return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
+}
+async function joinVerify(){
+  var btn = document.getElementById('join-btn');
+  if(!btn || btn.disabled) return;
+  var orig = btn.textContent;
+  var release = function(){ btn.disabled = false; btn.textContent = orig; };
+  var email = __joinField('j-email', (window.state && state.email));
+  var name  = __joinField('j-name',  (window.state && state.name));
+  var group = __joinField('j-group', (window.state && (state.groupNum || state.group)));
+
+  /* local/unwired copy only — the published file always has a real endpoint */
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)){ __joinNext(); return; }
+
+  btn.disabled = true; btn.textContent = 'Checking…';
+  var ctl = (window.AbortController ? new AbortController() : null);
+  var timer = setTimeout(function(){ if(ctl) ctl.abort(); }, JOIN_VERIFY_MS);
+  var code = 'NO_ANSWER';
+  try{
+    var res = await fetch(CREDIT_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ mode:'join', email:email, name:name, testKey:TEST_KEY,
+        week:EX_WEEK, session:EX_SESSION, exerciseId:EX_ID,
+        password:PW, group:group })
+    });
+    clearTimeout(timer);
+    var d = await res.json().catch(function(){ return null; });
+    code = (d && d.code) || ('HTTP_' + res.status);
+  }catch(e){
+    clearTimeout(timer); code = 'NO_ANSWER';
+  }
+  release();
+
+  if(code === 'JOIN_OK' || code === 'DRY_RUN_OK'){
+    if(code === 'DRY_RUN_OK'){
+      creditBanner('warn', 'DRY RUN — test key active. Every gate is being checked for real, but nothing will be written to Canvas.', 'retry');
+    } else {
+      creditBanner('clear');
+    }
+    __joinNext(); return;
+  }
+
+  if(code === 'NOT_ENROLLED'){
+    creditBanner('bad', 'That email is not on the class roster, so you cannot be given credit. Check it for a typo — it is your @mail.uc.edu address, the one Canvas uses. If it is correct, see Professor Hudnall now.', 'retry');
+  } else if(code === 'BAD_PASSWORD'){
+    creditBanner('bad', 'That is not today\'s class code. Get it from Professor Hudnall and enter it again.', 'pw');
+  } else if(code === 'WINDOW_CLOSED'){
+    creditBanner('bad', 'This exercise is only open during class.', 'retry');
+  } else {
+    creditBanner('warn', 'Could not reach the roster check (' + code + '). Try again. If it keeps failing, Professor Hudnall will tell the class what to do.', 'retry');
+  }
+}
+
+/* ── PERSISTENT BANNER ────────────────────────────────────────────────────
+   Lives on <body>, not inside a screen, so it survives every show() call.
+   It is the message on a BLOCKED screen — never a permission to continue. ── */
+function creditBanner(kind, text, action){
+  var el = document.getElementById('credit-banner');
+  if(kind === 'clear'){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    document.body.classList.remove('has-credit-banner');
+    return;
+  }
+  if(!el){ el = document.createElement('div'); el.id = 'credit-banner'; document.body.appendChild(el); }
+  el.className = kind;
+  el.innerHTML = '';
+  var span = document.createElement('span'); span.textContent = text; el.appendChild(span);
+  var toPw = (action === 'pw') && document.getElementById('pw-screen');
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cb-fix';
+  b.textContent = toPw ? 'Re-enter the code' : 'Try again';
+  b.onclick = function(){ if(toPw){ show('pw-screen'); } else { joinVerify(); } };
+  el.appendChild(b);
+  document.body.classList.add('has-credit-banner');
+}
+
+</script>
+</body>
+</html>
