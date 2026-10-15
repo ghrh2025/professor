@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W9.1 · The Name on the Pack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Week 9.1 palette (Gillette navy + light blue). Same values as the 9.1 deck. */
+  --cm-blue:   #0B2D6B;
+  --cm-ink:    #0A1A3A;
+  --cm-gold:   #9EC5F0;
+  --cm-gold-d: #1F5FA8;
+
+  --bg:      #F3F5F8;
+  --surface: #FFFFFF;
+  --border:  #DFE4EC;
+  --text:    #1A1A1A;
+  --muted:   #6B7280;
+  --radius:  10px;
+  --shadow:  0 2px 14px rgba(0,0,0,0.08);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── SCREENS — ID specificity keeps pw centered without breaking others ── */
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:820px;margin:0 auto;padding:22px 20px 90px}
+
+.week-tag{
+  font-family:'Space Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;color:var(--cm-gold-d);
+}
+.screen-title{font-size:29px;font-weight:900;line-height:1.15;margin-bottom:6px}
+.screen-sub{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:4px;background:transparent;
+  border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-radius:6px;
+  cursor:pointer;margin-bottom:16px;transition:all .15s;
+}
+.back-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* ── PRIMARY BUTTON ── */
+.btn{
+  display:inline-block;width:100%;border:none;border-radius:9px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:.3px;
+  padding:15px 20px;transition:transform .08s, box-shadow .15s, opacity .15s;
+}
+.btn-go{background:var(--cm-gold);color:var(--cm-ink)}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(158,197,240,.6);transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--cm-blue);font-size:14px;padding:12px 18px}
+.btn-ghost:hover{border-color:var(--cm-blue)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── PASSWORD SCREEN ── */
+.pw-box{
+  background:var(--cm-blue);color:#fff;border-radius:16px;
+  border-bottom:6px solid var(--cm-gold);
+  padding:40px 34px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:var(--cm-gold);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.pw-box h1 .g{color:var(--cm-gold)}
+.pw-box p{font-size:14px;color:#D3DEF0;margin-bottom:22px;line-height:1.5}
+.pw-input{
+  width:100%;background:#071E4A;border:2px solid #3D64A8;border-radius:10px;
+  color:#fff;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;
+  letter-spacing:3px;text-align:center;text-transform:uppercase;padding:14px;margin-bottom:6px;
+  outline:none;transition:border-color .15s;
+}
+.pw-input:focus{border-color:var(--cm-gold)}
+.pw-input::placeholder{color:#8FA8D0;letter-spacing:2px}
+.pw-err{color:#FCA5A5;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field select{
+  width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:12px 13px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--cm-blue)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ── STAGE LADDER (brief) ── */
+.ladder{background:var(--cm-blue);color:#fff;border-radius:12px;padding:18px 20px;
+  border-left:5px solid var(--cm-gold);margin-bottom:8px}
+.ladder .row{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.ladder .row:last-child{border-bottom:none}
+.ladder .n{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--cm-gold);min-width:22px}
+.ladder .nm{font-size:15.5px;font-weight:800;margin-right:8px;white-space:nowrap}
+.ladder .pl{font-size:13px;color:#D3DEF0;margin-top:2px}
+
+.mission{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;margin:14px 0}
+.mission b{color:var(--cm-blue)}
+
+/* ── SORT ── */
+.sort-progress{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.moment-card{
+  background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:24px 24px;box-shadow:var(--shadow);margin-bottom:18px;
+  font-size:18px;line-height:1.55;font-weight:500;min-height:120px;display:flex;align-items:center;
+}
+.stage-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.stage-btn{
+  display:block;width:100%;text-align:left;background:var(--cm-blue);color:#fff;
+  border:none;border-radius:10px;padding:13px 16px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:transform .1s, box-shadow .15s;
+}
+.stage-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(11,45,107,.3)}
+.stage-btn .q{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--cm-gold)}
+.stage-btn .n{font-size:16px;font-weight:900;margin-top:2px}
+.stage-btn .ax{font-size:12px;opacity:.8;margin-top:2px}
+
+/* ── REVIEW TIMELINE ── */
+.tl-stage{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;margin-bottom:10px}
+.tl-head{display:flex;align-items:baseline;gap:9px;margin-bottom:6px}
+.tl-num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:1px;color:var(--cm-gold-d);text-transform:uppercase}
+.tl-name{font-size:16px;font-weight:800}
+.tl-stage ul{margin:0;padding:0;list-style:none}
+.tl-stage li{font-size:14px;line-height:1.5;padding:7px 0 7px 26px;position:relative;
+  border-top:1px solid var(--border)}
+.tl-stage li:first-child{border-top:none}
+.tl-stage li .mark{position:absolute;left:0;top:7px;font-weight:800}
+.tl-stage li.hit .mark{color:#1B7F4B}
+.tl-stage li.miss .mark{color:#B4232A}
+.tl-stage li .why{display:block;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+.tl-empty{font-size:13px;color:var(--muted);font-style:italic;padding:4px 0}
+.score-pill{display:inline-block;background:#EEF4FB;color:var(--cm-blue);border:1px solid #C9DAF0;
+  font-size:13px;font-weight:800;padding:8px 16px;border-radius:20px;margin-bottom:14px}
+
+/* ── GATE ── */
+.gate-q{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:18px 20px;font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px}
+.pull{background:var(--cm-blue);color:#fff;border-radius:10px;padding:15px 18px;
+  font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.pull .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--cm-gold);display:block;margin-bottom:6px}
+textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;color:var(--text);
+  padding:14px;outline:none;resize:vertical;min-height:120px;transition:border-color .15s;
+}
+textarea:focus{border-color:var(--cm-blue)}
+.char-count{font-size:12px;color:var(--muted);margin-top:6px;text-align:right}
+.char-count.ok{color:#1B7F4B;font-weight:700}
+.submit-note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+.rule-out{background:#FFF6E0;border:1px solid #F0DBA6;border-radius:8px;padding:12px 15px;
+  font-size:13.5px;line-height:1.55;color:#6B5200;margin-bottom:16px}
+.rule-out b{color:#4A3800}
+
+/* ── SUMMARY ── */
+.confirm-pill{display:inline-block;background:#E7F3EC;color:#14512F;border:1px solid #A9D6BC;
+  font-size:13px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:20px;margin-bottom:16px}
+.student-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.section-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--cm-gold-d);margin-bottom:8px}
+.answer-box{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:15px 18px;font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.verdict{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:16px;line-height:1.7;margin-bottom:18px}
+.verdict .fill{color:var(--cm-gold);font-weight:700}
+.debrief-box{background:#F7F9FC;border:1px solid var(--border);border-top:4px solid var(--cm-gold);
+  border-radius:12px;padding:20px 22px;margin-top:8px}
+.debrief-box h3{font-size:16px;font-weight:800;margin-bottom:12px}
+.debrief-box ol{margin:0 0 0 20px}
+.debrief-box li{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+
+@media(max-width:680px){
+  .screen-title{font-size:24px}
+  .moment-card{font-size:16px}
+  .verdict{font-size:15px}
+}
+
+/* ── W6 additions ── */
+.price-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px}
+.pc-head{display:flex;align-items:baseline;gap:10px}
+.pc-amt{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--cm-blue)}
+.pc-note{font-size:13.5px;line-height:1.5;color:#3A3A3A;margin:6px 0 11px}
+.read-row{display:flex;flex-wrap:wrap;gap:7px}
+.read-btn{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;
+  background:#fff;border:1.5px solid var(--border);color:var(--muted);
+  border-radius:999px;padding:7px 13px;cursor:pointer;transition:all .12s}
+.read-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+.read-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.person-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:13px}
+.pc-name{font-size:18px;font-weight:900;margin-bottom:6px}
+.pc-bio{font-size:14px;line-height:1.55;color:#3A3A3A;margin-bottom:12px}
+.call-row{display:flex;gap:9px;flex-wrap:wrap}
+.call-btn{font-family:'Inter',sans-serif;font-size:13.5px;font-weight:700;background:#fff;
+  border:1.5px solid var(--border);color:var(--muted);border-radius:8px;padding:9px 15px;
+  cursor:pointer;transition:all .12s}
+.call-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+.call-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.tally{font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.6;
+  background:#F7F9FC;border:1px solid var(--border);border-radius:8px;
+  padding:12px 15px;margin:14px 0;color:var(--muted)}
+.tally .got{color:#1B7F4B;font-weight:700}
+.tally .missing{color:#B4232A;font-weight:700}
+.slot{margin-bottom:12px}
+.slot label{display:block;font-size:13px;margin-bottom:6px}
+.slot-key{font-weight:800;color:var(--cm-blue);text-transform:none}
+.slot-hint{color:var(--muted);font-weight:500}
+.slot input{width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:11px 13px;outline:none}
+.slot input:focus{border-color:var(--cm-blue)}
+.stmt-preview{background:var(--cm-blue);color:#fff;border-radius:10px;border-left:5px solid var(--cm-gold);
+  padding:16px 18px;font-size:15.5px;line-height:1.65;margin:14px 0;min-height:30px}
+.stmt-preview .fill{color:var(--cm-gold);font-weight:700}
+.stmt-preview .blank{opacity:.45;font-style:italic}
+</style>
+<style>/* credit-fix 2026-08-21: never claim credit before the server answers */
+body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
+#credit-status{margin:18px auto !important}
+/* roster gate message (added 2026-08-25) */
+.join-msg{margin-top:10px;font-size:14px;line-height:1.45;min-height:1px}
+.join-msg.bad{color:#a4262c;font-weight:600}
+.join-msg.warn{color:#7a5c00}
+
+/* persistent credit banner (2026-08-25) */
+#credit-banner{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;gap:12px;
+  align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 16px;
+  font-size:14px;font-weight:600;line-height:1.35;text-align:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#credit-banner.bad{background:#a4262c;color:#fff}
+#credit-banner.warn{background:#ffd24a;color:#3a2d00}
+#credit-banner .cb-fix{border:0;border-radius:6px;padding:6px 12px;font-weight:700;
+  cursor:pointer;background:rgba(255,255,255,.92);color:#222}
+body.has-credit-banner{padding-top:58px}
+</style>
+
+<style>/* ── shared option/sort styles, from the W6.2 chassis ── */
+.tmpl{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:17px;line-height:1.7;margin-bottom:14px}
+.tmpl .fill{color:var(--cm-gold);font-weight:800}
+.slotdef{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.slotdef div{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-size:13.5px;line-height:1.5}
+.slotdef b{display:block;color:var(--cm-blue);font-size:14px;margin-bottom:2px}
+.stem{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:14px 16px;font-size:15.5px;line-height:1.6;margin-bottom:14px}
+.stem .blank{color:var(--cm-gold-d);font-weight:800}
+.opt-list{display:grid;gap:8px;margin-bottom:16px}
+.opt-btn{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;
+  border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.45;color:var(--text);transition:all .12s}
+.opt-btn:hover{border-color:var(--cm-blue)}
+.opt-btn .l{font-family:'Space Mono',monospace;font-weight:700;color:var(--cm-gold-d);flex:0 0 auto}
+.opt-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.opt-btn.on .l{color:var(--cm-gold)}
+.opt-btn.close,.opt-btn.close.on{background:#FFF1C9;border-color:#C9962B;color:var(--text)}
+.opt-btn.close .l,.opt-btn.close.on .l{color:#8A6100}
+.opt-btn:disabled{opacity:.35;cursor:not-allowed}
+.step-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--cm-gold-d);margin:4px 0 8px}
+.stmt-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:13px}
+.stmt-card .num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:1.5px;color:var(--cm-gold-d);margin-bottom:6px}
+.stmt-card .txt{font-size:15px;line-height:1.6;margin-bottom:11px}
+.sort-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:10px}
+.sort-card .txt{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+.bin-row{display:flex;gap:7px;flex-wrap:wrap}
+.pick-row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--border)}
+.pick-row:first-of-type{border-top:none}
+.pick-row .lab{font-weight:800;font-size:15px}
+@media(max-width:680px){.slotdef{grid-template-columns:1fr}.pick-row{grid-template-columns:1fr}}
+</style>
+<style>/* ── W8.2 The One Question (built 2026-10-05) ── */
+.adv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.adv-btn{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);
+  border-radius:10px;padding:13px 15px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.adv-btn:hover{border-color:var(--cm-blue)}
+.adv-btn .t{font-size:15px;font-weight:800;color:var(--text)}
+.adv-btn .s{font-size:12.5px;color:var(--muted);margin-top:3px}
+.adv-btn.on{background:var(--cm-blue);border-color:var(--cm-blue)}
+.adv-btn.on .t{color:#fff}.adv-btn.on .s{color:#D3DEF0}
+.held{background:var(--surface);border:1px solid var(--border);border-top:6px solid var(--cm-gold);
+  border-radius:12px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+.held .who{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--cm-gold-d);margin-bottom:6px}
+.held h3{font-size:20px;font-weight:900;margin-bottom:10px}
+.held .quote{border-left:4px solid var(--cm-gold);padding:6px 0 6px 14px;font-size:15px;
+  line-height:1.55;font-style:italic;margin-bottom:12px}
+.held .arg{font-size:14.5px;line-height:1.6;margin-bottom:12px}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.facts div{background:#F7F9FC;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:12.5px;line-height:1.4}
+.facts b{display:block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.facts .cant{grid-column:1 / -1;background:#FFF6E0;border-color:#F0DBA6}
+.stop{background:var(--cm-ink);color:#fff;border-radius:12px;padding:18px 20px;margin:6px 0 16px;
+  border-left:6px solid var(--cm-gold)}
+.stop .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2.5px;color:var(--cm-gold);display:block;margin-bottom:6px}
+.stop p{font-size:15px;line-height:1.55}
+.src-card{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 14px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px;transition:all .12s}
+.src-card:hover{border-color:var(--cm-blue)}
+.src-card .t{font-size:15px;font-weight:800}
+.src-card .m{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+.src-card.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.src-card.on .m{color:#D3DEF0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.yn-row{display:flex;gap:10px;margin:8px 0 12px}
+.yn-row .call-btn{flex:1}
+.back-to-1{background:#FFF1C9;border:1px solid #C9962B;border-radius:10px;padding:14px 16px;
+  font-size:15px;line-height:1.55;margin-bottom:14px;display:none}
+.back-to-1.show{display:block}
+.back-to-1 b{color:#7A4F00}
+@media(max-width:680px){.adv-grid,.grid2{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}}
+</style>
+<style>/* ── W9.1 The Name on the Pack (built 2026-10-15) ── */
+.defs{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px}
+.defs summary{cursor:pointer;font-weight:800;font-size:14px;color:var(--cm-blue)}
+.defs dl{margin-top:10px;display:grid;grid-template-columns:170px 1fr;gap:6px 12px;font-size:13.5px;line-height:1.45}
+.defs dt{font-weight:800}
+.buyer{display:inline-block;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;background:var(--cm-blue);color:#fff;border-radius:5px;padding:2px 8px;margin-bottom:6px}
+.buyer.b2{background:#1F5FA8}
+@media(max-width:680px){.defs dl{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 9.1</div>
+    <h1>The Name on <span class="g">the Pack</span></h1>
+    <p>Enter today's password, given in class. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('pw-screen')">← Back</button>
+    <div class="week-tag">Week 9.1 · Gillette Guard</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">Mid-2010. Gillette has built a 15-rupee razor for men who shave on the floor of a hut, and it goes on sale in a few weeks. You will walk it through both of this week's frameworks, then make the call on the name.</div>
+    <div class="card">
+      <div class="field">
+        <label for="j-name">Your name</label>
+        <input id="j-name" type="text" placeholder="First and last" autocomplete="off" oninput="onJoin()">
+      </div>
+      <div class="field">
+        <label for="j-email">UC email</label>
+        <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
+        <div class="hint">Use your @mail.uc.edu address, the same one Canvas uses. Credit is matched on it.</div>
+      </div>
+      <div class="field">
+        <label for="j-group">Your group</label>
+        <select id="j-group" onchange="onJoin()">
+          <option value="">Pick your group…</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+        </select>
+      </div>
+      <button class="btn btn-go" id="join-btn" onclick="joinVerify()" disabled>Let's go →</button>
+      <div id="join-err" class="join-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BRIEF ═══════════════════════ -->
+<div id="brief-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Week 9.1 · New Products + Brand Equity</div>
+    <div class="screen-title">Three rounds, one razor.</div>
+    <div class="screen-sub">Every card you sort is a sentence from the case. Work on your own device, then stop and talk at each gate.</div>
+    <div class="mission"><b>Leave a slot empty if no card belongs there.</b> The case does not cover everything. Spotting what is missing is part of the job.</div>
+    <div class="ladder">
+      <div class="row"><span class="n">1</span><span><span class="nm">Walk it through NPD</span><span class="pl">Put 8 facts on the 6 stages of new product development.</span></span></div>
+      <div class="row"><span class="n">2</span><span><span class="nm">What the name is worth</span><span class="pl">Put 6 facts about two buyers on the 4 parts of brand equity.</span></span></div>
+      <div class="row"><span class="n">3</span><span><span class="nm">The call</span><span class="pl">Will the name help sell the razor, or will the razor hurt the name?</span></span></div>
+    </div>
+    <button class="btn btn-go" style="margin-top:16px" onclick="renderR1(); show('r1-screen')">Start Round 1 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 1 · NPD ═══════════════════════ -->
+<div id="r1-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('brief-screen')">← Back</button>
+    <div class="week-tag">Week 9.1 · Round 1 · New Product Development</div>
+    <div class="screen-title">Put each fact on a stage</div>
+    <div class="screen-sub">Eight facts from the case, 2002 to 2010. Tap the stage each one belongs to.</div>
+    <details class="defs"><summary>The 6 stages, in one line each</summary><dl id="npd-defs"></dl></details>
+    <div id="r1-list"></div>
+    <div class="tally" id="r1-tally"></div>
+    <div class="stop">
+      <span class="cap">Stop · Turn to your group</span>
+      <p>Compare where you each put card 3. Then answer this together, each of you in your own words.</p>
+    </div>
+    <div class="gate-q">Why did the 2002 Vector flop in India, and what did the 2008 team do differently?</div>
+    <textarea id="r1-gate" placeholder="The Vector flopped because… In 2008 the team…" oninput="onR1()"></textarea>
+    <div class="char-count" id="r1-count">0 / 60 minimum</div>
+    <button class="btn btn-go" id="r1-btn" style="margin-top:14px" onclick="renderR2(); show('r2-screen')" disabled>On to Round 2 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 2 · EQUITY ═══════════════════════ -->
+<div id="r2-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('r1-screen')">← Back</button>
+    <div class="week-tag">Week 9.1 · Round 2 · Brand Equity</div>
+    <div class="screen-title">What is the name worth, and to whom?</div>
+    <div class="screen-sub">Three facts about Ravi Kumar, who has never paid for a Gillette. Three about the man who already pays about $2.75 for a Mach3. Tap the part of brand equity each one shows.</div>
+    <details class="defs"><summary>The 4 parts of brand equity, in one line each</summary><dl id="eq-defs"></dl></details>
+    <div id="r2-list"></div>
+    <div class="tally" id="r2-tally"></div>
+    <div class="stop">
+      <span class="cap">Stop · Turn to your group</span>
+      <p>Look at the man who pays $2.75. Is there a part of brand equity with no card for him?</p>
+    </div>
+    <div class="gate-q">Which part of brand equity has no card for the $2.75 buyer, and why does that matter to Gillette?</div>
+    <textarea id="r2-gate" placeholder="There is no card for… That matters because…" oninput="onR2()"></textarea>
+    <div class="char-count" id="r2-count">0 / 50 minimum</div>
+    <button class="btn btn-go" id="r2-btn" style="margin-top:14px" onclick="renderR3(); show('r3-screen')" disabled>On to Round 3 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 3 · THE CALL ═══════════════════════ -->
+<div id="r3-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('r2-screen')">← Back</button>
+    <div class="week-tag">Week 9.1 · Round 3 · The call</div>
+    <div class="screen-title">The word on the front of the pack is Gillette.</div>
+    <div class="pull"><span class="cap">The question</span>Will the Gillette name help sell this 34-cent razor, or will this 34-cent razor hurt the Gillette name?</div>
+    <div class="step-label">1 · Your call</div>
+    <div class="opt-list" id="r3-opts"></div>
+    <div class="step-label">2 · Which part of brand equity, and which buyer, does your call depend on?</div>
+    <textarea id="r3-why" placeholder="It depends on ____ for ____, because…" oninput="onR3()"></textarea>
+    <div class="char-count" id="r3-why-count">0 / 60 minimum</div>
+    <div class="step-label" style="margin-top:14px">3 · One stage in Round 1 had no card. What should Gillette have shown men like Ravi, before it built anything?</div>
+    <textarea id="r3-ct" placeholder="Before building it, Gillette should have shown Ravi…" oninput="onR3()" style="min-height:90px"></textarea>
+    <div class="char-count" id="r3-ct-count">0 / 40 minimum</div>
+    <button class="btn btn-go" id="submit-btn" style="margin-top:14px" onclick="submitAll()" disabled>Submit for credit →</button>
+    <div class="submit-note">One submission per student. Your own answers, your own name.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="summary-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('r3-screen')">← Back</button>
+    <div class="week-tag">Week 9.1 · Summary</div>
+    <div class="screen-title">Your call on the name</div>
+    <div class="confirm-pill credit-claim">✓ Participation recorded, you're all set</div>
+    <div class="student-tag" id="student-tag"></div>
+
+    <div class="section-label">Round 3 · Your call</div>
+    <div class="verdict" id="sum-call"></div>
+
+    <div class="section-label">Round 1 · Where you put each fact</div>
+    <div class="answer-box" id="sum-r1"></div>
+
+    <div class="section-label">Round 2 · What the name is worth</div>
+    <div class="answer-box" id="sum-r2"></div>
+
+    <div class="debrief-box">
+      <h3>Bring to the debrief</h3>
+      <ol>
+        <li>Which stage had no card at all? What should Gillette have shown Ravi?</li>
+        <li>Why did the 2002 Vector flop, and what did the 2008 team do differently?</li>
+        <li>Which component had no card for the man who pays $2.75? Why does that matter?</li>
+        <li>Will the Gillette name help sell this 34-cent razor, or will this 34-cent razor hurt the Gillette name?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<script>
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
+/* The class code is NOT stored here. It ships to a PUBLIC repo.
+   The student types it; the Logic App checks it against Key Vault. */
+var PW = '';
+
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── DRY-RUN PASSTHROUGH ───────────────────────────────────────────────────
+   ?testKey=... on the URL turns this page into a dry run: the workflow skips
+   the class-window gate and answers on the join branch, so no grade is ever
+   written. Absent the parameter this is '' — which matches no secret — and the
+   page behaves exactly as it does for a student. ── */
+var TEST_KEY = (function(){
+  try { return new URLSearchParams(location.search).get('testKey') || ''; }
+  catch(e){ return ''; }
+})();
+
+/* ── participation credit (Logic App contract) ───────────────────────── */
+function creditAnswers(src){
+  const skip=['email','name','week','session','exerciseId','password','group','points','answers','timestamp','submittedAt','exercise'];
+  return Object.entries(src||{}).filter(([k])=>!skip.includes(k))
+    .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
+    .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
+}
+function creditFields(src){
+  var skip = ['email','name','week','session','exerciseId','password','group',
+              'points','answers','fields','timestamp','submittedAt','exercise'];
+  var out = {};
+  Object.keys(src || {}).forEach(function(k){
+    if (skip.indexOf(k) !== -1) return;
+    var v = src[k];
+    if (v === undefined || v === null) return;
+    out[k] = v;
+  });
+  return out;
+}
+async function postForCredit(c){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  if(TEST_KEY) c.testKey = TEST_KEY;
+  const set=(bg,bd,fg,html)=>{
+    let el=document.getElementById('credit-status');
+    if(!el){el=document.createElement('div');el.id='credit-status';}
+    var _anchor=document.querySelector('.confirm-pill,.credit-claim');
+    var _host=(_anchor&&_anchor.parentElement)||document.getElementById('summary-screen')
+      ||document.getElementById('sum-screen')||document.querySelector('.screen.active')||document.body;
+    if(el.parentElement!==_host){
+      if(_anchor&&_anchor.parentElement===_host) _host.insertBefore(el,_anchor.nextSibling);
+      else _host.appendChild(el);
+    }
+    el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML=html;
+  };
+  document.body.classList.add('awaiting-credit');
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
+    const d=await res.json();
+    if(d.code==='DRY_RUN_OK'){
+      document.body.classList.remove('awaiting-credit');
+      set('#eef4ff','#c3d4f7','#1e3a8a','<strong>Dry run.</strong> Every gate passed and the roster matched — '+
+        'nothing was written to Canvas. Remove ?testKey from the URL to run for real.');
+    } else if(d.accepted){
+      document.body.classList.remove('awaiting-credit');
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
+
+/* ── EXERCISE METADATA ── */
+const EX_WEEK = 9, EX_SESSION = 1, EX_ID = 'W09a-name-on-the-pack', EX_POINTS = 12;
+
+/* ── W9.1 The Name on the Pack. Built 2026-10-15 from Week 9, Gillette Guard - CASE.docx.
+   NOTHING HERE IS GRADED AND NO ANSWER SHIPS IN THIS FILE. The answers live in the
+   Professor Key and the 9.1 deck reveals. Every card is a sentence from the case.
+   No card belongs on Concept Testing, and no card gives loyalty for the $2.75 buyer.
+   Both gaps are deliberate. Change a card here and change the key and deck the same day. ── */
+const STAGES = ['Idea Generation','Concept Testing','Product Development','Market Testing','Product Launch','Evaluation of Results'];
+const STAGE_DEF = [
+  'Where ideas come from: your own R&D, customers, competitors, licensing.',
+  'Showing people the idea, in words or pictures, before building anything.',
+  'Design specifications and prototypes. The physical product takes shape.',
+  'Trying the finished product with real customers before the full launch.',
+  'Going to market: price set, on the shelves, broad distribution.',
+  'Measuring what happened, and deciding to fix it, keep it or kill it.'
+];
+const NPD_CARDS = [
+  'In 2008, 20 people from Gillette’s US headquarters spent three weeks in India and made 300 visits to homes.',
+  'Carvalho watched a man shave in a tiny hut and called it “a big ‘aha.’”',
+  'In 2002, Indian students at MIT tried the early Vector before it went on sale, and said it was a big improvement.',
+  'The Vector went on sale in India and flopped. Executives went to India to find out why.',
+  'The Guard has 4 parts. The Mach3 needs 25.',
+  'The Guard has one blade, put there on purpose so the emphasis falls on safety instead of closeness.',
+  'Engineers talked about changes to the razor worth a thousandth of a cent.',
+  'In a few weeks the Guard goes on sale in India for 15 rupees, with blades at 5 rupees.'
+];
+const PARTS = ['Awareness','Perceived Value','Associations','Loyalty'];
+const PART_DEF = [
+  'Whether customers recognize and remember the brand.',
+  'What customers believe the brand is worth, compared with the other choices.',
+  'The mental links and images customers attach to the brand.',
+  'Customers choosing this brand again and again over competitors.'
+];
+const EQ_CARDS = [
+  { who:'Ravi', t:'Almost none of the men like Ravi had ever paid for a Gillette.' },
+  { who:'Ravi', t:'At 12 cents, a Guard blade costs several times what Ravi pays for a blade now.' },
+  { who:'Ravi', t:'Ravi cannot tell a good razor from a bad one by looking. The only thing on the pack is the word Gillette.' },
+  { who:'$2.75 buyer', t:'To the man who already owns a Mach3, the word Gillette means “the good one.”' },
+  { who:'$2.75 buyer', t:'He already pays about $2.75 for a Mach3. Gillette’s own cheap razor, the Vector, costs about 72 cents.' },
+  { who:'$2.75 buyer', t:'American razor makers spent decades selling closeness, and adding blades to get more of it.' }
+];
+const CALLS = [
+  'The name helps sell the razor',
+  'The razor hurts the name',
+  'Both: it helps with one buyer and hurts with the other'
+];
+
+let state = { name:'', email:'', groupNum:'', r1:{}, r1gate:'', r2:{}, r2gate:'', call:null, why:'', ct:'' };
+
+function el(tag, cls, text){ const e = document.createElement(tag); if(cls) e.className = cls; if(text!=null) e.textContent = text; return e; }
+function fillDefs(id, names, defs){
+  const d = document.getElementById(id); if (d.childElementCount) return;
+  names.forEach((n,i)=>{ d.appendChild(el('dt',null,(i+1)+'. '+n)); d.appendChild(el('dd',null,defs[i])); });
+}
+function counter(id, n, min){ const c = document.getElementById(id); c.textContent = n + ' / ' + min + ' minimum'; c.classList.toggle('ok', n >= min); }
+
+/* ── ROUND 1 ── */
+function renderR1(){
+  fillDefs('npd-defs', STAGES, STAGE_DEF);
+  const box = document.getElementById('r1-list'); box.innerHTML = '';
+  NPD_CARDS.forEach((t, i) => {
+    const card = el('div', 'sort-card');
+    card.appendChild(el('div', 'txt', (i+1) + '. ' + t));
+    const row = el('div', 'bin-row');
+    STAGES.forEach(s => {
+      const b = el('button', 'read-btn' + (state.r1[i] === s ? ' on' : ''), s); b.type = 'button';
+      b.onclick = () => { state.r1[i] = s; renderR1(); }; row.appendChild(b);
+    });
+    card.appendChild(row); box.appendChild(card);
+  });
+  document.getElementById('r1-gate').value = state.r1gate;
+  onR1();
+}
+function onR1(){
+  state.r1gate = document.getElementById('r1-gate').value.trim();
+  counter('r1-count', state.r1gate.length, 60);
+  const done = NPD_CARDS.filter((_, i) => state.r1[i]).length;
+  const t = document.getElementById('r1-tally'); t.innerHTML = '';
+  t.appendChild(el('span', done === NPD_CARDS.length ? 'got' : 'missing', 'Placed ' + done + ' of ' + NPD_CARDS.length));
+  document.getElementById('r1-btn').disabled = !(done === NPD_CARDS.length && state.r1gate.length >= 60);
+}
+
+/* ── ROUND 2 ── */
+function renderR2(){
+  fillDefs('eq-defs', PARTS, PART_DEF);
+  const box = document.getElementById('r2-list'); box.innerHTML = '';
+  EQ_CARDS.forEach((c, i) => {
+    const card = el('div', 'sort-card');
+    card.appendChild(el('span', 'buyer' + (c.who === 'Ravi' ? '' : ' b2'), c.who));
+    card.appendChild(el('div', 'txt', String.fromCharCode(65+i) + '. ' + c.t));
+    const row = el('div', 'bin-row');
+    PARTS.forEach(p => {
+      const b = el('button', 'read-btn' + (state.r2[i] === p ? ' on' : ''), p); b.type = 'button';
+      b.onclick = () => { state.r2[i] = p; renderR2(); }; row.appendChild(b);
+    });
+    card.appendChild(row); box.appendChild(card);
+  });
+  document.getElementById('r2-gate').value = state.r2gate;
+  onR2();
+}
+function onR2(){
+  state.r2gate = document.getElementById('r2-gate').value.trim();
+  counter('r2-count', state.r2gate.length, 50);
+  const done = EQ_CARDS.filter((_, i) => state.r2[i]).length;
+  const t = document.getElementById('r2-tally'); t.innerHTML = '';
+  t.appendChild(el('span', done === EQ_CARDS.length ? 'got' : 'missing', 'Placed ' + done + ' of ' + EQ_CARDS.length));
+  document.getElementById('r2-btn').disabled = !(done === EQ_CARDS.length && state.r2gate.length >= 50);
+}
+
+/* ── ROUND 3 ── */
+function renderR3(){
+  const box = document.getElementById('r3-opts'); box.innerHTML = '';
+  CALLS.forEach((c, j) => {
+    const b = el('button', 'opt-btn' + (state.call === j ? ' on' : '')); b.type = 'button';
+    b.appendChild(el('span', 'l', String.fromCharCode(65+j))); b.appendChild(el('span', null, c));
+    b.onclick = () => { state.call = j; renderR3(); };
+    box.appendChild(b);
+  });
+  document.getElementById('r3-why').value = state.why;
+  document.getElementById('r3-ct').value = state.ct;
+  onR3();
+}
+function onR3(){
+  state.why = document.getElementById('r3-why').value.trim();
+  state.ct = document.getElementById('r3-ct').value.trim();
+  counter('r3-why-count', state.why.length, 60);
+  counter('r3-ct-count', state.ct.length, 40);
+  const btn = document.getElementById('submit-btn');
+  if (btn.dataset.sent === '1') return;
+  btn.disabled = !(state.call != null && state.why.length >= 60 && state.ct.length >= 40);
+}
+
+/* ── SUBMIT ── */
+function submitAll(){
+  const btn = document.getElementById('submit-btn');
+  if (btn.disabled || btn.dataset.sent === '1') return;           // no double submits
+  btn.disabled = true; btn.dataset.sent = '1'; btn.textContent = 'Submitting…';
+
+  const payload = {
+    exercise: 'W9.1-name-on-the-pack',
+    week: '9.1',
+    submittedAt: new Date().toISOString(),
+    name: state.name, email: state.email, group: state.groupNum
+  };
+  NPD_CARDS.forEach((_, i) => { payload['r1_card' + (i+1)] = state.r1[i] || ''; });
+  payload.r1_gate_vector = state.r1gate;
+  EQ_CARDS.forEach((_, i) => { payload['r2_card' + String.fromCharCode(65+i)] = state.r2[i] || ''; });
+  payload.r2_gate_missing = state.r2gate;
+  payload.r3_call = state.call != null ? CALLS[state.call] : '';
+  payload.r3_why = state.why;
+  payload.r3_concept_test = state.ct;
+
+  try{
+    if(/^https?:\/\//i.test(CREDIT_ENDPOINT)){
+      postForCredit({
+        email: state.email, name: state.name,
+        week: EX_WEEK, session: EX_SESSION, exerciseId: EX_ID,
+        password: PW, group: String(state.groupNum||''), points: EX_POINTS,
+        fields: creditFields(payload),
+        answers: creditAnswers(payload)
+      });
+    }
+  }catch(e){
+    console.warn('Credit POST error (non-blocking):', e);
+  }
+
+  buildSummary();
+  show('summary-screen');
+}
+
+function line(parent, bold, rest){
+  const d = document.createElement('div'); d.style.marginBottom = '10px';
+  const b = document.createElement('b'); b.textContent = bold; d.appendChild(b);
+  if (rest){ d.appendChild(document.createElement('br')); d.appendChild(document.createTextNode(rest)); }
+  parent.appendChild(d);
+}
+function buildSummary(){
+  document.getElementById('student-tag').textContent =
+    state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
+  const sc = document.getElementById('sum-call'); sc.innerHTML = '';
+  sc.appendChild(el('div', 'fill', state.call != null ? CALLS[state.call] : ''));
+  const w = el('div'); w.style.marginTop = '8px'; w.textContent = state.why; sc.appendChild(w);
+  const s1 = document.getElementById('sum-r1'); s1.innerHTML = '';
+  NPD_CARDS.forEach((t, i) => line(s1, (i+1) + '. ' + (state.r1[i] || '?'), t));
+  line(s1, 'Why the Vector flopped', state.r1gate);
+  line(s1, 'What Gillette should have shown Ravi first', state.ct);
+  const s2 = document.getElementById('sum-r2'); s2.innerHTML = '';
+  EQ_CARDS.forEach((c, i) => line(s2, String.fromCharCode(65+i) + '. ' + (state.r2[i] || '?') + ' · ' + c.who, c.t));
+  line(s2, 'The missing card for the $2.75 buyer', state.r2gate);
+}
+
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function checkPw(){
+  var val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val.length >= 4){
+    PW = val;                       /* verified server-side at the join step */
+    document.getElementById('pw-err').textContent = '';
+    show('join-screen');
+  } else {
+    var box = document.querySelector('.pw-box');
+    if(box){ box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
+    document.getElementById('pw-err').textContent = "Enter today's class code.";
+  }
+}
+
+function onJoin(){
+  const name  = document.getElementById('j-name').value.trim();
+  const email = document.getElementById('j-email').value.trim().toLowerCase();
+  const group = document.getElementById('j-group').value;
+  const emailOk = ucEmailOk(email);
+  state.name = name; state.email = email; state.groupNum = group;
+  document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk && group);
+}
+
+/* ── ROSTER GATE ─────────────────────────────────────────────────────────
+   The Logic App verifies enrollment server-side via mode:"join". EVERY
+   failure is a hard stop: nobody enters the exercise unverified, because a
+   student who walks in past a failed check gets no credit and does not find
+   out until the gradebook. ── */
+var JOIN_VERIFY_MS = 12000;
+function __joinNext(){ show('brief-screen'); }
+function __joinField(id, fallback){
+  var el = document.getElementById(id);
+  return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
+}
+async function joinVerify(){
+  var btn = document.getElementById('join-btn');
+  if(!btn || btn.disabled) return;
+  var orig = btn.textContent;
+  var release = function(){ btn.disabled = false; btn.textContent = orig; };
+  var email = __joinField('j-email', (window.state && state.email));
+  var name  = __joinField('j-name',  (window.state && state.name));
+  var group = __joinField('j-group', (window.state && (state.groupNum || state.group)));
+
+  /* local/unwired copy only — the published file always has a real endpoint */
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)){ __joinNext(); return; }
+
+  btn.disabled = true; btn.textContent = 'Checking…';
+  var ctl = (window.AbortController ? new AbortController() : null);
+  var timer = setTimeout(function(){ if(ctl) ctl.abort(); }, JOIN_VERIFY_MS);
+  var code = 'NO_ANSWER';
+  try{
+    var res = await fetch(CREDIT_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ mode:'join', email:email, name:name, testKey:TEST_KEY,
+        week:EX_WEEK, session:EX_SESSION, exerciseId:EX_ID,
+        password:PW, group:group })
+    });
+    clearTimeout(timer);
+    var d = await res.json().catch(function(){ return null; });
+    code = (d && d.code) || ('HTTP_' + res.status);
+  }catch(e){
+    clearTimeout(timer); code = 'NO_ANSWER';
+  }
+  release();
+
+  if(code === 'JOIN_OK' || code === 'DRY_RUN_OK'){
+    if(code === 'DRY_RUN_OK'){
+      creditBanner('warn', 'DRY RUN — test key active. Every gate is being checked for real, but nothing will be written to Canvas.', 'retry');
+    } else {
+      creditBanner('clear');
+    }
+    __joinNext(); return;
+  }
+
+  if(code === 'NOT_ENROLLED'){
+    creditBanner('bad', 'That email is not on the class roster, so you cannot be given credit. Check it for a typo — it is your @mail.uc.edu address, the one Canvas uses. If it is correct, see Professor Hudnall now.', 'retry');
+  } else if(code === 'BAD_PASSWORD'){
+    creditBanner('bad', 'That is not today\'s class code. Get it from Professor Hudnall and enter it again.', 'pw');
+  } else if(code === 'WINDOW_CLOSED'){
+    creditBanner('bad', 'This exercise is only open during class.', 'retry');
+  } else {
+    creditBanner('warn', 'Could not reach the roster check (' + code + '). Try again. If it keeps failing, Professor Hudnall will tell the class what to do.', 'retry');
+  }
+}
+
+/* ── PERSISTENT BANNER ────────────────────────────────────────────────────
+   Lives on <body>, not inside a screen, so it survives every show() call.
+   It is the message on a BLOCKED screen — never a permission to continue. ── */
+function creditBanner(kind, text, action){
+  var el = document.getElementById('credit-banner');
+  if(kind === 'clear'){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    document.body.classList.remove('has-credit-banner');
+    return;
+  }
+  if(!el){ el = document.createElement('div'); el.id = 'credit-banner'; document.body.appendChild(el); }
+  el.className = kind;
+  el.innerHTML = '';
+  var span = document.createElement('span'); span.textContent = text; el.appendChild(span);
+  var toPw = (action === 'pw') && document.getElementById('pw-screen');
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cb-fix';
+  b.textContent = toPw ? 'Re-enter the code' : 'Try again';
+  b.onclick = function(){ if(toPw){ show('pw-screen'); } else { joinVerify(); } };
+  el.appendChild(b);
+  document.body.classList.add('has-credit-banner');
+}
+</script>
+</body>
+</html>
