@@ -418,8 +418,6 @@ body.has-credit-banner{padding-top:58px}
       <div class="numrow"><div class="lab">How many trades did you make through the professor?<span>Count the tally marks on your cup. Each one cost you a Skittle.</span></div><input id="n-trades" type="number" min="0" max="300" inputmode="numeric" oninput="onNum()"></div>
       <div class="numrow"><div class="lab">Count your whole pile now, every color.<span>Everything in your cup, not only your color.</span></div><input id="n-end" type="number" min="0" max="300" inputmode="numeric" oninput="onNum()"></div>
     </div>
-    <div class="step-label">In Round 2, what did you mostly do?</div>
-    <div class="opt-list" id="r2-opts"></div>
     <div class="ledger" id="ledger"></div>
     <button class="btn btn-go" id="num-btn" onclick="renderReflect(); show('reflect-screen')" disabled>On to what you learned →</button>
   </div>
@@ -467,9 +465,8 @@ body.has-credit-banner{padding-top:58px}
         <li>Who ended class with the most Skittles? Who was trying to?</li>
         <li>Who wrote the goal you were chasing? Did anyone ask why?</li>
         <li>Count your total. Where did the missing Skittles go?</li>
-        <li>In Round 2 you could keep paying, go direct, or stop. What did you pick, and why?</li>
         <li>Gillette set the price of the razor and the price of every blade. Which one does a man pay over and over?</li>
-        <li>Name one game you are playing right now. Who is the house? Will you keep playing?</li>
+        <li>Credit cards, stocks, social media, sports. Who designed each game, and who gets paid whether you win or lose?</li>
       </ol>
     </div>
   </div>
@@ -560,29 +557,15 @@ const EX_WEEK = 9, EX_SESSION = 2, EX_ID = 'W09b-what-game', EX_POINTS = 12;
    Students do NOT open this page until the trading is over. The rules live on the
    9.2 deck, not here, so the page cannot be used to play. Nothing is graded on how
    well anyone traded. The debrief questions are copied word for word into the
-   Professor Key and the 9.2 deck. Change one, change all three the same day. ── */
-const R2 = [
-  'Kept trading through the professor and paying the fee',
-  'Traded directly with other students, no fee',
-  'Stopped and kept what I had',
-  'We did not get to Round 2'
-];
-
-let state = { name:'', email:'', groupNum:'', start:null, trades:null, end:null, r2:null, q1:'', q2:'', q3:'' };
+   Professor Key and the 9.2 deck. Change one, change all three the same day.
+   2026-10-19: one round only (Round 2 removed); debrief ends on Q5, the four
+   "who designed this game" examples. Five questions. ── */
+let state = { name:'', email:'', groupNum:'', start:null, trades:null, end:null, q1:'', q2:'', q3:'' };
 
 function el(tag, cls, text){ const e = document.createElement(tag); if(cls) e.className = cls; if(text!=null) e.textContent = text; return e; }
 function counter(id, n, min){ const c = document.getElementById(id); c.textContent = n + ' / ' + min + ' minimum'; c.classList.toggle('ok', n >= min); }
 function num(id){ const v = document.getElementById(id).value.trim(); if (v === '') return null; const n = Number(v); return (Number.isInteger(n) && n >= 0 && n <= 300) ? n : null; }
 
-function renderR2(){
-  const box = document.getElementById('r2-opts'); box.innerHTML = '';
-  R2.forEach((c, j) => {
-    const b = el('button', 'opt-btn' + (state.r2 === j ? ' on' : '')); b.type = 'button';
-    b.appendChild(el('span', 'l', String.fromCharCode(65+j))); b.appendChild(el('span', null, c));
-    b.onclick = () => { state.r2 = j; renderR2(); onNum(); };
-    box.appendChild(b);
-  });
-}
 function onNum(){
   state.start = num('n-start'); state.trades = num('n-trades'); state.end = num('n-end');
   const L = document.getElementById('ledger'); L.innerHTML = '';
@@ -596,7 +579,7 @@ function onNum(){
   } else {
     L.appendChild(el('span', null, 'Fill in all three numbers to see your ledger.'));
   }
-  document.getElementById('num-btn').disabled = !(state.start != null && state.trades != null && state.end != null && state.r2 != null);
+  document.getElementById('num-btn').disabled = !(state.start != null && state.trades != null && state.end != null);
 }
 
 function renderReflect(){
@@ -628,7 +611,6 @@ function submitAll(){
     trades_paid: state.trades,
     skittles_end: state.end,
     pile_change: (state.end != null && state.start != null) ? state.end - state.start : null,
-    round2_choice: state.r2 != null ? R2[state.r2] : '',
     q1_who_wins: state.q1,
     q2_your_game: state.q2,
     q3_learned: state.q3
@@ -663,7 +645,6 @@ function buildSummary(){
     state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
   const sn = document.getElementById('sum-num'); sn.innerHTML = '';
   sn.appendChild(el('div', null, 'Started with ' + state.start + '. Ended with ' + state.end + '. Paid the professor ' + state.trades + '.'));
-  const r = el('div'); r.style.marginTop = '8px'; r.appendChild(el('span', 'fill', 'Round 2: ')); r.appendChild(document.createTextNode(state.r2 != null ? R2[state.r2] : '')); sn.appendChild(r);
   const sl = document.getElementById('sum-learn'); sl.innerHTML = '';
   line(sl, 'Who ends with the most', state.q1);
   line(sl, 'Your game, and the house', state.q2);
@@ -708,7 +689,7 @@ function onJoin(){
    student who walks in past a failed check gets no credit and does not find
    out until the gradebook. ── */
 var JOIN_VERIFY_MS = 12000;
-function __joinNext(){ renderR2(); onNum(); show('num-screen'); }
+function __joinNext(){ onNum(); show('num-screen'); }
 function __joinField(id, fallback){
   var el = document.getElementById(id);
   return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
