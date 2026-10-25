@@ -392,14 +392,6 @@ body.has-credit-banner{padding-top:58px}
         <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
         <div class="hint">Use your @mail.uc.edu address, the same one Canvas uses. Credit is matched on it.</div>
       </div>
-      <div class="field">
-        <label for="j-group">Your group</label>
-        <select id="j-group" onchange="onJoin()">
-          <option value="">Pick your group…</option>
-          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
-        </select>
-      </div>
       <button class="btn btn-go" id="join-btn" onclick="joinVerify()" disabled>Let's go →</button>
       <div id="join-err" class="join-msg"></div>
     </div>
@@ -642,7 +634,7 @@ function line(parent, bold, rest){
 }
 function buildSummary(){
   document.getElementById('student-tag').textContent =
-    state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
+    state.name + ' · ' + state.email;
   const sn = document.getElementById('sum-num'); sn.innerHTML = '';
   sn.appendChild(el('div', null, 'Started with ' + state.start + '. Ended with ' + state.end + '. Paid the professor ' + state.trades + '.'));
   const sl = document.getElementById('sum-learn'); sl.innerHTML = '';
@@ -677,10 +669,10 @@ function checkPw(){
 function onJoin(){
   const name  = document.getElementById('j-name').value.trim();
   const email = document.getElementById('j-email').value.trim().toLowerCase();
-  const group = document.getElementById('j-group').value;
+  const group = '';  /* individual exercise: no group (2026-10-21) */
   const emailOk = ucEmailOk(email);
   state.name = name; state.email = email; state.groupNum = group;
-  document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk && group);
+  document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk);
 }
 
 /* ── ROSTER GATE ─────────────────────────────────────────────────────────
