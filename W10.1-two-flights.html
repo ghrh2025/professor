@@ -431,7 +431,7 @@ body.has-credit-banner{padding-top:58px}
     </div>
     <div class="gate-q">Curtis was as good at his job as Denise. So who is to blame for Tuesday?</div>
     <textarea id="r1-gate" placeholder="Tuesday was not Curtis's fault because… The blame belongs to…" oninput="onR1()"></textarea>
-    <div class="char-count" id="r1-count">0 / 60 minimum</div>
+    <div class="char-count" id="r1-count">0 / 40 minimum</div>
     <button class="btn btn-go" id="r1-btn" style="margin-top:14px" onclick="renderR2(); show('r2-screen')" disabled>On to Round 2 →</button>
   </div>
 </div>
@@ -446,7 +446,7 @@ body.has-credit-banner{padding-top:58px}
     <div class="opt-list" id="r2-opts"></div>
     <div class="step-label">Why that one? Use one fact from the case.</div>
     <textarea id="r2-why" placeholder="Southwest is really selling ____, because in the case…" oninput="onR2()"></textarea>
-    <div class="char-count" id="r2-count">0 / 50 minimum</div>
+    <div class="char-count" id="r2-count">0 / 40 minimum</div>
     <div class="stop">
       <span class="cap">Stop · Turn to your group</span>
       <p>Find someone in your group who picked a different answer. Each of you makes the case in 30 seconds. Then move on.</p>
@@ -466,10 +466,10 @@ body.has-credit-banner{padding-top:58px}
     <div class="opt-list" id="r3-opts"></div>
     <div class="step-label">2 · Back your answer with one number from the case.</div>
     <textarea id="r3-why" placeholder="The number that proves it is… It shows that…" oninput="onR3()"></textarea>
-    <div class="char-count" id="r3-why-count">0 / 50 minimum</div>
+    <div class="char-count" id="r3-why-count">0 / 30 minimum</div>
     <div class="step-label" style="margin-top:14px">3 · Eleven seats flew empty on Tuesday. What did Southwest lose when the door closed?</div>
     <textarea id="r3-seats" placeholder="When the door closed, Southwest lost…" oninput="onR3()" style="min-height:90px"></textarea>
-    <div class="char-count" id="r3-seats-count">0 / 40 minimum</div>
+    <div class="char-count" id="r3-seats-count">0 / 30 minimum</div>
     <button class="btn btn-go" id="submit-btn" style="margin-top:14px" onclick="submitAll()" disabled>Submit for credit →</button>
     <div class="submit-note">One submission per student. Your own answers, your own name.</div>
   </div>
@@ -484,14 +484,17 @@ body.has-credit-banner{padding-top:58px}
     <div class="confirm-pill credit-claim">✓ Participation recorded, you're all set</div>
     <div class="student-tag" id="student-tag"></div>
 
-    <div class="section-label">Round 3 · Your call</div>
-    <div class="verdict" id="sum-call"></div>
+    <div class="callout-restored" id="restored-note" style="display:none;background:#EEF2FB;border:1px solid #C7D2F0;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:14px">You already submitted. This is your summary for the debrief. Nothing more to do.</div>
 
     <div class="section-label">Round 1 · Where you put each fact</div>
     <div class="answer-box" id="sum-r1"></div>
 
     <div class="section-label">Round 2 · What Southwest is selling</div>
     <div class="answer-box" id="sum-r2"></div>
+
+    <div class="section-label">Round 3 · Your call</div>
+    <div class="verdict" id="sum-call"></div>
+    <div class="answer-box" id="sum-r3"></div>
 
     <div class="debrief-box">
       <h3>Bring to the debrief</h3>
@@ -659,11 +662,11 @@ function renderR1(){
 }
 function onR1(){
   state.r1gate = document.getElementById('r1-gate').value.trim();
-  counter('r1-count', state.r1gate.length, 60);
+  counter('r1-count', state.r1gate.length, 40);
   const done = HIIP_CARDS.filter((_, i) => state.r1[i]).length;
   const t = document.getElementById('r1-tally'); t.innerHTML = '';
   t.appendChild(el('span', done === HIIP_CARDS.length ? 'got' : 'missing', 'Placed ' + done + ' of ' + HIIP_CARDS.length));
-  document.getElementById('r1-btn').disabled = !(done === HIIP_CARDS.length && state.r1gate.length >= 60);
+  document.getElementById('r1-btn').disabled = !(done === HIIP_CARDS.length && state.r1gate.length >= 40);
 }
 
 /* ── ROUND 2 ── */
@@ -674,8 +677,8 @@ function renderR2(){
 }
 function onR2(){
   state.sellWhy = document.getElementById('r2-why').value.trim();
-  counter('r2-count', state.sellWhy.length, 50);
-  document.getElementById('r2-btn').disabled = !(state.sell != null && state.sellWhy.length >= 50);
+  counter('r2-count', state.sellWhy.length, 40);
+  document.getElementById('r2-btn').disabled = !(state.sell != null && state.sellWhy.length >= 40);
 }
 
 /* ── ROUND 3 ── */
@@ -688,11 +691,11 @@ function renderR3(){
 function onR3(){
   state.why = document.getElementById('r3-why').value.trim();
   state.seats = document.getElementById('r3-seats').value.trim();
-  counter('r3-why-count', state.why.length, 50);
-  counter('r3-seats-count', state.seats.length, 40);
+  counter('r3-why-count', state.why.length, 30);
+  counter('r3-seats-count', state.seats.length, 30);
   const btn = document.getElementById('submit-btn');
   if (btn.dataset.sent === '1') return;
-  btn.disabled = !(state.call != null && state.why.length >= 50 && state.seats.length >= 40);
+  btn.disabled = !(state.call != null && state.why.length >= 30 && state.seats.length >= 30);
 }
 
 /* ── SUBMIT ── */
@@ -730,6 +733,7 @@ function submitAll(){
   }
 
   buildSummary();
+  saveSummary();
   show('summary-screen');
 }
 
@@ -742,15 +746,42 @@ function line(parent, bold, rest){
 function buildSummary(){
   document.getElementById('student-tag').textContent =
     state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
-  const sc = document.getElementById('sum-call'); sc.innerHTML = '';
-  sc.appendChild(el('div', 'fill', state.call != null ? CALLS[state.call] : ''));
-  const w = el('div'); w.style.marginTop = '8px'; w.textContent = state.why; sc.appendChild(w);
   const s1 = document.getElementById('sum-r1'); s1.innerHTML = '';
   HIIP_CARDS.forEach((t, i) => line(s1, (i+1) + '. ' + (state.r1[i] || '?'), t));
-  line(s1, 'Who is to blame for Tuesday', state.r1gate);
-  line(s1, 'What Southwest lost when the door closed', state.seats);
+  line(s1, 'Debrief Q1 · Who is to blame for Tuesday?', state.r1gate);
   const s2 = document.getElementById('sum-r2'); s2.innerHTML = '';
-  line(s2, state.sell != null ? SELLS[state.sell] : '?', state.sellWhy);
+  line(s2, 'Debrief Q2 · Your pick: ' + (state.sell != null ? SELLS[state.sell] : '?'), state.sellWhy);
+  const sc = document.getElementById('sum-call'); sc.innerHTML = '';
+  sc.appendChild(el('div', 'fill', 'Debrief Q4 · ' + (state.call != null ? CALLS[state.call] : '')));
+  const w = el('div'); w.style.marginTop = '8px'; w.textContent = state.why; sc.appendChild(w);
+  const s3 = document.getElementById('sum-r3'); s3.innerHTML = '';
+  line(s3, 'Debrief Q3 · What Southwest lost when the door closed', state.seats);
+}
+
+/* ── SUMMARY SURVIVES A RELOAD (2026-10-26) ──────────────────────────────
+   Phones reload a background tab when the student switches apps. Without this,
+   a student who submitted comes back to the password screen and loses the
+   summary page the debrief runs from. Saved only on THIS device, only after
+   submit, and never re-posted. Storage can be blocked; every call is wrapped. */
+var SAVE_KEY = 'mktg2080-' + EX_ID + '-summary';
+function saveSummary(){
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ v:1, at:Date.now(), state:state })); } catch(e){}
+}
+function restoreSummary(){
+  var raw = null;
+  try { raw = localStorage.getItem(SAVE_KEY); } catch(e){ return; }
+  if (!raw) return;
+  try {
+    var d = JSON.parse(raw);
+    if (!d || !d.state || (Date.now() - (d.at || 0)) > 1000*60*60*14) return;   /* same class day only */
+    state = Object.assign(state, d.state);
+    var btn = document.getElementById('submit-btn');
+    if (btn){ btn.disabled = true; btn.dataset.sent = '1'; btn.textContent = 'Submitted'; }
+    buildSummary();
+    document.querySelectorAll('.confirm-pill,.credit-claim').forEach(function(x){ x.style.display = 'none'; });
+    document.getElementById('restored-note').style.display = 'block';
+    show('summary-screen');
+  } catch(e){}
 }
 
 function show(screenId){
@@ -870,6 +901,9 @@ function creditBanner(kind, text, action){
   el.appendChild(b);
   document.body.classList.add('has-credit-banner');
 }
+
+/* restore a submitted summary after a reload */
+try { restoreSummary(); } catch(e) {}
 </script>
 </body>
 </html>
