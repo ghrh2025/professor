@@ -433,7 +433,7 @@ body.has-credit-banner{padding-top:58px}
     </div>
     <div class="gate-q">Cards A and G are both Southwest talking about its customers. Why is one a gap and the other not?</div>
     <textarea id="r1-gate" placeholder="Card A is a gap because… Card G is not, because…" oninput="onR1()"></textarea>
-    <div class="char-count" id="r1-count">0 / 60 minimum</div>
+    <div class="char-count" id="r1-count">0 / 40 minimum</div>
     <button class="btn btn-go" id="r1-btn" style="margin-top:14px" onclick="renderR2(); show('r2-screen')" disabled>On to Round 2 →</button>
   </div>
 </div>
@@ -453,7 +453,7 @@ body.has-credit-banner{padding-top:58px}
     </div>
     <div class="gate-q">Pick the moment only the gate could fix. What exactly is the fix, and who does it?</div>
     <textarea id="r2-gate" placeholder="Only the gate could fix… The fix is… It is done by…" oninput="onR2()"></textarea>
-    <div class="char-count" id="r2-count">0 / 50 minimum</div>
+    <div class="char-count" id="r2-count">0 / 40 minimum</div>
     <button class="btn btn-go" id="r2-btn" style="margin-top:14px" onclick="renderR3(); show('r3-screen')" disabled>On to Round 3 →</button>
   </div>
 </div>
@@ -469,10 +469,10 @@ body.has-credit-banner{padding-top:58px}
     <div class="opt-list" id="r3-opts"></div>
     <div class="step-label">2 · Name the gap your answer rests on, and why.</div>
     <textarea id="r3-why" placeholder="My answer rests on the ____ Gap, because…" oninput="onR3()"></textarea>
-    <div class="char-count" id="r3-why-count">0 / 60 minimum</div>
+    <div class="char-count" id="r3-why-count">0 / 30 minimum</div>
     <div class="step-label" style="margin-top:14px">3 · Nora’s Tuesday already went wrong. What could Southwest do now to win her back?</div>
     <textarea id="r3-recover" placeholder="To win Nora back, Southwest could…" oninput="onR3()" style="min-height:90px"></textarea>
-    <div class="char-count" id="r3-recover-count">0 / 40 minimum</div>
+    <div class="char-count" id="r3-recover-count">0 / 30 minimum</div>
     <button class="btn btn-go" id="submit-btn" style="margin-top:14px" onclick="submitAll()" disabled>Submit for credit →</button>
     <div class="submit-note">One submission per student. Your own answers, your own name.</div>
   </div>
@@ -487,14 +487,17 @@ body.has-credit-banner{padding-top:58px}
     <div class="confirm-pill credit-claim">✓ Participation recorded, you're all set</div>
     <div class="student-tag" id="student-tag"></div>
 
-    <div class="section-label">Round 3 · Your call</div>
-    <div class="verdict" id="sum-call"></div>
+    <div id="restored-note" style="display:none;background:#EEF2FB;border:1px solid #C7D2F0;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:14px">You already submitted. This is your summary for the debrief. Nothing more to do.</div>
 
     <div class="section-label">Round 1 · The gap on each card</div>
     <div class="answer-box" id="sum-r1"></div>
 
     <div class="section-label">Round 2 · Dallas or the gate</div>
     <div class="answer-box" id="sum-r2"></div>
+
+    <div class="section-label">Round 3 · Your call</div>
+    <div class="verdict" id="sum-call"></div>
+    <div class="answer-box" id="sum-r3"></div>
 
     <div class="debrief-box">
       <h3>Bring to the debrief</h3>
@@ -652,11 +655,11 @@ function renderR1(){
 }
 function onR1(){
   state.r1gate = document.getElementById('r1-gate').value.trim();
-  counter('r1-count', state.r1gate.length, 60);
+  counter('r1-count', state.r1gate.length, 40);
   const done = GAP_CARDS.filter((_, i) => state.r1[i]).length;
   const t = document.getElementById('r1-tally'); t.innerHTML = '';
   t.appendChild(el('span', done === GAP_CARDS.length ? 'got' : 'missing', 'Placed ' + done + ' of ' + GAP_CARDS.length));
-  document.getElementById('r1-btn').disabled = !(done === GAP_CARDS.length && state.r1gate.length >= 60);
+  document.getElementById('r1-btn').disabled = !(done === GAP_CARDS.length && state.r1gate.length >= 40);
 }
 
 /* ── ROUND 2 ── */
@@ -678,11 +681,11 @@ function renderR2(){
 }
 function onR2(){
   state.r2gate = document.getElementById('r2-gate').value.trim();
-  counter('r2-count', state.r2gate.length, 50);
+  counter('r2-count', state.r2gate.length, 40);
   const done = FIX_CARDS.filter(ci => state.r2[ci]).length;
   const t = document.getElementById('r2-tally'); t.innerHTML = '';
   t.appendChild(el('span', done === FIX_CARDS.length ? 'got' : 'missing', 'Placed ' + done + ' of ' + FIX_CARDS.length));
-  document.getElementById('r2-btn').disabled = !(done === FIX_CARDS.length && state.r2gate.length >= 50);
+  document.getElementById('r2-btn').disabled = !(done === FIX_CARDS.length && state.r2gate.length >= 40);
 }
 
 /* ── ROUND 3 ── */
@@ -701,11 +704,11 @@ function renderR3(){
 function onR3(){
   state.why = document.getElementById('r3-why').value.trim();
   state.recover = document.getElementById('r3-recover').value.trim();
-  counter('r3-why-count', state.why.length, 60);
-  counter('r3-recover-count', state.recover.length, 40);
+  counter('r3-why-count', state.why.length, 30);
+  counter('r3-recover-count', state.recover.length, 30);
   const btn = document.getElementById('submit-btn');
   if (btn.dataset.sent === '1') return;
-  btn.disabled = !(state.call != null && state.why.length >= 60 && state.recover.length >= 40);
+  btn.disabled = !(state.call != null && state.why.length >= 30 && state.recover.length >= 30);
 }
 
 /* ── SUBMIT ── */
@@ -743,6 +746,7 @@ function submitAll(){
   }
 
   buildSummary();
+  saveSummary();
   show('summary-screen');
 }
 
@@ -755,16 +759,43 @@ function line(parent, bold, rest){
 function buildSummary(){
   document.getElementById('student-tag').textContent =
     state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
-  const sc = document.getElementById('sum-call'); sc.innerHTML = '';
-  sc.appendChild(el('div', 'fill', state.call != null ? CALLS[state.call] : ''));
-  const w = el('div'); w.style.marginTop = '8px'; w.textContent = state.why; sc.appendChild(w);
   const s1 = document.getElementById('sum-r1'); s1.innerHTML = '';
   GAP_CARDS.forEach((t, i) => line(s1, L(i) + '. ' + (state.r1[i] || '?'), t));
-  line(s1, 'Why A is a gap and G is not', state.r1gate);
+  line(s1, 'Debrief Q1 · Why A is a gap and G is not', state.r1gate);
   const s2 = document.getElementById('sum-r2'); s2.innerHTML = '';
   FIX_CARDS.forEach(ci => line(s2, L(ci) + '. ' + (state.r2[ci] || '?'), GAP_CARDS[ci]));
-  line(s2, 'The fix only the gate can make', state.r2gate);
-  line(s2, 'How Southwest wins Nora back', state.recover);
+  line(s2, 'Debrief Q2 · The fix only the gate can make', state.r2gate);
+  const sc = document.getElementById('sum-call'); sc.innerHTML = '';
+  sc.appendChild(el('div', 'fill', 'Debrief Q3 · ' + (state.call != null ? CALLS[state.call] : '')));
+  const w = el('div'); w.style.marginTop = '8px'; w.textContent = state.why; sc.appendChild(w);
+  const s3 = document.getElementById('sum-r3'); s3.innerHTML = '';
+  line(s3, 'Debrief Q4 · How Southwest wins Nora back', state.recover);
+}
+
+/* ── SUMMARY SURVIVES A RELOAD (2026-10-26) ──────────────────────────────
+   Phones reload a background tab when the student switches apps. Without this,
+   a student who submitted comes back to the password screen and loses the
+   summary page the debrief runs from. Saved only on THIS device, only after
+   submit, and never re-posted. Storage can be blocked; every call is wrapped. */
+var SAVE_KEY = 'mktg2080-' + EX_ID + '-summary';
+function saveSummary(){
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ v:1, at:Date.now(), state:state })); } catch(e){}
+}
+function restoreSummary(){
+  var raw = null;
+  try { raw = localStorage.getItem(SAVE_KEY); } catch(e){ return; }
+  if (!raw) return;
+  try {
+    var d = JSON.parse(raw);
+    if (!d || !d.state || (Date.now() - (d.at || 0)) > 1000*60*60*14) return;   /* same class day only */
+    state = Object.assign(state, d.state);
+    var btn = document.getElementById('submit-btn');
+    if (btn){ btn.disabled = true; btn.dataset.sent = '1'; btn.textContent = 'Submitted'; }
+    buildSummary();
+    document.querySelectorAll('.confirm-pill,.credit-claim').forEach(function(x){ x.style.display = 'none'; });
+    document.getElementById('restored-note').style.display = 'block';
+    show('summary-screen');
+  } catch(e){}
 }
 
 function show(screenId){
@@ -884,6 +915,9 @@ function creditBanner(kind, text, action){
   el.appendChild(b);
   document.body.classList.add('has-credit-banner');
 }
+
+/* restore a submitted summary after a reload */
+try { restoreSummary(); } catch(e) {}
 </script>
 </body>
 </html>
