@@ -505,16 +505,15 @@ body.has-credit-banner{padding-top:58px}
     <div class="section-label">Round 2 · What moves the price</div>
     <div class="answer-box" id="sum-r2"></div>
 
-    <div class="section-label">Round 3 · Your call</div>
-    <div class="verdict" id="sum-call"></div>
+    <div class="section-label">Round 3 · One phone, two prices</div>
     <div class="answer-box" id="sum-r3"></div>
 
     <div class="debrief-box">
       <h3>Bring to the debrief</h3>
       <ol>
         <li>Costco watches rival prices every day. Does that make it a competitive pricer?</li>
-        <li>What moves each firm's price: Costco's, Apple's and McDonald's?</li>
-        <li>Why does Apple charge $1,199 for a phone Costco's rule would price at $572?</li>
+        <li>Pick one trigger. Name the fact from the case that proves your match.</li>
+        <li>In your own words: what is Apple's price measuring that Costco's price is not?</li>
         <li>Costco needs more money next year, and its own rule will not let it take that money out of what it sells. So where should the money come from?</li>
       </ol>
     </div>
@@ -772,26 +771,44 @@ function submitAll(){
   show('summary-screen');
 }
 
-function line(parent, bold, rest){
-  const d = document.createElement('div'); d.style.marginBottom = '10px';
-  const b = document.createElement('b'); b.textContent = bold; d.appendChild(b);
-  if (rest){ d.appendChild(document.createElement('br')); d.appendChild(document.createTextNode(rest)); }
+/* ── SUMMARY (Commandment 10, 2026-11-02): every on-screen question, word for word,
+   then the student's answer, in exercise order. The deck and the key use the same words. ── */
+const Q_R1 = 'How was each price set? Tap the pricing method each one shows best.';
+const Q_GATE = 'Costco watches rival prices every day. Does that make it a competitive pricer?';
+const Q_R2 = 'Find what moves the price. Tap the firm whose price answers to it.';
+const Q_PROOF = 'Pick one trigger. Name the fact from the case that proves your match.';
+const Q_1199 = 'Why does Apple charge $1,199 for a phone Costco\'s rule would price at $572?';
+const Q_WORDS = 'In your own words: what is Apple\'s price measuring that Costco\'s price is not?';
+const Q_MONEY = 'Costco needs more money next year, and its own rule will not let it take that money out of what it sells. So where should the money come from?';
+function qa(parent, q, a, tag){
+  const d = el('div'); d.style.cssText = 'margin-bottom:14px';
+  const qq = el('div', null, (tag ? tag + ' · ' : '') + q);
+  qq.style.cssText = 'font-size:13px;font-weight:700;color:#475569;line-height:1.45;margin-bottom:4px';
+  const aa = el('div', null, a || '(no answer)');
+  aa.style.cssText = 'font-size:15px;line-height:1.5;white-space:pre-wrap';
+  d.appendChild(qq); if (a !== null) d.appendChild(aa); parent.appendChild(d);
+}
+function pickLine(parent, n, text, pick){
+  const d = el('div'); d.style.cssText = 'margin:0 0 10px 0;padding-left:10px;border-left:3px solid #E2E8F0';
+  d.appendChild(el('div', null, n + '. ' + text));
+  const b = el('b', null, 'Your pick: ' + (pick || '?')); d.appendChild(b);
   parent.appendChild(d);
 }
 function buildSummary(){
   document.getElementById('student-tag').textContent =
     state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
   const s1 = document.getElementById('sum-r1'); s1.innerHTML = '';
-  TAG_CARDS.forEach((t, i) => line(s1, (i+1) + '. ' + (state.r1[i] || '?'), t));
-  line(s1, 'Debrief Q1 · Does watching rival prices make Costco a competitive pricer?', state.r1gate);
+  qa(s1, Q_R1, null);
+  TAG_CARDS.forEach((t, i) => pickLine(s1, i+1, t, state.r1[i]));
+  qa(s1, Q_GATE, state.r1gate, 'Debrief Q1');
   const s2 = document.getElementById('sum-r2'); s2.innerHTML = '';
-  TRIGGERS.forEach((t, i) => line(s2, 'Trigger ' + (i+1) + ' · ' + (state.r2[i] || '?'), t));
-  line(s2, 'Debrief Q2 · Your proof from the case', state.r2why);
-  const sc = document.getElementById('sum-call'); sc.innerHTML = '';
-  sc.appendChild(el('div', 'fill', 'Debrief Q3 · ' + (state.why1199 != null ? WHY_1199[state.why1199] : '')));
-  const w = el('div'); w.style.marginTop = '8px'; w.textContent = state.why; sc.appendChild(w);
+  qa(s2, Q_R2, null);
+  TRIGGERS.forEach((t, i) => pickLine(s2, 'Trigger ' + (i+1), t, state.r2[i]));
+  qa(s2, Q_PROOF, state.r2why, 'Debrief Q2');
   const s3 = document.getElementById('sum-r3'); s3.innerHTML = '';
-  line(s3, 'Debrief Q4 · Where the money should come from: ' + (state.door != null ? DOORS[state.door] : '?'), state.money);
+  qa(s3, '1 · ' + Q_1199, state.why1199 != null ? String.fromCharCode(65 + state.why1199) + '. ' + WHY_1199[state.why1199] : '');
+  qa(s3, '2 · ' + Q_WORDS, state.why, 'Debrief Q3');
+  qa(s3, '3 · ' + Q_MONEY, (state.door != null ? DOORS[state.door] : '?') + '\n' + state.money, 'Debrief Q4');
 }
 
 /* ── SUMMARY SURVIVES A RELOAD (2026-10-26) ──────────────────────────────

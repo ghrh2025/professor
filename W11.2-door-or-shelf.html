@@ -562,9 +562,14 @@ body.has-credit-banner{padding-top:58px}
     <div class="ask-q" id="y1-react-label"></div>
     <textarea id="y1-react" oninput="onY1()"></textarea>
     <div class="char-count" id="y1-react-count">0 / 40 minimum</div>
-    <div class="gate-q">Before you move on, as a group: what does the ceiling buy Costco that one more point of markup would take away?</div>
+    <div class="step-label" style="margin-top:14px">As a group, before you move on. Then each person types it.</div>
+    <div class="gate-q">What does the ceiling buy Costco that one more point of markup would take away?</div>
     <textarea id="y1-gate" placeholder="The ceiling buys Costco… One more point would take away…" oninput="onY1()"></textarea>
     <div class="char-count" id="y1-gate-count">0 / 40 minimum</div>
+    <div class="step-label" style="margin-top:14px">On your own.</div>
+    <div class="gate-q">One point on the shelf costs a Gold Star household about $32 a year. The fee increase costs $5. Why is the bigger cost the one nobody would complain about?</div>
+    <textarea id="y1-32" placeholder="Nobody would complain about the $32 because…" oninput="onY1()"></textarea>
+    <div class="char-count" id="y1-32-count">0 / 40 minimum</div>
     <button class="btn btn-go" id="y1-btn" style="margin-top:14px" onclick="renderY2(); show('y2-screen')" disabled>Step 4: go to Year 2 →</button>
   </div>
 </div>
@@ -645,9 +650,8 @@ body.has-credit-banner{padding-top:58px}
     <div class="section-label">Year 2 · The jeans</div>
     <div class="answer-box" id="sum-y2"></div>
 
-    <div class="section-label">The sign</div>
-    <div class="verdict" id="sum-sign"></div>
-    <div class="answer-box" id="sum-gaveup"></div>
+    <div class="section-label">Step 5 · Tell the members</div>
+    <div class="answer-box" id="sum-sign"></div>
 
     <div class="debrief-box">
       <h3>Bring to the debrief</h3>
@@ -813,7 +817,7 @@ const JEANS = [
 ];
 
 let state = { name:'', email:'', groupNum:'', role:null, pending:null, prepQ:'', prepArg:'',
-              fee:null, shelf:null, renew:null, y1react:'', y1gate:'', jeans:null, y2why:'', sign:'', gaveup:'' };
+              fee:null, shelf:null, renew:null, y1react:'', y1gate:'', y132:'', jeans:null, y2why:'', sign:'', gaveup:'' };
 
 function el(tag, cls, text){ const e = document.createElement(tag); if(cls) e.className = cls; if(text!=null) e.textContent = text; return e; }
 function counter(id, n, min){ const c = document.getElementById(id); c.textContent = n + ' / ' + min + ' minimum'; c.classList.toggle('ok', n >= min); }
@@ -935,15 +939,18 @@ function renderY1(){
   document.getElementById('y1-react-label').textContent = r ? r.react : '';
   document.getElementById('y1-react').value = state.y1react;
   document.getElementById('y1-gate').value = state.y1gate;
+  document.getElementById('y1-32').value = state.y132 || '';
   onY1();
 }
 function onY1(){
   state.y1react = document.getElementById('y1-react').value.trim();
   state.y1gate = document.getElementById('y1-gate').value.trim();
+  state.y132 = document.getElementById('y1-32').value.trim();
   counter('y1-react-count', state.y1react.length, 40);
   counter('y1-gate-count', state.y1gate.length, 40);
+  counter('y1-32-count', state.y132.length, 40);
   document.getElementById('y1-btn').disabled = !(state.fee != null && state.shelf != null && state.renew != null &&
-    state.y1react.length >= 40 && state.y1gate.length >= 40);
+    state.y1react.length >= 40 && state.y1gate.length >= 40 && state.y132.length >= 40);
 }
 
 /* ── STEP 4: YEAR 2, the jeans ── */
@@ -1030,6 +1037,7 @@ function submitAll(){
   payload.y1_member_renews = state.renew === 0 ? 'Yes' : state.renew === 1 ? 'No' : '';
   payload.y1_role_reaction = state.y1react;
   payload.y1_ceiling_buys = state.y1gate;
+  payload.y1_32_vs_5 = state.y132;
   payload.y2_jeans = state.jeans === 'keep' ? 'Kept at $29.99' : state.jeans === 'drop' ? 'Dropped to $22.99' : '';
   payload.y2_who_finds_out = state.y2why;
   payload.sign_text = state.sign;
@@ -1054,33 +1062,43 @@ function submitAll(){
   show('summary-screen');
 }
 
-function line(parent, bold, rest){
-  const d = document.createElement('div'); d.style.marginBottom = '10px';
-  const b = document.createElement('b'); b.textContent = bold; d.appendChild(b);
-  if (rest){ d.appendChild(document.createElement('br')); d.appendChild(document.createTextNode(rest)); }
-  parent.appendChild(d);
+/* ── SUMMARY (Commandment 10, 2026-11-02): every on-screen question, word for word,
+   then the student's answer, in exercise order. The deck and the key use the same words. ── */
+const Q_GATE = 'What does the ceiling buy Costco that one more point of markup would take away?';
+const Q_32 = 'One point on the shelf costs a Gold Star household about $32 a year. The fee increase costs $5. Why is the bigger cost the one nobody would complain about?';
+const Q_JEANS = 'What does the tag say tomorrow?';
+const Q_FIND = 'Who would ever find out? And if nobody does, what changes?';
+const Q_GAVEUP = 'Name the one thing Apple can do with a price, and the one thing McDonald\'s can do with a price, that Costco has given up.';
+function qa(parent, q, a, tag){
+  const d = el('div'); d.style.cssText = 'margin-bottom:14px';
+  const qq = el('div', null, (tag ? tag + ' · ' : '') + q);
+  qq.style.cssText = 'font-size:13px;font-weight:700;color:#475569;line-height:1.45;margin-bottom:4px';
+  const aa = el('div', null, a || '(no answer)');
+  aa.style.cssText = 'font-size:15px;line-height:1.5;white-space:pre-wrap';
+  d.appendChild(qq); d.appendChild(aa); parent.appendChild(d);
 }
 function buildSummary(){
   const r = roleObj();
   renderBadge();
   document.getElementById('student-tag').textContent =
-    state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
+    state.name + ' · Group ' + state.groupNum + ' · ' + state.email + (r ? ' · Role ' + r.n + ': ' + r.name : '');
   const sp = document.getElementById('sum-prep'); sp.innerHTML = '';
-  line(sp, r ? 'Role ' + r.n + ': ' + r.name : 'Role ?', r ? r.q : '');
-  line(sp, 'Your answer', state.prepQ);
-  line(sp, 'Your opening argument', state.prepArg);
+  qa(sp, 'Your question: ' + (r ? r.q : '?'), state.prepQ);
+  qa(sp, 'Your opening argument, in your own words. You will read this to your group.', state.prepArg);
   const s1 = document.getElementById('sum-y1'); s1.innerHTML = '';
-  line(s1, 'Fee: ' + (state.fee != null ? FEES[state.fee].t : '?') + ' · Markup: ' + (state.shelf != null ? SHELF[state.shelf].t : '?'),
-       'About ' + fmtM(planMoney()) + ' a year. The Member ' + (state.renew === 0 ? 'renews.' : state.renew === 1 ? 'does NOT renew.' : '?'));
-  line(s1, 'Your role’s reaction', state.y1react);
-  line(s1, 'Debrief Q1 · What the ceiling buys that one more point would take away', state.y1gate);
+  qa(s1, 'The door · the membership fee (Gold Star / Executive)', state.fee != null ? FEES[state.fee].t : '');
+  qa(s1, 'The shelf · the markup ceiling (brands / Kirkland Signature)', state.shelf != null ? SHELF[state.shelf].t : '');
+  qa(s1, 'New money a year from your plan', 'About ' + fmtM(planMoney()));
+  qa(s1, 'The Member\'s answer: does she renew under this plan?', state.renew === 0 ? 'Yes, she renews' : state.renew === 1 ? 'No, she does not renew' : '');
+  qa(s1, r ? r.react : 'Your role\'s reaction', state.y1react);
+  qa(s1, Q_GATE, state.y1gate, 'Debrief Q1');
+  qa(s1, Q_32, state.y132, 'Debrief Q2');
   const s2 = document.getElementById('sum-y2'); s2.innerHTML = '';
-  line(s2, 'The jeans: ' + (state.jeans === 'keep' ? 'kept at $29.99' : 'dropped to $22.99'), state.y2why);
+  qa(s2, Q_JEANS, state.jeans === 'keep' ? 'Keep the tag at $29.99' : state.jeans === 'drop' ? 'Drop the tag to $22.99' : '');
+  qa(s2, Q_FIND, state.y2why);
   const sc = document.getElementById('sum-sign'); sc.innerHTML = '';
-  sc.appendChild(el('div', 'fill', 'Debrief Q3 · ' + signCopy().cap));
-  const w = el('div'); w.style.marginTop = '8px'; w.textContent = state.sign; sc.appendChild(w);
-  const s3 = document.getElementById('sum-gaveup'); s3.innerHTML = '';
-  line(s3, 'Debrief Q4 · What Apple and McDonald’s can do with a price that Costco gave up', state.gaveup);
+  qa(sc, signCopy().cap, state.sign, 'Debrief Q3 · Read your sign out loud. Would a member renew after reading it?');
+  qa(sc, Q_GAVEUP, state.gaveup, 'Debrief Q4');
 }
 renderDash('dash-brief', false);
 
