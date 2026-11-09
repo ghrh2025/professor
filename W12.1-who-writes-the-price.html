@@ -418,7 +418,7 @@ body.has-credit-banner{padding-top:58px}
     <div class="mission"><b>One card is a trap.</b> It sounds like one kind of channel and is really another. Find it, and be ready to defend your call to your group.</div>
     <div class="ladder">
       <div class="row"><span class="n">1</span><span><span class="nm">Read the channel</span><span class="pl">Put 8 facts from the case on the infographic's words.</span></span></div>
-      <div class="row"><span class="n">2</span><span><span class="nm">What the stores do</span><span class="pl">Pick 3 jobs the 9,955 stores do. Say what a company with 655 stores would have to build.</span></span></div>
+      <div class="row"><span class="n">2</span><span><span class="nm">What the stores do</span><span class="pl">Pick 3 jobs the 9,955 stores do. Say what Tesla, with 655 locations, would have to build.</span></span></div>
       <div class="row"><span class="n">3</span><span><span class="nm">Both of these are Ford</span><span class="pl">Which price should Ford fight for, and what would winning cost?</span></span></div>
     </div>
     <button class="btn btn-go" style="margin-top:16px" onclick="renderR1(); show('r1-screen')">Start Round 1 →</button>
@@ -434,11 +434,11 @@ body.has-credit-banner{padding-top:58px}
     <div class="screen-sub">Eight facts from the case, in two parts. For each card, tap the word from the infographic that fits it best.</div>
 
     <div class="step-label">Part A · Cards 1 to 3 · Which channel type?</div>
-    <details class="defs"><summary>The 4 channel types, from the infographic</summary><dl id="type-defs"></dl></details>
+    <details class="defs" open><summary>The 4 channel types, from the infographic</summary><dl id="type-defs"></dl></details>
     <div id="r1a-list"></div>
 
     <div class="step-label" style="margin-top:18px">Part B · Cards 4 to 8 · Which kind of power or conflict?</div>
-    <details class="defs"><summary>Channel power and conflict, from the infographic</summary><dl id="pc-defs"></dl></details>
+    <details class="defs" open><summary>Channel power and conflict, from the infographic</summary><dl id="pc-defs"></dl></details>
     <div id="r1b-list"></div>
 
     <div class="tally" id="r1-tally"></div>
@@ -463,11 +463,11 @@ body.has-credit-banner{padding-top:58px}
     <div class="step-label">1 · Tap exactly 3 jobs the stores do for a Ford buyer.</div>
     <div id="r2-jobs"></div>
     <div class="tally" id="r2-tally"></div>
-    <div class="step-label" style="margin-top:6px">2 · For each job you picked: what would a company with 655 stores have to build to do it?</div>
+    <div class="step-label" style="margin-top:6px">2 · For each job you picked: what would Tesla, with 655 locations, have to build to do it?</div>
     <div id="r2-build"></div>
     <div class="stop">
       <span class="cap">Stop · Turn to your group</span>
-      <p>Compare your three jobs. Which one would cost a 655-store company the most to build? Agree on one in 30 seconds, then move on.</p>
+      <p>Compare your three jobs. Which one would cost Tesla the most to build? Agree on one in 30 seconds, then move on.</p>
     </div>
     <button class="btn btn-go" id="r2-btn" style="margin-top:14px" onclick="renderR3(); show('r3-screen')" disabled>On to Round 3 →</button>
   </div>
@@ -483,7 +483,7 @@ body.has-credit-banner{padding-top:58px}
     <div class="rule-out"><b>There is no single right answer here.</b> Pick the side you can defend with the case, then name the price of winning.</div>
     <div class="step-label">1 · Which price should Ford fight for?</div>
     <div class="opt-list" id="r3-price"></div>
-    <div class="step-label">2 · Which kind of channel power would your answer use?</div>
+    <div class="step-label">2 · Which kind of channel power would that take?</div>
     <div class="opt-list" id="r3-power"></div>
     <div class="step-label">3 · What would winning that fight cost Ford? Use one number from the case.</div>
     <textarea id="r3-cost" placeholder="Winning would cost Ford… because…" oninput="onR3()"></textarea>
@@ -510,17 +510,16 @@ body.has-credit-banner{padding-top:58px}
     <div class="section-label">Round 2 · What the stores do</div>
     <div class="answer-box" id="sum-r2"></div>
 
-    <div class="section-label">Round 3 · Your call</div>
-    <div class="verdict" id="sum-call"></div>
+    <div class="section-label">Round 3 · The call</div>
     <div class="answer-box" id="sum-r3"></div>
 
     <div class="debrief-box">
       <h3>Bring to the debrief</h3>
       <ol>
         <li>Ford took nearly 200,000 reservations on its own website. Does that make Ford a direct channel?</li>
-        <li>Name three jobs the 9,955 stores do for a Ford buyer. What would a company with 655 stores have to build to do those same three jobs?</li>
-        <li>Which price should Ford fight for, and which kind of channel power would that take?</li>
-        <li>What would winning that fight cost Ford?</li>
+        <li>Tap exactly 3 jobs the stores do for a Ford buyer. For each job you picked: what would Tesla, with 655 locations, have to build to do it?</li>
+        <li>Which price should Ford fight for? Which kind of channel power would that take?</li>
+        <li>What would winning that fight cost Ford? Use one number from the case.</li>
       </ol>
     </div>
   </div>
@@ -654,11 +653,12 @@ const JOBS = [
   { t:'The service bay', d:'The truck comes back for warranty work for years. In 2019, franchised dealers wrote about 311 million repair orders.' }
 ];
 const PRICES = [
-  'Ford’s price, enforced through its dealers',
-  'Ford’s price, by selling the truck directly',
-  'The dealer’s price: let each store set it'
+  'Ford’s sticker price, enforced through its dealers',
+  'Ford’s sticker price, by selling the truck directly',
+  'The dealer’s price: let each store set its own'
 ];
 const POWERS = ['Coercive Power','Contractual Control','Direct Disruption','None of the three'];
+const POWER_DEF = [PC_DEF[0], PC_DEF[1], PC_DEF[2], 'Ford uses no power and leaves the price to the stores.'];
 
 let state = { name:'', email:'', groupNum:'', r1a:{}, r1b:{}, r1gate:'', jobs:[], build:{}, price:null, power:null, cost:'' };
 
@@ -668,11 +668,14 @@ function fillDefs(id, names, defs){
   names.forEach((n,i)=>{ d.appendChild(el('dt',null,n)); d.appendChild(el('dd',null,defs[i])); });
 }
 function counter(id, n, min){ const c = document.getElementById(id); c.textContent = n + ' / ' + min + ' minimum'; c.classList.toggle('ok', n >= min); }
-function optList(boxId, opts, picked, onPick){
+function optList(boxId, opts, picked, onPick, subs){
   const box = document.getElementById(boxId); box.innerHTML = '';
   opts.forEach((c, j) => {
     const b = el('button', 'opt-btn' + (picked === j ? ' on' : '')); b.type = 'button';
-    b.appendChild(el('span', 'l', String.fromCharCode(65+j))); b.appendChild(el('span', null, c));
+    b.appendChild(el('span', 'l', String.fromCharCode(65+j)));
+    const tx = el('span', null, c);
+    if (subs){ const d = el('span', null, subs[j]); d.style.cssText = 'display:block;font-size:13px;opacity:.8;margin-top:3px;font-weight:400'; tx.appendChild(d); }
+    b.appendChild(tx);
     b.onclick = () => onPick(j);
     box.appendChild(b);
   });
@@ -736,7 +739,7 @@ function renderR2(){
   state.jobs.slice().sort((a,b)=>a-b).forEach(i => {
     const s = el('div', 'slot');
     const lab = el('label'); lab.appendChild(el('span', 'slot-key', JOBS[i].t + ' · '));
-    lab.appendChild(el('span', 'slot-hint', 'what a 655-store company would have to build'));
+    lab.appendChild(el('span', 'slot-hint', 'what Tesla would have to build'));
     s.appendChild(lab);
     const inp = document.createElement('input'); inp.type = 'text'; inp.id = 'build-' + i;
     inp.placeholder = 'It would have to build…'; inp.value = state.build[i] || '';
@@ -754,7 +757,7 @@ function onR2(){
 /* ── ROUND 3 ── */
 function renderR3(){
   optList('r3-price', PRICES, state.price, j => { state.price = j; renderR3(); });
-  optList('r3-power', POWERS, state.power, j => { state.power = j; renderR3(); });
+  optList('r3-power', POWERS, state.power, j => { state.power = j; renderR3(); }, POWER_DEF);
   document.getElementById('r3-cost').value = state.cost;
   onR3();
 }
@@ -814,22 +817,58 @@ function line(parent, bold, rest){
   if (rest){ d.appendChild(document.createElement('br')); d.appendChild(document.createTextNode(rest)); }
   parent.appendChild(d);
 }
+/* ── SUMMARY (Commandment 10, 2026-11-04): every on-screen question, word for word,
+   then the student's answer, in exercise order. The deck and the key use the same words. ── */
+const Q_R1 = 'Eight facts from the case, in two parts. For each card, tap the word from the infographic that fits it best.';
+const Q_R1A = 'Part A · Cards 1 to 3 · Which channel type?';
+const Q_R1B = 'Part B · Cards 4 to 8 · Which kind of power or conflict?';
+const Q_GATE = 'Ford took nearly 200,000 reservations on its own website. Does that make Ford a direct channel?';
+const Q_JOBS = 'Tap exactly 3 jobs the stores do for a Ford buyer.';
+const Q_BUILD = 'For each job you picked: what would Tesla, with 655 locations, have to build to do it?';
+const Q_PRICE = 'Which price should Ford fight for?';
+const Q_POWER = 'Which kind of channel power would that take?';
+const Q_COST = 'What would winning that fight cost Ford? Use one number from the case.';
+function qa(parent, q, a, tag){
+  const d = el('div'); d.style.cssText = 'margin-bottom:14px';
+  const qq = el('div', null, (tag ? tag + ' · ' : '') + q);
+  qq.style.cssText = 'font-size:13px;font-weight:700;color:#475569;line-height:1.45;margin-bottom:4px';
+  d.appendChild(qq);
+  if (a !== null){
+    const aa = el('div', null, a || '(no answer)');
+    aa.style.cssText = 'font-size:15px;line-height:1.5;white-space:pre-wrap';
+    d.appendChild(aa);
+  }
+  parent.appendChild(d);
+}
+function pickLine(parent, n, text, pick){
+  const d = el('div'); d.style.cssText = 'margin:0 0 10px 0;padding-left:10px;border-left:3px solid #E2E8F0';
+  d.appendChild(el('div', null, n + '. ' + text));
+  d.appendChild(el('b', null, 'Your pick: ' + (pick || '?')));
+  parent.appendChild(d);
+}
 function buildSummary(){
   document.getElementById('student-tag').textContent =
     state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
   const s1 = document.getElementById('sum-r1'); s1.innerHTML = '';
-  A_CARDS.forEach((t, i) => line(s1, (i+1) + '. ' + (state.r1a[i] || '?'), t));
-  B_CARDS.forEach((t, i) => line(s1, (i+1+A_CARDS.length) + '. ' + (state.r1b[i] || '?'), t));
-  line(s1, 'Debrief Q1 · Does 200,000 reservations on its own website make Ford a direct channel?', state.r1gate);
+  qa(s1, Q_R1, null);
+  qa(s1, Q_R1A, null);
+  A_CARDS.forEach((t, i) => pickLine(s1, i+1, t, state.r1a[i]));
+  qa(s1, Q_R1B, null);
+  B_CARDS.forEach((t, i) => pickLine(s1, i+1+A_CARDS.length, t, state.r1b[i]));
+  qa(s1, Q_GATE, state.r1gate, 'Debrief Q1');
   const s2 = document.getElementById('sum-r2'); s2.innerHTML = '';
-  s2.appendChild(el('div', 'step-label', 'Debrief Q2 · Three jobs, and what a 655-store company would have to build'));
-  state.jobs.slice().sort((a,b)=>a-b).forEach(i => line(s2, JOBS[i].t, state.build[i] || ''));
-  const sc = document.getElementById('sum-call'); sc.innerHTML = '';
-  sc.appendChild(el('div', 'fill', 'Debrief Q3 · ' + (state.price != null ? PRICES[state.price] : '')));
-  const w = el('div'); w.style.marginTop = '8px';
-  w.textContent = 'Channel power it would take: ' + (state.power != null ? POWERS[state.power] : '?'); sc.appendChild(w);
+  qa(s2, '1 · ' + Q_JOBS, state.jobs.slice().sort((a,b)=>a-b).map(i => JOBS[i].t).join(', '), 'Debrief Q2');
+  qa(s2, '2 · ' + Q_BUILD, null, 'Debrief Q2');
+  state.jobs.slice().sort((a,b)=>a-b).forEach(i => {
+    const d = el('div'); d.style.cssText = 'margin:0 0 10px 0;padding-left:10px;border-left:3px solid #E2E8F0';
+    d.appendChild(el('b', null, JOBS[i].t));
+    d.appendChild(el('div', null, state.build[i] || '(no answer)'));
+    s2.appendChild(d);
+  });
   const s3 = document.getElementById('sum-r3'); s3.innerHTML = '';
-  line(s3, 'Debrief Q4 · What winning that fight would cost Ford', state.cost);
+  qa(s3, '1 · ' + Q_PRICE, state.price != null ? String.fromCharCode(65 + state.price) + '. ' + PRICES[state.price] : '', 'Debrief Q3');
+  qa(s3, '2 · ' + Q_POWER, state.power != null ? String.fromCharCode(65 + state.power) + '. ' + POWERS[state.power] : '', 'Debrief Q3');
+  qa(s3, '3 · ' + Q_COST, state.cost, 'Debrief Q4');
 }
 
 /* ── SUMMARY SURVIVES A RELOAD (2026-10-26) ──────────────────────────────
