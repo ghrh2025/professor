@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W13.1 · Sort the Roster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Week 13 palette (Barbie pink + ink + yellow). Shared by W13.1 and W13.2.
+     Variable names kept from the chassis so every shared rule still works. */
+  --cm-blue:   #B8126F;
+  --cm-ink:    #2B0A22;
+  --cm-gold:   #FFD23F;
+  --cm-gold-d: #8A5A00;
+
+  --bg:      #F3F5F8;
+  --surface: #FFFFFF;
+  --border:  #DFE4EC;
+  --text:    #1A1A1A;
+  --muted:   #6B7280;
+  --radius:  10px;
+  --shadow:  0 2px 14px rgba(0,0,0,0.08);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── SCREENS — ID specificity keeps pw centered without breaking others ── */
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:820px;margin:0 auto;padding:22px 20px 90px}
+
+.week-tag{
+  font-family:'Space Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;color:var(--cm-gold-d);
+}
+.screen-title{font-size:29px;font-weight:900;line-height:1.15;margin-bottom:6px}
+.screen-sub{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:4px;background:transparent;
+  border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-radius:6px;
+  cursor:pointer;margin-bottom:16px;transition:all .15s;
+}
+.back-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* ── PRIMARY BUTTON ── */
+.btn{
+  display:inline-block;width:100%;border:none;border-radius:9px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:.3px;
+  padding:15px 20px;transition:transform .08s, box-shadow .15s, opacity .15s;
+}
+.btn-go{background:var(--cm-gold);color:var(--cm-ink)}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(158,197,240,.6);transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--cm-blue);font-size:14px;padding:12px 18px}
+.btn-ghost:hover{border-color:var(--cm-blue)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── PASSWORD SCREEN ── */
+.pw-box{
+  background:var(--cm-blue);color:#fff;border-radius:16px;
+  border-bottom:6px solid var(--cm-gold);
+  padding:40px 34px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:var(--cm-gold);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.pw-box h1 .g{color:var(--cm-gold)}
+.pw-box p{font-size:14px;color:#D3DEF0;margin-bottom:22px;line-height:1.5}
+.pw-input{
+  width:100%;background:#071E4A;border:2px solid #3D64A8;border-radius:10px;
+  color:#fff;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;
+  letter-spacing:3px;text-align:center;text-transform:uppercase;padding:14px;margin-bottom:6px;
+  outline:none;transition:border-color .15s;
+}
+.pw-input:focus{border-color:var(--cm-gold)}
+.pw-input::placeholder{color:#8FA8D0;letter-spacing:2px}
+.pw-err{color:#FCA5A5;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field select{
+  width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:12px 13px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--cm-blue)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ── STAGE LADDER (brief) ── */
+.ladder{background:var(--cm-blue);color:#fff;border-radius:12px;padding:18px 20px;
+  border-left:5px solid var(--cm-gold);margin-bottom:8px}
+.ladder .row{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.ladder .row:last-child{border-bottom:none}
+.ladder .n{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--cm-gold);min-width:22px}
+.ladder .nm{font-size:15.5px;font-weight:800;margin-right:8px;white-space:nowrap}
+.ladder .pl{font-size:13px;color:#D3DEF0;margin-top:2px}
+
+.mission{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;margin:14px 0}
+.mission b{color:var(--cm-blue)}
+
+/* ── SORT ── */
+.sort-progress{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.moment-card{
+  background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:24px 24px;box-shadow:var(--shadow);margin-bottom:18px;
+  font-size:18px;line-height:1.55;font-weight:500;min-height:120px;display:flex;align-items:center;
+}
+.stage-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.stage-btn{
+  display:block;width:100%;text-align:left;background:var(--cm-blue);color:#fff;
+  border:none;border-radius:10px;padding:13px 16px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:transform .1s, box-shadow .15s;
+}
+.stage-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(11,45,107,.3)}
+.stage-btn .q{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--cm-gold)}
+.stage-btn .n{font-size:16px;font-weight:900;margin-top:2px}
+.stage-btn .ax{font-size:12px;opacity:.8;margin-top:2px}
+
+/* ── REVIEW TIMELINE ── */
+.tl-stage{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;margin-bottom:10px}
+.tl-head{display:flex;align-items:baseline;gap:9px;margin-bottom:6px}
+.tl-num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:1px;color:var(--cm-gold-d);text-transform:uppercase}
+.tl-name{font-size:16px;font-weight:800}
+.tl-stage ul{margin:0;padding:0;list-style:none}
+.tl-stage li{font-size:14px;line-height:1.5;padding:7px 0 7px 26px;position:relative;
+  border-top:1px solid var(--border)}
+.tl-stage li:first-child{border-top:none}
+.tl-stage li .mark{position:absolute;left:0;top:7px;font-weight:800}
+.tl-stage li.hit .mark{color:#1B7F4B}
+.tl-stage li.miss .mark{color:#B4232A}
+.tl-stage li .why{display:block;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+.tl-empty{font-size:13px;color:var(--muted);font-style:italic;padding:4px 0}
+.score-pill{display:inline-block;background:#EEF4FB;color:var(--cm-blue);border:1px solid #C9DAF0;
+  font-size:13px;font-weight:800;padding:8px 16px;border-radius:20px;margin-bottom:14px}
+
+/* ── GATE ── */
+.gate-q{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:18px 20px;font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px}
+.pull{background:var(--cm-blue);color:#fff;border-radius:10px;padding:15px 18px;
+  font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.pull .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--cm-gold);display:block;margin-bottom:6px}
+textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;color:var(--text);
+  padding:14px;outline:none;resize:vertical;min-height:120px;transition:border-color .15s;
+}
+textarea:focus{border-color:var(--cm-blue)}
+.char-count{font-size:12px;color:var(--muted);margin-top:6px;text-align:right}
+.char-count.ok{color:#1B7F4B;font-weight:700}
+.submit-note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+.rule-out{background:#FFF6E0;border:1px solid #F0DBA6;border-radius:8px;padding:12px 15px;
+  font-size:13.5px;line-height:1.55;color:#6B5200;margin-bottom:16px}
+.rule-out b{color:#4A3800}
+
+/* ── SUMMARY ── */
+.confirm-pill{display:inline-block;background:#E7F3EC;color:#14512F;border:1px solid #A9D6BC;
+  font-size:13px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:20px;margin-bottom:16px}
+.student-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.section-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--cm-gold-d);margin-bottom:8px}
+.answer-box{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:15px 18px;font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.verdict{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:16px;line-height:1.7;margin-bottom:18px}
+.verdict .fill{color:var(--cm-gold);font-weight:700}
+.debrief-box{background:#F7F9FC;border:1px solid var(--border);border-top:4px solid var(--cm-gold);
+  border-radius:12px;padding:20px 22px;margin-top:8px}
+.debrief-box h3{font-size:16px;font-weight:800;margin-bottom:12px}
+.debrief-box ol{margin:0 0 0 20px}
+.debrief-box li{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+
+@media(max-width:680px){
+  .screen-title{font-size:24px}
+  .moment-card{font-size:16px}
+  .verdict{font-size:15px}
+}
+
+/* ── W6 additions ── */
+.price-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px}
+.pc-head{display:flex;align-items:baseline;gap:10px}
+.pc-amt{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--cm-blue)}
+.pc-note{font-size:13.5px;line-height:1.5;color:#3A3A3A;margin:6px 0 11px}
+.read-row{display:flex;flex-wrap:wrap;gap:7px}
+.read-btn{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;
+  background:#fff;border:1.5px solid var(--border);color:var(--muted);
+  border-radius:999px;padding:7px 13px;cursor:pointer;transition:all .12s}
+.read-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+.read-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.person-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:13px}
+.pc-name{font-size:18px;font-weight:900;margin-bottom:6px}
+.pc-bio{font-size:14px;line-height:1.55;color:#3A3A3A;margin-bottom:12px}
+.call-row{display:flex;gap:9px;flex-wrap:wrap}
+.call-btn{font-family:'Inter',sans-serif;font-size:13.5px;font-weight:700;background:#fff;
+  border:1.5px solid var(--border);color:var(--muted);border-radius:8px;padding:9px 15px;
+  cursor:pointer;transition:all .12s}
+.call-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+.call-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.tally{font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.6;
+  background:#F7F9FC;border:1px solid var(--border);border-radius:8px;
+  padding:12px 15px;margin:14px 0;color:var(--muted)}
+.tally .got{color:#1B7F4B;font-weight:700}
+.tally .missing{color:#B4232A;font-weight:700}
+.slot{margin-bottom:12px}
+.slot label{display:block;font-size:13px;margin-bottom:6px}
+.slot-key{font-weight:800;color:var(--cm-blue);text-transform:none}
+.slot-hint{color:var(--muted);font-weight:500}
+.slot input{width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:11px 13px;outline:none}
+.slot input:focus{border-color:var(--cm-blue)}
+.stmt-preview{background:var(--cm-blue);color:#fff;border-radius:10px;border-left:5px solid var(--cm-gold);
+  padding:16px 18px;font-size:15.5px;line-height:1.65;margin:14px 0;min-height:30px}
+.stmt-preview .fill{color:var(--cm-gold);font-weight:700}
+.stmt-preview .blank{opacity:.45;font-style:italic}
+</style>
+<style>/* credit-fix 2026-08-21: never claim credit before the server answers */
+body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
+#credit-status{margin:18px auto !important}
+/* roster gate message (added 2026-08-25) */
+.join-msg{margin-top:10px;font-size:14px;line-height:1.45;min-height:1px}
+.join-msg.bad{color:#a4262c;font-weight:600}
+.join-msg.warn{color:#7a5c00}
+
+/* persistent credit banner (2026-08-25) */
+#credit-banner{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;gap:12px;
+  align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 16px;
+  font-size:14px;font-weight:600;line-height:1.35;text-align:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#credit-banner.bad{background:#a4262c;color:#fff}
+#credit-banner.warn{background:#ffd24a;color:#3a2d00}
+#credit-banner .cb-fix{border:0;border-radius:6px;padding:6px 12px;font-weight:700;
+  cursor:pointer;background:rgba(255,255,255,.92);color:#222}
+body.has-credit-banner{padding-top:58px}
+</style>
+
+<style>/* ── shared option/sort styles, from the W6.2 chassis ── */
+.tmpl{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:17px;line-height:1.7;margin-bottom:14px}
+.tmpl .fill{color:var(--cm-gold);font-weight:800}
+.slotdef{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.slotdef div{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-size:13.5px;line-height:1.5}
+.slotdef b{display:block;color:var(--cm-blue);font-size:14px;margin-bottom:2px}
+.stem{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:14px 16px;font-size:15.5px;line-height:1.6;margin-bottom:14px}
+.stem .blank{color:var(--cm-gold-d);font-weight:800}
+.opt-list{display:grid;gap:8px;margin-bottom:16px}
+.opt-btn{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;
+  border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.45;color:var(--text);transition:all .12s}
+.opt-btn:hover{border-color:var(--cm-blue)}
+.opt-btn .l{font-family:'Space Mono',monospace;font-weight:700;color:var(--cm-gold-d);flex:0 0 auto}
+.opt-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.opt-btn.on .l{color:var(--cm-gold)}
+.opt-btn.close,.opt-btn.close.on{background:#FFF1C9;border-color:#C9962B;color:var(--text)}
+.opt-btn.close .l,.opt-btn.close.on .l{color:#8A6100}
+.opt-btn:disabled{opacity:.35;cursor:not-allowed}
+.step-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--cm-gold-d);margin:4px 0 8px}
+.stmt-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:13px}
+.stmt-card .num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:1.5px;color:var(--cm-gold-d);margin-bottom:6px}
+.stmt-card .txt{font-size:15px;line-height:1.6;margin-bottom:11px}
+.sort-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:10px}
+.sort-card .txt{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+.bin-row{display:flex;gap:7px;flex-wrap:wrap}
+.pick-row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--border)}
+.pick-row:first-of-type{border-top:none}
+.pick-row .lab{font-weight:800;font-size:15px}
+@media(max-width:680px){.slotdef{grid-template-columns:1fr}.pick-row{grid-template-columns:1fr}}
+</style>
+<style>/* ── W8.2 The One Question (built 2026-10-05) ── */
+.adv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.adv-btn{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);
+  border-radius:10px;padding:13px 15px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.adv-btn:hover{border-color:var(--cm-blue)}
+.adv-btn .t{font-size:15px;font-weight:800;color:var(--text)}
+.adv-btn .s{font-size:12.5px;color:var(--muted);margin-top:3px}
+.adv-btn.on{background:var(--cm-blue);border-color:var(--cm-blue)}
+.adv-btn.on .t{color:#fff}.adv-btn.on .s{color:#D3DEF0}
+.held{background:var(--surface);border:1px solid var(--border);border-top:6px solid var(--cm-gold);
+  border-radius:12px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+.held .who{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--cm-gold-d);margin-bottom:6px}
+.held h3{font-size:20px;font-weight:900;margin-bottom:10px}
+.held .quote{border-left:4px solid var(--cm-gold);padding:6px 0 6px 14px;font-size:15px;
+  line-height:1.55;font-style:italic;margin-bottom:12px}
+.held .arg{font-size:14.5px;line-height:1.6;margin-bottom:12px}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.facts div{background:#F7F9FC;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:12.5px;line-height:1.4}
+.facts b{display:block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.facts .cant{grid-column:1 / -1;background:#FFF6E0;border-color:#F0DBA6}
+.stop{background:var(--cm-ink);color:#fff;border-radius:12px;padding:18px 20px;margin:6px 0 16px;
+  border-left:6px solid var(--cm-gold)}
+.stop .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2.5px;color:var(--cm-gold);display:block;margin-bottom:6px}
+.stop p{font-size:15px;line-height:1.55}
+.src-card{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 14px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px;transition:all .12s}
+.src-card:hover{border-color:var(--cm-blue)}
+.src-card .t{font-size:15px;font-weight:800}
+.src-card .m{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+.src-card.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.src-card.on .m{color:#D3DEF0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.yn-row{display:flex;gap:10px;margin:8px 0 12px}
+.yn-row .call-btn{flex:1}
+.back-to-1{background:#FFF1C9;border:1px solid #C9962B;border-radius:10px;padding:14px 16px;
+  font-size:15px;line-height:1.55;margin-bottom:14px;display:none}
+.back-to-1.show{display:block}
+.back-to-1 b{color:#7A4F00}
+@media(max-width:680px){.adv-grid,.grid2{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}}
+</style>
+<style>/* ── definitions panel (from the W10.1 chassis) ── */
+.defs{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px}
+.defs summary{cursor:pointer;font-weight:800;font-size:14px;color:var(--cm-blue)}
+.defs dl{margin-top:10px;display:grid;grid-template-columns:170px 1fr;gap:6px 12px;font-size:13.5px;line-height:1.45}
+.defs dt{font-weight:800}
+@media(max-width:680px){.defs dl{grid-template-columns:1fr}}
+</style>
+
+<style>/* ── W11.2 Run Costco, role version (rebuilt 2026-10-27) ── */
+.dash{background:var(--cm-ink);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:16px;border-left:6px solid var(--cm-gold)}
+.dash .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:2px;color:#FFB3C0;display:block;margin-bottom:8px}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.dash-grid div{background:rgba(255,255,255,.07);border-radius:8px;padding:8px 10px}
+.dash-grid b{display:block;font-family:'Space Mono',monospace;font-size:16px;color:#fff}
+.dash-grid span{font-size:11.5px;color:#C9D6EA;line-height:1.35;display:block;margin-top:2px}
+.dash-grid .chg b{color:#FFD24A}
+.todo{background:#EAF2FB;border:2px solid var(--cm-blue);border-radius:12px;padding:14px 18px;margin-bottom:16px}
+.todo .cap{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--cm-blue);margin-bottom:8px;text-transform:uppercase}
+.todo .who{background:var(--cm-blue);color:#fff;border-radius:999px;padding:3px 10px;letter-spacing:1px}
+.todo .who.group{background:var(--cm-gold)}
+.todo ol{margin:0 0 0 20px}
+.todo li{font-size:15px;line-height:1.5;margin-bottom:6px}
+.todo li b{color:var(--cm-ink)}
+.role-badge{position:sticky;top:0;z-index:50;background:var(--cm-ink);color:#fff;font-size:13.5px;font-weight:700;padding:9px 16px;text-align:center;display:none}
+.role-badge.on{display:block}
+.role-badge b{color:#FFD24A}
+.role-pick{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;transition:all .12s}
+.role-pick:hover{border-color:var(--cm-blue)}
+.role-pick .num{display:inline-block;width:34px;height:34px;border-radius:50%;background:var(--cm-blue);color:#fff;font-weight:900;font-size:18px;text-align:center;line-height:34px;margin-right:10px;vertical-align:middle}
+.role-pick .t{font-size:17px;font-weight:900;vertical-align:middle}
+.role-pick .req{display:inline-block;margin-left:8px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;border-radius:6px;padding:3px 8px;vertical-align:middle;background:#E7F3EC;color:#14512F}
+.role-pick .req.opt{background:#FFF1C9;color:#7A4F00}
+.role-pick .m{font-size:13.5px;color:#3A3A3A;margin-top:6px;line-height:1.5}
+.role-pick.on{border-color:var(--cm-blue);background:#EAF2FB}
+.confirm{background:#FFF6E0;border:2px solid #C9962B;border-radius:12px;padding:16px 18px;margin:6px 0 14px;display:none}
+.confirm.show{display:block}
+.confirm p{font-size:16px;line-height:1.5;margin-bottom:10px}
+.evid{background:#fff;border:1px solid var(--border);border-left:5px solid var(--cm-blue);border-radius:10px;padding:12px 16px;margin-bottom:10px}
+.evid .k{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
+.evid .v{font-size:15px;line-height:1.55}
+.goal{background:var(--cm-ink);color:#fff;border-radius:12px;padding:14px 18px;margin:12px 0 16px}
+.goal .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:#FFD24A;display:block;margin-bottom:5px}
+.goal p{font-size:15.5px;line-height:1.55}
+.lever{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.lever .t{font-size:15px;font-weight:900;margin-bottom:8px}
+.lever .call-row .call-btn{flex:1;min-width:150px}
+.planbox{background:var(--cm-blue);color:#fff;border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:15px;line-height:1.7}
+.planbox b{color:#FFD24A}
+.planbox .warn{color:#FFD5DC;font-weight:700}
+.event{background:#FFF6E0;border:1px solid #F0DBA6;border-left:6px solid #C9962B;border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:15px;line-height:1.6}
+.event .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:#8A6100;display:block;margin-bottom:6px}
+.sign{background:#fff;border:3px solid var(--cm-ink);border-radius:6px;padding:16px;margin-bottom:14px}
+.sign .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--cm-gold-d);display:block;margin-bottom:8px}
+.sign textarea{border-style:dashed}
+.ask-q{font-size:15.5px;font-weight:800;line-height:1.5;color:var(--cm-ink);background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-blue);border-radius:10px;padding:12px 14px;margin:6px 0 10px}
+.door-card{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;transition:all .12s}
+.door-card:hover{border-color:var(--cm-blue)}
+.door-card .t{font-size:16px;font-weight:900;color:var(--text)}
+.door-card .m{font-size:13.5px;color:#3A3A3A;margin-top:5px;line-height:1.5}
+.door-card.on{background:var(--cm-blue);border-color:var(--cm-blue)}
+.door-card.on .t,.door-card.on .m{color:#fff}
+@media(max-width:680px){.dash-grid{grid-template-columns:1fr 1fr}}
+</style>
+<style>/* ── W13 Mattel/Barbie overrides (built 2026-11-12) ── */
+.pw-box p,.ladder .pl{color:#FBD9EA}
+.pw-input{background:#7C0C4A;border-color:#E88BBE}
+.pw-input::placeholder{color:#F3B6D6}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(184,18,111,.35)}
+.todo{background:#FDEEF6}
+.role-pick.on{background:#FDEEF6}
+.dash .cap{color:#FFD23F}
+.dash-grid{grid-template-columns:repeat(3,1fr)}
+.dash-grid span{color:#F3D3E4}
+.adv-btn.on .s,.src-card.on .m{color:#FBD9EA}
+.stage-btn:hover{box-shadow:0 6px 18px rgba(184,18,111,.3)}
+.funnel{background:var(--cm-ink);border-radius:12px;padding:14px 16px;margin-bottom:14px;position:sticky;top:0;z-index:40;border-left:6px solid var(--cm-gold)}
+body.has-credit-banner .funnel{top:58px}
+#plan-meter{top:38px}
+.funnel .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:2px;color:#FFD23F;display:block;margin-bottom:8px;text-transform:uppercase}
+.fn-row{display:grid;grid-template-columns:118px 1fr 150px;gap:10px;align-items:center;margin:6px 0;color:#fff;font-size:13px;font-weight:700}
+.fn-bar{height:16px;background:rgba(255,255,255,.14);border-radius:8px;overflow:hidden}
+.fn-fill{height:100%;background:var(--cm-gold);width:0;transition:width .25s}
+.fn-n{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:#F3D3E4;text-align:right}
+.fn-row.empty .fn-n{color:#FF9DB0}
+.piece{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-blue);border-radius:12px;padding:13px 15px;margin-bottom:10px}
+.piece .t{font-size:15.5px;font-weight:800;line-height:1.35}
+.piece .m{font-size:13px;color:#3A3A3A;line-height:1.45;margin:3px 0 9px}
+.piece.stop{border-left-color:#9CA3AF;background:#F3F4F6}
+.piece.stop .t{text-decoration:line-through;color:#6B7280}
+.piece.point{border-left-color:var(--cm-gold);background:#FFFBEA;box-shadow:0 0 0 2px var(--cm-gold) inset}
+.piece .sub{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)}
+.piece .sub label{display:block;font-size:12.5px;font-weight:800;margin-bottom:6px;color:var(--cm-ink)}
+.piece select,.piece input[type=text],.codes input{width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:10px 12px;outline:none}
+.piece select:focus,.piece input[type=text]:focus,.codes input:focus{border-color:var(--cm-blue)}
+.codeword{background:var(--cm-ink);color:#fff;border-radius:12px;padding:14px 18px;margin:12px 0 16px;text-align:center}
+.codeword .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:#FFD23F;display:block;margin-bottom:5px}
+.codeword b{font-family:'Space Mono',monospace;font-size:26px;letter-spacing:4px}
+.codeword p{font-size:13px;color:#F3D3E4;margin-top:6px;line-height:1.45}
+.codes .row{display:grid;grid-template-columns:1fr 150px;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--border)}
+.codes .row:first-child{border-top:none}
+.codes .who{font-size:15px;font-weight:800}
+.codes .who span{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin-top:2px}
+.codes .ok{color:#1B7F4B;font-weight:800;font-size:14px;text-align:right}
+.codes .miss{background:transparent;border:0;color:var(--cm-blue);font-size:12.5px;font-weight:700;text-decoration:underline;cursor:pointer;padding:4px 0;font-family:'Inter',sans-serif}
+.conseq{background:#fff;border:1px solid var(--border);border-left:5px solid var(--cm-blue);border-radius:10px;padding:12px 16px;margin-bottom:10px;font-size:15px;line-height:1.55}
+.conseq .k{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
+.guess{display:inline-block;background:#FDEEF6;border:1px solid #F3B6D6;color:var(--cm-ink);font-size:13.5px;font-weight:700;padding:8px 14px;border-radius:20px;margin:0 6px 10px 0}
+@media(max-width:680px){.fn-row{grid-template-columns:86px 1fr 104px;font-size:12px}.dash-grid{grid-template-columns:1fr 1fr}.codes .row{grid-template-columns:1fr 120px}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 13.1</div>
+    <h1>Sort the <span class="g">Roster</span></h1>
+    <p>Enter today's password, given in class. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('pw-screen')">← Back</button>
+    <div class="week-tag">Week 13.1 · Mattel</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">Monday, July 17, 2023. The Barbie film opens Friday. Mattel has more than 100 brand partners and a campaign that is close to everywhere. Today you sort what each piece of that campaign is, and what it can make a person do.</div>
+    <div class="card">
+      <div class="field">
+        <label for="j-name">Your name</label>
+        <input id="j-name" type="text" placeholder="First and last" autocomplete="off" oninput="onJoin()">
+      </div>
+      <div class="field">
+        <label for="j-email">UC email</label>
+        <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
+        <div class="hint">Use your @mail.uc.edu address, the same one Canvas uses. Credit is matched on it.</div>
+      </div>
+      <div class="field">
+        <label for="j-group">Your group</label>
+        <select id="j-group" onchange="onJoin()">
+          <option value="">Pick your group…</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+        </select>
+      </div>
+      <button class="btn btn-go" id="join-btn" onclick="joinVerify()" disabled>Let's go →</button>
+      <div id="join-err" class="join-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BRIEF ═══════════════════════ -->
+<div id="brief-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Week 13.1 · How this works</div>
+    <div class="screen-title">A hundred partners. What is each one for?</div>
+    <div class="screen-sub">Read this whole screen before you tap anything.</div>
+    <div class="ladder">
+      <div class="row"><span class="n">0</span><span><span class="nm">Guess first</span><span class="pl">On your own. Two taps and one sentence. About 1 minute.</span></span></div>
+      <div class="row"><span class="n">1</span><span><span class="nm">Name the tool</span><span class="pl">Seven pieces of the campaign, six tools. Then one stop with your group. About 6 minutes.</span></span></div>
+      <div class="row"><span class="n">2</span><span><span class="nm">Build the funnel</span><span class="pl">Put the campaign on the four stages and watch the count. About 5 minutes.</span></span></div>
+      <div class="row"><span class="n">3</span><span><span class="nm">Read your board</span><span class="pl">Four short answers, typed, then submit. About 6 minutes.</span></span></div>
+    </div>
+    <div class="mission"><b>Your only reference is the Chapter 17 infographic:</b> six tools on top, four stages underneath. Its words are on every screen. Every card is a fact from the case.</div>
+    <button class="btn btn-go" style="margin-top:6px" onclick="renderPredict(); show('predict-screen')">Start: guess first →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PREDICT ═══════════════════════ -->
+<div id="predict-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('brief-screen')">← Back</button>
+    <div class="week-tag">Step 0 · Guess first</div>
+    <div class="screen-title">Before you sort anything, guess.</div>
+    <div class="todo">
+      <div class="cap"><span class="who">On your own</span> About 1 minute. No talking yet.</div>
+      <ol>
+        <li><b>Tap one stage</b> for each question. A guess is fine. Nothing here is graded.</li>
+        <li><b>Type one sentence</b> on why.</li>
+      </ol>
+    </div>
+    <div class="ask-q" id="p-most-q"></div>
+    <div class="call-row" id="p-most" style="margin-bottom:16px"></div>
+    <div class="ask-q" id="p-least-q"></div>
+    <div class="call-row" id="p-least" style="margin-bottom:16px"></div>
+    <div class="ask-q" id="p-why-q"></div>
+    <textarea id="p-why" style="min-height:80px" placeholder="I think most of it is working on… because…" oninput="onPredict()"></textarea>
+    <div class="char-count" id="p-why-count">0 / 20 minimum</div>
+    <button class="btn btn-go" id="predict-btn" style="margin-top:14px" onclick="state.r1i=firstOpenCard(); renderCard(); show('r1-screen')" disabled>Round 1: name the tool →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 1: CARD BY CARD ═══════════════════════ -->
+<div id="r1-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="r1Back()">← Back</button>
+    <div class="week-tag">Round 1 · Name the tool</div>
+    <div class="screen-title">Which of the six tools is this?</div>
+    <div class="sort-progress" id="r1-progress"></div>
+    <div class="moment-card" id="r1-card"></div>
+    <div class="step-label">Tap the tool. The words under each name are the infographic's.</div>
+    <div class="stage-grid" id="r1-tools"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 1: REVIEW + STOP ═══════════════════════ -->
+<div id="r1r-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="state.r1i=CARDS.length-1; renderCard(); show('r1-screen')">← Back</button>
+    <div class="week-tag">Round 1 · Your seven picks</div>
+    <div class="screen-title">Check your picks, then stop.</div>
+    <div class="todo">
+      <div class="cap"><span class="who group">As a group</span> About 3 minutes</div>
+      <ol>
+        <li><b>Compare picks out loud</b>, card by card. Tap a different tool if someone changes your mind.</li>
+        <li><b>Stop on card 4</b> and argue it. You do not have to agree.</li>
+        <li><b>Each person types</b> their own two answers below.</li>
+      </ol>
+    </div>
+    <div class="tally" id="r1-tally"></div>
+    <div id="r1-list"></div>
+    <div class="stop"><span class="cap">STOP · Turn to your group</span><p id="q-card4-stop"></p></div>
+    <textarea id="t-card4" style="min-height:90px" placeholder="My group said… The headline word that settles it is…" oninput="onR1R()"></textarea>
+    <div class="char-count" id="t-card4-count">0 / 30 minimum</div>
+    <div class="ask-q" id="q-unused" style="margin-top:14px"></div>
+    <textarea id="t-unused" style="min-height:90px" placeholder="The tool with no card is… A doll in a box does not need it because…" oninput="onR1R()"></textarea>
+    <div class="char-count" id="t-unused-count">0 / 30 minimum</div>
+    <button class="btn btn-go" id="r1r-btn" style="margin-top:14px" onclick="renderBoard(); show('r2-screen')" disabled>Round 2: build the funnel →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 2: THE FUNNEL BOARD ═══════════════════════ -->
+<div id="r2-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="renderR1R(); show('r1r-screen')">← Back</button>
+    <div class="week-tag">Round 2 · Build the funnel</div>
+    <div class="screen-title">What can it make a person do?</div>
+    <div class="todo">
+      <div class="cap"><span class="who group">As a group</span> About 5 minutes</div>
+      <ol>
+        <li><b>The case's exhibit left one column blank:</b> “What can it make a person do?” Fill it in. For each piece, tap the stage it can move a person to.</li>
+        <li><b>Talk it through,</b> then everyone taps on their own screen. Your boards do not have to match.</li>
+        <li><b>Watch the funnel fill</b> at the top as you tap.</li>
+      </ol>
+    </div>
+    <details class="defs"><summary>The four stages, in the infographic's words</summary>
+      <dl id="stage-defs"></dl>
+    </details>
+    <div class="funnel" id="funnel"></div>
+    <div id="r2-list"></div>
+    <div class="stop"><span class="cap">STOP · Turn to your group</span><p>Stage 4 on the infographic says: “The customer buys the product.” When a Gap shirt gets bought, whose product is that? Look at your board and find the piece that asks a person to buy a doll.</p></div>
+    <button class="btn btn-go" id="r2-btn" style="margin-top:6px" onclick="renderR3(); show('r3-screen')" disabled>Round 3: read your board →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 3: READ YOUR BOARD ═══════════════════════ -->
+<div id="r3-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="renderBoard(); show('r2-screen')">← Back</button>
+    <div class="week-tag">Round 3 · Read your board</div>
+    <div class="screen-title">Four answers. Your own words.</div>
+    <div class="todo">
+      <div class="cap"><span class="who group">Talk as a group</span> <span class="who">Type on your own</span> About 6 minutes</div>
+      <ol>
+        <li><b>Say each question out loud</b> in your group before anyone types.</li>
+        <li><b>Each person types</b> their own answer. Use a number or a name from the case.</li>
+        <li><b>Press Submit</b> when all four are done.</li>
+      </ol>
+    </div>
+    <div class="funnel" id="funnel3" style="position:static"></div>
+
+    <div class="gate-q" id="q-fifty"></div>
+    <textarea id="t-fifty" placeholder="It is… because every one of them…" oninput="onR3()"></textarea>
+    <div class="char-count" id="t-fifty-count">0 / 40 minimum</div>
+
+    <div class="gate-q" id="q-who" style="margin-top:14px"></div>
+    <textarea id="t-who" placeholder="The movie is for… The doll is for… They are / are not the same person because…" oninput="onR3()"></textarea>
+    <div class="char-count" id="t-who-count">0 / 40 minimum</div>
+
+    <div class="gate-q" id="q-close" style="margin-top:14px"></div>
+    <textarea id="t-close" placeholder="Mattel still needs a person to… The part of the campaign asking for that is…" oninput="onR3()"></textarea>
+    <div class="char-count" id="t-close-count">0 / 40 minimum</div>
+
+    <div id="guess-row" style="margin-top:16px"></div>
+    <div class="gate-q" id="q-surprise"></div>
+    <textarea id="t-surprise" style="min-height:90px" placeholder="I guessed… My board shows…" oninput="onR3()"></textarea>
+    <div class="char-count" id="t-surprise-count">0 / 30 minimum</div>
+
+    <button class="btn btn-go" id="submit-btn" style="margin-top:14px" onclick="submitAll()" disabled>Submit for credit →</button>
+    <div class="submit-note">One submission per student. Your own answers, your own name.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="summary-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('r3-screen')">← Back</button>
+    <div class="week-tag">Week 13.1 · Summary</div>
+    <div class="screen-title">Your roster, sorted</div>
+    <div class="confirm-pill credit-claim">✓ Participation recorded, you're all set</div>
+    <div class="student-tag" id="student-tag"></div>
+
+    <div class="callout-restored" id="restored-note" style="display:none;background:#EEF2FB;border:1px solid #C7D2F0;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:14px">You already submitted. This is your summary for the debrief. Nothing more to do.</div>
+
+    <div class="section-label">Step 0 · Your first guess</div>
+    <div class="answer-box" id="sum-predict"></div>
+
+    <div class="section-label">Round 1 · Name the tool</div>
+    <div class="answer-box" id="sum-r1"></div>
+
+    <div class="section-label">Round 2 · Your funnel</div>
+    <div class="funnel" id="funnel-sum" style="position:static"></div>
+    <div class="answer-box" id="sum-r2"></div>
+
+    <div class="section-label">Round 3 · Read your board</div>
+    <div class="answer-box" id="sum-r3"></div>
+
+    <div class="debrief-box">
+      <h3>Bring to the debrief</h3>
+      <ol id="debrief-list"></ol>
+    </div>
+  </div>
+</div>
+
+<script>
+
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
+/* The class code is NOT stored here. It ships to a PUBLIC repo.
+   The student types it; the Logic App checks it against Key Vault. */
+var PW = '';
+
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── DRY-RUN PASSTHROUGH ───────────────────────────────────────────────────
+   ?testKey=... on the URL turns this page into a dry run: the workflow skips
+   the class-window gate and answers on the join branch, so no grade is ever
+   written. Absent the parameter this is '' — which matches no secret — and the
+   page behaves exactly as it does for a student. ── */
+var TEST_KEY = (function(){
+  try { return new URLSearchParams(location.search).get('testKey') || ''; }
+  catch(e){ return ''; }
+})();
+
+/* ── participation credit (Logic App contract) ───────────────────────── */
+function creditAnswers(src){
+  const skip=['email','name','week','session','exerciseId','password','group','points','answers','timestamp','submittedAt','exercise'];
+  return Object.entries(src||{}).filter(([k])=>!skip.includes(k))
+    .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
+    .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
+}
+function creditFields(src){
+  var skip = ['email','name','week','session','exerciseId','password','group',
+              'points','answers','fields','timestamp','submittedAt','exercise'];
+  var out = {};
+  Object.keys(src || {}).forEach(function(k){
+    if (skip.indexOf(k) !== -1) return;
+    var v = src[k];
+    if (v === undefined || v === null) return;
+    out[k] = v;
+  });
+  return out;
+}
+async function postForCredit(c){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  if(TEST_KEY) c.testKey = TEST_KEY;
+  const set=(bg,bd,fg,html)=>{
+    let el=document.getElementById('credit-status');
+    if(!el){el=document.createElement('div');el.id='credit-status';}
+    var _anchor=document.querySelector('.confirm-pill,.credit-claim');
+    var _host=(_anchor&&_anchor.parentElement)||document.getElementById('summary-screen')
+      ||document.getElementById('sum-screen')||document.querySelector('.screen.active')||document.body;
+    if(el.parentElement!==_host){
+      if(_anchor&&_anchor.parentElement===_host) _host.insertBefore(el,_anchor.nextSibling);
+      else _host.appendChild(el);
+    }
+    el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML=html;
+  };
+  document.body.classList.add('awaiting-credit');
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
+    const d=await res.json();
+    if(d.code==='DRY_RUN_OK'){
+      document.body.classList.remove('awaiting-credit');
+      set('#eef4ff','#c3d4f7','#1e3a8a','<strong>Dry run.</strong> Every gate passed and the roster matched — '+
+        'nothing was written to Canvas. Remove ?testKey from the URL to run for real.');
+    } else if(d.accepted){
+      document.body.classList.remove('awaiting-credit');
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
+function el(tag, cls, text){ const e = document.createElement(tag); if(cls) e.className = cls; if(text!=null) e.textContent = text; return e; }
+function counter(id, n, min){ const c = document.getElementById(id); c.textContent = n + ' / ' + min + ' minimum'; c.classList.toggle('ok', n >= min); }
+function qa(parent, q, a, tag){
+  const d = el('div'); d.style.cssText = 'margin-bottom:14px';
+  const qq = el('div', null, (tag ? tag + ' · ' : '') + q);
+  qq.style.cssText = 'font-size:13px;font-weight:700;color:#475569;line-height:1.45;margin-bottom:4px';
+  const aa = el('div', null, a || '(no answer)');
+  aa.style.cssText = 'font-size:15px;line-height:1.5;white-space:pre-wrap';
+  d.appendChild(qq); d.appendChild(aa); parent.appendChild(d);
+}
+
+
+/* ── EXERCISE METADATA ──
+   EX_ID reuses the Spring W13.1 vault key on purpose (Exercise-Build Commandment 6):
+   it inherits a working class code and the W13.1 Case Participation routing.
+   Join probe run 2026-11-12 returned DRY_RUN_OK. The page itself is new. ── */
+const EX_WEEK = 13, EX_SESSION = 1, EX_ID = 'W13-spot-the-funnel', EX_POINTS = 12;
+
+/* ── W13.1 Sort the Roster. Built 2026-11-12 from Week 13, Barbie - CASE.docx and the
+   Chapter 17 infographic (six tools, four stages). Every card is a sentence the case prints.
+   Tool and stage wording is the infographic's. NOTHING HERE IS GRADED AND NO ANSWER SHIPS:
+   options are listed unmarked and the funnel only counts the student's own taps.
+   Change a card here and change the key and the 13.1 deck the same day. ── */
+const TOOLS = [
+  { k:'adv', n:'Advertising',      h:'Mass Reach',              d:'Advertising offers message control through mass media.' },
+  { k:'pr',  n:'Public Relations', h:'Credibility',             d:'PR builds reputation through credible earned media.' },
+  { k:'sp',  n:'Sales Promotion',  h:'Incentives',              d:'Sales promotions drive immediate action.' },
+  { k:'ps',  n:'Personal Selling', h:'High-Touch Engagement',   d:'Personal selling provides direct, one-on-one communication for complex sales.' },
+  { k:'dm',  n:'Direct Marketing', h:'Targeted Channels',       d:'Direct marketing reaches specific customers.' },
+  { k:'dg',  n:'Digital Marketing',h:'Interactive Channels',    d:'Digital/social media facilitates interactive, two-way communication through online platforms.' }
+];
+const STAGES = [
+  { k:'aw', short:'1 · Awareness', n:'Stage 1: Awareness (Think)', d:'The customer learns the brand exists.' },
+  { k:'in', short:'2 · Interest',  n:'Stage 2: Interest (Feel)',   d:'The customer becomes intrigued.' },
+  { k:'de', short:'3 · Desire',    n:'Stage 3: Desire (Feel)',     d:'The customer decides they want it.' },
+  { k:'ac', short:'4 · Action',    n:'Stage 4: Action (Do)',       d:'The customer buys the product.' }
+];
+const CARDS = [
+  'A teaser for the film ran in theaters on December 16, 2022, in front of Avatar: The Way of Water. The full trailer came out on May 25, 2023.',
+  'In June, Fortune reported that the film had used so much bright pink paint that the maker of the paint ran short of it. That coverage was not bought.',
+  'In April, the studio put up a website that dropped any photo into a Barbie poster.',
+  'Mattel sells its own Barbie goods on its own website, where a T-shirt is $30 and a mug is $15.',
+  'Burger King started selling a pink burger combo in Brazil on July 13.',
+  'Roughly 500,000 news stories have been written about Barbie since January, and 86,000 of those ran in the past month alone.',
+  'Posts about Barbie have drawn more than 6 million likes, shares and comments in six months.'
+];
+/* Round 2 pieces. p = partners counted in the case exhibit (0 for pieces that are not partners). */
+const PIECES = [
+  { k:'news',    t:'The news stories',                 m:'Roughly 500,000 since January. 86,000 in the past month.', p:0 },
+  { k:'trailer', t:'The film’s trailer',               m:'A teaser in December, the full trailer on May 25. About one story in seventy was about it.', p:0 },
+  { k:'poster',  t:'The poster website and the posts', m:'A site that drops any photo into a Barbie poster. More than 6 million likes, shares and comments.', p:0 },
+  { k:'clothes', t:'Clothes, shoes and bags',          m:'More than 50 partners: Gap, Zara, Forever 21, Crocs, Superga, Béis, Hot Topic, MeUndies.', p:50, plus:true },
+  { k:'beauty',  t:'Makeup, nails and hair',           m:'11 partners: NYX, OPI, Tangle Teezer.', p:11 },
+  { k:'home',    t:'Things for the house',             m:'11 partners: Ruggable, Joybird, Funboy.', p:11 },
+  { k:'food',    t:'Food, drink and a place to stay',  m:'10 partners: Burger King in Brazil, Pinkberry, Swoon, Airbnb.', p:10 },
+  { k:'screens', t:'Screens and games',                m:'7 partners: Xbox and Forza Horizon 5, HGTV, Architectural Digest.', p:7 }
+];
+const PARTNER_TOTAL = PIECES.reduce((a, x) => a + x.p, 0);
+
+/* Every question, once. The summary page, the key and the deck use these exact words. */
+const Q_MOST   = 'Which stage do you think MOST of this campaign is working on?';
+const Q_LEAST  = 'Which stage do you think has the LEAST working on it?';
+const Q_WHY    = 'Why? One sentence.';
+const Q_CARD4  = 'Card 4. Is Mattel’s own website Direct Marketing or Digital Marketing? Which headline word on the infographic settles it?';
+const Q_UNUSED = 'Which of the six tools got no card from you, or the fewest? Why might a doll sold in a box at Target not need that tool?';
+const Q_BOARD  = 'What can it make a person do?';
+const Q_FIFTY  = 'More than 50 of the partners sell clothes, shoes and bags. Is that fifty pieces of marketing, or one piece done fifty times? Say why.';
+const Q_WHO    = 'Who is the movie for, who is the doll for, and are they the same person?';
+const Q_CLOSE  = 'Name the one thing Mattel still needs a person to do, and then name the part of this campaign that is actually asking them to do it.';
+const Q_SURPRISE = 'Look at your funnel next to your first guess. What did you get right, and what surprised you?';
+
+let state = { name:'', email:'', groupNum:'', pMost:null, pLeast:null, pWhy:'',
+              r1:CARDS.map(() => null), r1i:0, card4:'', unused:'',
+              r2:{}, fifty:'', who:'', close:'', surprise:'' };
+
+function toolName(k){ const t = TOOLS.find(x => x.k === k); return t ? t.n : ''; }
+function stageName(k){ const s = STAGES.find(x => x.k === k); return s ? s.n : ''; }
+function firstOpenCard(){ const i = state.r1.findIndex(x => !x); return i === -1 ? 0 : i; }
+
+/* ── STEP 0: PREDICT ── */
+function stageRow(id, picked, onPick){
+  const row = document.getElementById(id); row.innerHTML = '';
+  STAGES.forEach(s => {
+    const b = el('button', 'call-btn' + (picked === s.k ? ' on' : ''), s.short); b.type = 'button';
+    b.onclick = () => onPick(s.k); row.appendChild(b);
+  });
+}
+function renderPredict(){
+  document.getElementById('p-most-q').textContent = Q_MOST;
+  document.getElementById('p-least-q').textContent = Q_LEAST;
+  document.getElementById('p-why-q').textContent = Q_WHY;
+  stageRow('p-most', state.pMost, k => { state.pMost = k; renderPredict(); });
+  stageRow('p-least', state.pLeast, k => { state.pLeast = k; renderPredict(); });
+  document.getElementById('p-why').value = state.pWhy;
+  onPredict();
+}
+function onPredict(){
+  state.pWhy = document.getElementById('p-why').value.trim();
+  counter('p-why-count', state.pWhy.length, 20);
+  document.getElementById('predict-btn').disabled = !(state.pMost && state.pLeast && state.pWhy.length >= 20);
+}
+
+/* ── ROUND 1: one card at a time ── */
+function renderCard(){
+  const i = state.r1i;
+  document.getElementById('r1-progress').textContent = 'Card ' + (i + 1) + ' of ' + CARDS.length;
+  document.getElementById('r1-card').textContent = CARDS[i];
+  const g = document.getElementById('r1-tools'); g.innerHTML = '';
+  TOOLS.forEach(t => {
+    const b = el('button', 'stage-btn'); b.type = 'button';
+    if (state.r1[i] === t.k) b.style.outline = '3px solid var(--cm-gold)';
+    b.appendChild(el('div', 'q', t.h)); b.appendChild(el('div', 'n', t.n)); b.appendChild(el('div', 'ax', t.d));
+    b.onclick = () => {
+      state.r1[i] = t.k;
+      if (i < CARDS.length - 1){ state.r1i = i + 1; renderCard(); window.scrollTo(0, 0); }
+      else { renderR1R(); show('r1r-screen'); }
+    };
+    g.appendChild(b);
+  });
+}
+function r1Back(){
+  if (state.r1i > 0){ state.r1i -= 1; renderCard(); window.scrollTo(0, 0); }
+  else { renderPredict(); show('predict-screen'); }
+}
+
+/* ── ROUND 1 review, the card 4 stop, the unused tool ── */
+function renderTally(){
+  const t = document.getElementById('r1-tally'); t.innerHTML = '';
+  t.appendChild(document.createTextNode('Your picks so far:  '));
+  TOOLS.forEach((x, j) => {
+    const n = state.r1.filter(v => v === x.k).length;
+    const s = el('span', n ? 'got' : 'missing', x.n + ' ' + n);
+    t.appendChild(s); if (j < TOOLS.length - 1) t.appendChild(document.createTextNode('  ·  '));
+  });
+}
+function renderR1R(){
+  const box = document.getElementById('r1-list'); box.innerHTML = '';
+  CARDS.forEach((c, i) => {
+    const card = el('div', 'sort-card');
+    card.appendChild(el('div', 'txt', (i + 1) + '. ' + c));
+    const row = el('div', 'bin-row');
+    TOOLS.forEach(t => {
+      const b = el('button', 'read-btn' + (state.r1[i] === t.k ? ' on' : ''), t.n); b.type = 'button';
+      b.onclick = () => { state.r1[i] = t.k; renderR1R(); };
+      row.appendChild(b);
+    });
+    card.appendChild(row); box.appendChild(card);
+  });
+  renderTally();
+  document.getElementById('q-card4-stop').textContent = Q_CARD4;
+  document.getElementById('q-unused').textContent = Q_UNUSED;
+  document.getElementById('t-card4').value = state.card4;
+  document.getElementById('t-unused').value = state.unused;
+  onR1R();
+}
+function onR1R(){
+  state.card4 = document.getElementById('t-card4').value.trim();
+  state.unused = document.getElementById('t-unused').value.trim();
+  counter('t-card4-count', state.card4.length, 30);
+  counter('t-unused-count', state.unused.length, 30);
+  document.getElementById('r1r-btn').disabled = !(state.r1.every(Boolean) && state.card4.length >= 30 && state.unused.length >= 30);
+}
+
+/* ── ROUND 2: the funnel. It counts the student's own taps and nothing else. ── */
+function funnelCounts(){
+  const out = {}; STAGES.forEach(s => out[s.k] = { pieces:0, partners:0, plus:false });
+  PIECES.forEach(p => { const k = state.r2[p.k]; if (k){ out[k].pieces += 1; out[k].partners += p.p; if (p.plus) out[k].plus = true; } });
+  return out;
+}
+function countLabel(c){
+  if (!c.pieces) return 'empty';
+  return c.pieces + (c.pieces === 1 ? ' piece' : ' pieces') + ' · ' + c.partners + (c.plus ? '+' : '') + ' partners';
+}
+function renderFunnel(id, cap){
+  const f = document.getElementById(id); if (!f) return; f.innerHTML = '';
+  f.appendChild(el('span', 'cap', cap || 'Your funnel · it counts what you tap'));
+  const c = funnelCounts();
+  STAGES.forEach(s => {
+    const x = c[s.k];
+    const row = el('div', 'fn-row' + (x.pieces ? '' : ' empty'));
+    row.appendChild(el('div', null, s.short));
+    const bar = el('div', 'fn-bar'); const fill = el('div', 'fn-fill');
+    const w = x.pieces ? Math.max(6, Math.round(100 * x.partners / PARTNER_TOTAL)) : 0;
+    fill.style.width = w + '%'; bar.appendChild(fill); row.appendChild(bar);
+    row.appendChild(el('div', 'fn-n', countLabel(x)));
+    f.appendChild(row);
+  });
+}
+function renderBoard(){
+  const d = document.getElementById('stage-defs'); d.innerHTML = '';
+  STAGES.forEach(s => { d.appendChild(el('dt', null, s.n)); d.appendChild(el('dd', null, s.d)); });
+  const box = document.getElementById('r2-list'); box.innerHTML = '';
+  PIECES.forEach(p => {
+    const card = el('div', 'piece');
+    card.appendChild(el('div', 't', p.t)); card.appendChild(el('div', 'm', p.m));
+    const row = el('div', 'bin-row');
+    STAGES.forEach(s => {
+      const b = el('button', 'read-btn' + (state.r2[p.k] === s.k ? ' on' : ''), s.short); b.type = 'button';
+      b.onclick = () => { state.r2[p.k] = s.k; renderBoard(); };
+      row.appendChild(b);
+    });
+    card.appendChild(row); box.appendChild(card);
+  });
+  renderFunnel('funnel');
+  document.getElementById('r2-btn').disabled = !PIECES.every(p => state.r2[p.k]);
+}
+
+/* ── ROUND 3 ── */
+function renderR3(){
+  renderFunnel('funnel3', 'Your funnel');
+  document.getElementById('q-fifty').textContent = Q_FIFTY;
+  document.getElementById('q-who').textContent = Q_WHO;
+  document.getElementById('q-close').textContent = Q_CLOSE;
+  document.getElementById('q-surprise').textContent = Q_SURPRISE;
+  const g = document.getElementById('guess-row'); g.innerHTML = '';
+  g.appendChild(el('span', 'guess', 'Your first guess · most: ' + stageName(state.pMost)));
+  g.appendChild(el('span', 'guess', 'least: ' + stageName(state.pLeast)));
+  document.getElementById('t-fifty').value = state.fifty;
+  document.getElementById('t-who').value = state.who;
+  document.getElementById('t-close').value = state.close;
+  document.getElementById('t-surprise').value = state.surprise;
+  onR3();
+}
+function onR3(){
+  state.fifty = document.getElementById('t-fifty').value.trim();
+  state.who = document.getElementById('t-who').value.trim();
+  state.close = document.getElementById('t-close').value.trim();
+  state.surprise = document.getElementById('t-surprise').value.trim();
+  counter('t-fifty-count', state.fifty.length, 40);
+  counter('t-who-count', state.who.length, 40);
+  counter('t-close-count', state.close.length, 40);
+  counter('t-surprise-count', state.surprise.length, 30);
+  const btn = document.getElementById('submit-btn');
+  if (btn.dataset.sent === '1') return;
+  btn.disabled = !(state.fifty.length >= 40 && state.who.length >= 40 && state.close.length >= 40 && state.surprise.length >= 30);
+}
+
+/* ── SUBMIT ── */
+function submitAll(){
+  const btn = document.getElementById('submit-btn');
+  if (btn.disabled || btn.dataset.sent === '1') return;           // no double submits
+  btn.disabled = true; btn.dataset.sent = '1'; btn.textContent = 'Submitting…';
+  const payload = {
+    exercise: 'W13.1-sort-the-roster',
+    week: '13.1',
+    submittedAt: new Date().toISOString(),
+    name: state.name, email: state.email, group: state.groupNum
+  };
+  payload.guess_most = stageName(state.pMost);
+  payload.guess_least = stageName(state.pLeast);
+  payload.guess_why = state.pWhy;
+  CARDS.forEach((c, i) => { payload['r1_card' + (i + 1)] = toolName(state.r1[i]); });
+  payload.r1_card4_group = state.card4;
+  payload.r1_unused_tool = state.unused;
+  PIECES.forEach(p => { payload['r2_' + p.k] = stageName(state.r2[p.k]); });
+  const c = funnelCounts();
+  payload.r2_funnel = STAGES.map(s => s.short + ': ' + countLabel(c[s.k])).join(' | ');
+  payload.q_fifty_or_one = state.fifty;
+  payload.q_movie_vs_doll = state.who;
+  payload.q_case_close = state.close;
+  payload.q_guess_check = state.surprise;
+
+  try{
+    if(/^https?:\/\//i.test(CREDIT_ENDPOINT)){
+      postForCredit({
+        email: state.email, name: state.name,
+        week: EX_WEEK, session: EX_SESSION, exerciseId: EX_ID,
+        password: PW, group: String(state.groupNum||''), points: EX_POINTS,
+        fields: creditFields(payload),
+        answers: creditAnswers(payload)
+      });
+    }
+  }catch(e){
+    console.warn('Credit POST error (non-blocking):', e);
+  }
+
+  buildSummary();
+  saveSummary();
+  show('summary-screen');
+}
+
+/* ── SUMMARY (Commandment 10): every on-screen question, word for word, then the
+   student's answer, in exercise order. The deck and the key use the same words. ── */
+function buildSummary(){
+  document.getElementById('student-tag').textContent = state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
+  const sp = document.getElementById('sum-predict'); sp.innerHTML = '';
+  qa(sp, Q_MOST, stageName(state.pMost));
+  qa(sp, Q_LEAST, stageName(state.pLeast));
+  qa(sp, Q_WHY, state.pWhy);
+  const s1 = document.getElementById('sum-r1'); s1.innerHTML = '';
+  CARDS.forEach((c, i) => qa(s1, 'Card ' + (i + 1) + '. Which of the six tools is this? ' + c, toolName(state.r1[i])));
+  qa(s1, Q_CARD4, state.card4, 'Debrief Q1');
+  qa(s1, Q_UNUSED, state.unused);
+  renderFunnel('funnel-sum', 'Your funnel');
+  const s2 = document.getElementById('sum-r2'); s2.innerHTML = '';
+  PIECES.forEach(p => qa(s2, Q_BOARD + ' ' + p.t + ' · ' + p.m, stageName(state.r2[p.k])));
+  const s3 = document.getElementById('sum-r3'); s3.innerHTML = '';
+  qa(s3, Q_FIFTY, state.fifty, 'Debrief Q2');
+  qa(s3, Q_WHO, state.who, 'Debrief Q3');
+  qa(s3, Q_CLOSE, state.close, 'Debrief Q4');
+  qa(s3, Q_SURPRISE, state.surprise);
+  const dl = document.getElementById('debrief-list'); dl.innerHTML = '';
+  [Q_CARD4, Q_FIFTY, Q_WHO, Q_CLOSE].forEach(q => dl.appendChild(el('li', null, q)));
+}
+
+
+var SAVE_KEY = 'mktg2080-' + EX_ID + '-summary';
+function saveSummary(){
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ v:1, at:Date.now(), state:state })); } catch(e){}
+}
+function restoreSummary(){
+  var raw = null;
+  try { raw = localStorage.getItem(SAVE_KEY); } catch(e){ return; }
+  if (!raw) return;
+  try {
+    var d = JSON.parse(raw);
+    if (!d || !d.state || (Date.now() - (d.at || 0)) > 1000*60*60*14) return;   /* same class day only */
+    state = Object.assign(state, d.state);
+    var btn = document.getElementById('submit-btn');
+    if (btn){ btn.disabled = true; btn.dataset.sent = '1'; btn.textContent = 'Submitted'; }
+    buildSummary();
+    document.querySelectorAll('.confirm-pill,.credit-claim').forEach(function(x){ x.style.display = 'none'; });
+    document.getElementById('restored-note').style.display = 'block';
+    show('summary-screen');
+  } catch(e){}
+}
+
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function checkPw(){
+  var val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val.length >= 4){
+    PW = val;                       /* verified server-side at the join step */
+    document.getElementById('pw-err').textContent = '';
+    show('join-screen');
+  } else {
+    var box = document.querySelector('.pw-box');
+    if(box){ box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
+    document.getElementById('pw-err').textContent = "Enter today's class code.";
+  }
+}
+
+function onJoin(){
+  const name  = document.getElementById('j-name').value.trim();
+  const email = document.getElementById('j-email').value.trim().toLowerCase();
+  const group = document.getElementById('j-group').value;
+  const emailOk = ucEmailOk(email);
+  state.name = name; state.email = email; state.groupNum = group;
+  document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk && group);
+}
+
+/* ── ROSTER GATE ─────────────────────────────────────────────────────────
+   The Logic App verifies enrollment server-side via mode:"join". EVERY
+   failure is a hard stop: nobody enters the exercise unverified, because a
+   student who walks in past a failed check gets no credit and does not find
+   out until the gradebook. ── */
+var JOIN_VERIFY_MS = 12000;
+function __joinNext(){ show('brief-screen'); }
+function __joinField(id, fallback){
+  var el = document.getElementById(id);
+  return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
+}
+async function joinVerify(){
+  var btn = document.getElementById('join-btn');
+  if(!btn || btn.disabled) return;
+  var orig = btn.textContent;
+  var release = function(){ btn.disabled = false; btn.textContent = orig; };
+  var email = __joinField('j-email', (window.state && state.email));
+  var name  = __joinField('j-name',  (window.state && state.name));
+  var group = __joinField('j-group', (window.state && (state.groupNum || state.group)));
+
+  /* local/unwired copy only — the published file always has a real endpoint */
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)){ __joinNext(); return; }
+
+  btn.disabled = true; btn.textContent = 'Checking…';
+  var ctl = (window.AbortController ? new AbortController() : null);
+  var timer = setTimeout(function(){ if(ctl) ctl.abort(); }, JOIN_VERIFY_MS);
+  var code = 'NO_ANSWER';
+  try{
+    var res = await fetch(CREDIT_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ mode:'join', email:email, name:name, testKey:TEST_KEY,
+        week:EX_WEEK, session:EX_SESSION, exerciseId:EX_ID,
+        password:PW, group:group })
+    });
+    clearTimeout(timer);
+    var d = await res.json().catch(function(){ return null; });
+    code = (d && d.code) || ('HTTP_' + res.status);
+  }catch(e){
+    clearTimeout(timer); code = 'NO_ANSWER';
+  }
+  release();
+
+  if(code === 'JOIN_OK' || code === 'DRY_RUN_OK'){
+    if(code === 'DRY_RUN_OK'){
+      creditBanner('warn', 'DRY RUN — test key active. Every gate is being checked for real, but nothing will be written to Canvas.', 'retry');
+    } else {
+      creditBanner('clear');
+    }
+    __joinNext(); return;
+  }
+
+  if(code === 'NOT_ENROLLED'){
+    creditBanner('bad', 'That email is not on the class roster, so you cannot be given credit. Check it for a typo — it is your @mail.uc.edu address, the one Canvas uses. If it is correct, see Professor Hudnall now.', 'retry');
+  } else if(code === 'BAD_PASSWORD'){
+    creditBanner('bad', 'That is not today\'s class code. Get it from Professor Hudnall and enter it again.', 'pw');
+  } else if(code === 'WINDOW_CLOSED'){
+    creditBanner('bad', 'This exercise is only open during class.', 'retry');
+  } else {
+    creditBanner('warn', 'Could not reach the roster check (' + code + '). Try again. If it keeps failing, Professor Hudnall will tell the class what to do.', 'retry');
+  }
+}
+
+/* ── PERSISTENT BANNER ────────────────────────────────────────────────────
+   Lives on <body>, not inside a screen, so it survives every show() call.
+   It is the message on a BLOCKED screen — never a permission to continue. ── */
+function creditBanner(kind, text, action){
+  var el = document.getElementById('credit-banner');
+  if(kind === 'clear'){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    document.body.classList.remove('has-credit-banner');
+    return;
+  }
+  if(!el){ el = document.createElement('div'); el.id = 'credit-banner'; document.body.appendChild(el); }
+  el.className = kind;
+  el.innerHTML = '';
+  var span = document.createElement('span'); span.textContent = text; el.appendChild(span);
+  var toPw = (action === 'pw') && document.getElementById('pw-screen');
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cb-fix';
+  b.textContent = toPw ? 'Re-enter the code' : 'Try again';
+  b.onclick = function(){ if(toPw){ show('pw-screen'); } else { joinVerify(); } };
+  el.appendChild(b);
+  document.body.classList.add('has-credit-banner');
+}
+
+/* restore a submitted summary after a reload */
+try { restoreSummary(); } catch(e) {}
+</script>
+</body>
+</html>
