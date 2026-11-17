@@ -1045,17 +1045,17 @@ function buildSummary(){
   const s1 = document.getElementById('sum-r1'); s1.innerHTML = '';
   CARDS.forEach((c, i) => qa(s1, 'Card ' + (i + 1) + '. Which of the six tools is this? ' + c, toolName(state.r1[i])));
   qa(s1, Q_CARD4, state.card4, 'Debrief Q1');
-  qa(s1, Q_UNUSED, state.unused);
+  qa(s1, Q_UNUSED, state.unused, 'Debrief Q2');
   renderFunnel('funnel-sum', 'Your funnel');
   const s2 = document.getElementById('sum-r2'); s2.innerHTML = '';
   PIECES.forEach(p => qa(s2, Q_BOARD + ' ' + p.t + ' · ' + p.m, stageName(state.r2[p.k])));
   const s3 = document.getElementById('sum-r3'); s3.innerHTML = '';
-  qa(s3, Q_FIFTY, state.fifty, 'Debrief Q2');
-  qa(s3, Q_WHO, state.who, 'Debrief Q3');
-  qa(s3, Q_CLOSE, state.close, 'Debrief Q4');
-  qa(s3, Q_SURPRISE, state.surprise);
+  qa(s3, Q_FIFTY, state.fifty, 'Debrief Q3');
+  qa(s3, Q_WHO, state.who, 'Debrief Q4');
+  qa(s3, Q_CLOSE, state.close, 'Debrief Q5');
+  qa(s3, Q_SURPRISE, state.surprise, 'Debrief Q6');
   const dl = document.getElementById('debrief-list'); dl.innerHTML = '';
-  [Q_CARD4, Q_FIFTY, Q_WHO, Q_CLOSE].forEach(q => dl.appendChild(el('li', null, q)));
+  [Q_CARD4, Q_UNUSED, Q_FIFTY, Q_WHO, Q_CLOSE, Q_SURPRISE].forEach(q => dl.appendChild(el('li', null, q)));
 }
 
 

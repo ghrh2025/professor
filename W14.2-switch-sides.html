@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W14.2 · Switch Sides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Week 14 palette (River Pools: pool blue + deep water + sun). Shared by W14.1 and W14.2.
+     Variable names kept from the chassis so every shared rule still works. */
+  --cm-blue:   #0B5C7A;
+  --cm-ink:    #06283A;
+  --cm-gold:   #FFC83D;
+  --cm-gold-d: #8A6100;
+
+  --bg:      #F3F5F8;
+  --surface: #FFFFFF;
+  --border:  #DFE4EC;
+  --text:    #1A1A1A;
+  --muted:   #6B7280;
+  --radius:  10px;
+  --shadow:  0 2px 14px rgba(0,0,0,0.08);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── SCREENS — ID specificity keeps pw centered without breaking others ── */
+.screen{display:none}
+.screen.active{display:block}
+#pw-screen.active{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:820px;margin:0 auto;padding:22px 20px 90px}
+
+.week-tag{
+  font-family:'Space Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;color:var(--cm-gold-d);
+}
+.screen-title{font-size:29px;font-weight:900;line-height:1.15;margin-bottom:6px}
+.screen-sub{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:4px;background:transparent;
+  border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-radius:6px;
+  cursor:pointer;margin-bottom:16px;transition:all .15s;
+}
+.back-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* ── PRIMARY BUTTON ── */
+.btn{
+  display:inline-block;width:100%;border:none;border-radius:9px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:.3px;
+  padding:15px 20px;transition:transform .08s, box-shadow .15s, opacity .15s;
+}
+.btn-go{background:var(--cm-gold);color:var(--cm-ink)}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(158,197,240,.6);transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--cm-blue);font-size:14px;padding:12px 18px}
+.btn-ghost:hover{border-color:var(--cm-blue)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── PASSWORD SCREEN ── */
+.pw-box{
+  background:var(--cm-blue);color:#fff;border-radius:16px;
+  border-bottom:6px solid var(--cm-gold);
+  padding:40px 34px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.pw-box .lockup{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:var(--cm-gold);margin-bottom:14px}
+.pw-box h1{font-size:30px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.pw-box h1 .g{color:var(--cm-gold)}
+.pw-box p{font-size:14px;color:#D3DEF0;margin-bottom:22px;line-height:1.5}
+.pw-input{
+  width:100%;background:#071E4A;border:2px solid #3D64A8;border-radius:10px;
+  color:#fff;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;
+  letter-spacing:3px;text-align:center;text-transform:uppercase;padding:14px;margin-bottom:6px;
+  outline:none;transition:border-color .15s;
+}
+.pw-input:focus{border-color:var(--cm-gold)}
+.pw-input::placeholder{color:#8FA8D0;letter-spacing:2px}
+.pw-err{color:#FCA5A5;font-size:13px;font-weight:600;min-height:18px;margin-bottom:10px}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input,.field select{
+  width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:12px 13px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--cm-blue)}
+.field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ── STAGE LADDER (brief) ── */
+.ladder{background:var(--cm-blue);color:#fff;border-radius:12px;padding:18px 20px;
+  border-left:5px solid var(--cm-gold);margin-bottom:8px}
+.ladder .row{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.ladder .row:last-child{border-bottom:none}
+.ladder .n{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--cm-gold);min-width:22px}
+.ladder .nm{font-size:15.5px;font-weight:800;margin-right:8px;white-space:nowrap}
+.ladder .pl{font-size:13px;color:#D3DEF0;margin-top:2px}
+
+.mission{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;margin:14px 0}
+.mission b{color:var(--cm-blue)}
+
+/* ── SORT ── */
+.sort-progress{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.moment-card{
+  background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:24px 24px;box-shadow:var(--shadow);margin-bottom:18px;
+  font-size:18px;line-height:1.55;font-weight:500;min-height:120px;display:flex;align-items:center;
+}
+.stage-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.stage-btn{
+  display:block;width:100%;text-align:left;background:var(--cm-blue);color:#fff;
+  border:none;border-radius:10px;padding:13px 16px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:transform .1s, box-shadow .15s;
+}
+.stage-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(11,45,107,.3)}
+.stage-btn .q{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--cm-gold)}
+.stage-btn .n{font-size:16px;font-weight:900;margin-top:2px}
+.stage-btn .ax{font-size:12px;opacity:.8;margin-top:2px}
+
+/* ── REVIEW TIMELINE ── */
+.tl-stage{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;margin-bottom:10px}
+.tl-head{display:flex;align-items:baseline;gap:9px;margin-bottom:6px}
+.tl-num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:1px;color:var(--cm-gold-d);text-transform:uppercase}
+.tl-name{font-size:16px;font-weight:800}
+.tl-stage ul{margin:0;padding:0;list-style:none}
+.tl-stage li{font-size:14px;line-height:1.5;padding:7px 0 7px 26px;position:relative;
+  border-top:1px solid var(--border)}
+.tl-stage li:first-child{border-top:none}
+.tl-stage li .mark{position:absolute;left:0;top:7px;font-weight:800}
+.tl-stage li.hit .mark{color:#1B7F4B}
+.tl-stage li.miss .mark{color:#B4232A}
+.tl-stage li .why{display:block;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+.tl-empty{font-size:13px;color:var(--muted);font-style:italic;padding:4px 0}
+.score-pill{display:inline-block;background:#EEF4FB;color:var(--cm-blue);border:1px solid #C9DAF0;
+  font-size:13px;font-weight:800;padding:8px 16px;border-radius:20px;margin-bottom:14px}
+
+/* ── GATE ── */
+.gate-q{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:18px 20px;font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px}
+.pull{background:var(--cm-blue);color:#fff;border-radius:10px;padding:15px 18px;
+  font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.pull .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--cm-gold);display:block;margin-bottom:6px}
+textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;color:var(--text);
+  padding:14px;outline:none;resize:vertical;min-height:120px;transition:border-color .15s;
+}
+textarea:focus{border-color:var(--cm-blue)}
+.char-count{font-size:12px;color:var(--muted);margin-top:6px;text-align:right}
+.char-count.ok{color:#1B7F4B;font-weight:700}
+.submit-note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+.rule-out{background:#FFF6E0;border:1px solid #F0DBA6;border-radius:8px;padding:12px 15px;
+  font-size:13.5px;line-height:1.55;color:#6B5200;margin-bottom:16px}
+.rule-out b{color:#4A3800}
+
+/* ── SUMMARY ── */
+.confirm-pill{display:inline-block;background:#E7F3EC;color:#14512F;border:1px solid #A9D6BC;
+  font-size:13px;font-weight:800;letter-spacing:.3px;padding:8px 16px;border-radius:20px;margin-bottom:16px}
+.student-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.section-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--cm-gold-d);margin-bottom:8px}
+.answer-box{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:15px 18px;font-size:14.5px;line-height:1.6;margin-bottom:18px}
+.verdict{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:16px;line-height:1.7;margin-bottom:18px}
+.verdict .fill{color:var(--cm-gold);font-weight:700}
+.debrief-box{background:#F7F9FC;border:1px solid var(--border);border-top:4px solid var(--cm-gold);
+  border-radius:12px;padding:20px 22px;margin-top:8px}
+.debrief-box h3{font-size:16px;font-weight:800;margin-bottom:12px}
+.debrief-box ol{margin:0 0 0 20px}
+.debrief-box li{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+
+@media(max-width:680px){
+  .screen-title{font-size:24px}
+  .moment-card{font-size:16px}
+  .verdict{font-size:15px}
+}
+
+/* ── W6 additions ── */
+.price-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px}
+.pc-head{display:flex;align-items:baseline;gap:10px}
+.pc-amt{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--cm-blue)}
+.pc-note{font-size:13.5px;line-height:1.5;color:#3A3A3A;margin:6px 0 11px}
+.read-row{display:flex;flex-wrap:wrap;gap:7px}
+.read-btn{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;
+  background:#fff;border:1.5px solid var(--border);color:var(--muted);
+  border-radius:999px;padding:7px 13px;cursor:pointer;transition:all .12s}
+.read-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+.read-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.person-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:13px}
+.pc-name{font-size:18px;font-weight:900;margin-bottom:6px}
+.pc-bio{font-size:14px;line-height:1.55;color:#3A3A3A;margin-bottom:12px}
+.call-row{display:flex;gap:9px;flex-wrap:wrap}
+.call-btn{font-family:'Inter',sans-serif;font-size:13.5px;font-weight:700;background:#fff;
+  border:1.5px solid var(--border);color:var(--muted);border-radius:8px;padding:9px 15px;
+  cursor:pointer;transition:all .12s}
+.call-btn:hover{border-color:var(--cm-blue);color:var(--cm-blue)}
+.call-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.tally{font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.6;
+  background:#F7F9FC;border:1px solid var(--border);border-radius:8px;
+  padding:12px 15px;margin:14px 0;color:var(--muted)}
+.tally .got{color:#1B7F4B;font-weight:700}
+.tally .missing{color:#B4232A;font-weight:700}
+.slot{margin-bottom:12px}
+.slot label{display:block;font-size:13px;margin-bottom:6px}
+.slot-key{font-weight:800;color:var(--cm-blue);text-transform:none}
+.slot-hint{color:var(--muted);font-weight:500}
+.slot input{width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;
+  font-family:'Inter',sans-serif;font-size:15px;color:var(--text);padding:11px 13px;outline:none}
+.slot input:focus{border-color:var(--cm-blue)}
+.stmt-preview{background:var(--cm-blue);color:#fff;border-radius:10px;border-left:5px solid var(--cm-gold);
+  padding:16px 18px;font-size:15.5px;line-height:1.65;margin:14px 0;min-height:30px}
+.stmt-preview .fill{color:var(--cm-gold);font-weight:700}
+.stmt-preview .blank{opacity:.45;font-style:italic}
+</style>
+<style>/* credit-fix 2026-08-21: never claim credit before the server answers */
+body.awaiting-credit .confirm-pill,body.awaiting-credit .credit-claim{display:none !important}
+#credit-status{margin:18px auto !important}
+/* roster gate message (added 2026-08-25) */
+.join-msg{margin-top:10px;font-size:14px;line-height:1.45;min-height:1px}
+.join-msg.bad{color:#a4262c;font-weight:600}
+.join-msg.warn{color:#7a5c00}
+
+/* persistent credit banner (2026-08-25) */
+#credit-banner{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;gap:12px;
+  align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 16px;
+  font-size:14px;font-weight:600;line-height:1.35;text-align:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#credit-banner.bad{background:#a4262c;color:#fff}
+#credit-banner.warn{background:#ffd24a;color:#3a2d00}
+#credit-banner .cb-fix{border:0;border-radius:6px;padding:6px 12px;font-weight:700;
+  cursor:pointer;background:rgba(255,255,255,.92);color:#222}
+body.has-credit-banner{padding-top:58px}
+</style>
+
+<style>/* ── shared option/sort styles, from the W6.2 chassis ── */
+.tmpl{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:5px solid var(--cm-gold);
+  padding:18px 20px;font-size:17px;line-height:1.7;margin-bottom:14px}
+.tmpl .fill{color:var(--cm-gold);font-weight:800}
+.slotdef{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.slotdef div{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-size:13.5px;line-height:1.5}
+.slotdef b{display:block;color:var(--cm-blue);font-size:14px;margin-bottom:2px}
+.stem{background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-gold);
+  border-radius:10px;padding:14px 16px;font-size:15.5px;line-height:1.6;margin-bottom:14px}
+.stem .blank{color:var(--cm-gold-d);font-weight:800}
+.opt-list{display:grid;gap:8px;margin-bottom:16px}
+.opt-btn{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;
+  border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.45;color:var(--text);transition:all .12s}
+.opt-btn:hover{border-color:var(--cm-blue)}
+.opt-btn .l{font-family:'Space Mono',monospace;font-weight:700;color:var(--cm-gold-d);flex:0 0 auto}
+.opt-btn.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.opt-btn.on .l{color:var(--cm-gold)}
+.opt-btn.close,.opt-btn.close.on{background:#FFF1C9;border-color:#C9962B;color:var(--text)}
+.opt-btn.close .l,.opt-btn.close.on .l{color:#8A6100}
+.opt-btn:disabled{opacity:.35;cursor:not-allowed}
+.step-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--cm-gold-d);margin:4px 0 8px}
+.stmt-card{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-gold);
+  border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:13px}
+.stmt-card .num{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:1.5px;color:var(--cm-gold-d);margin-bottom:6px}
+.stmt-card .txt{font-size:15px;line-height:1.6;margin-bottom:11px}
+.sort-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:10px}
+.sort-card .txt{font-size:14.5px;line-height:1.5;margin-bottom:9px}
+.bin-row{display:flex;gap:7px;flex-wrap:wrap}
+.pick-row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--border)}
+.pick-row:first-of-type{border-top:none}
+.pick-row .lab{font-weight:800;font-size:15px}
+@media(max-width:680px){.slotdef{grid-template-columns:1fr}.pick-row{grid-template-columns:1fr}}
+</style>
+<style>/* ── W8.2 The One Question (built 2026-10-05) ── */
+.adv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.adv-btn{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);
+  border-radius:10px;padding:13px 15px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s}
+.adv-btn:hover{border-color:var(--cm-blue)}
+.adv-btn .t{font-size:15px;font-weight:800;color:var(--text)}
+.adv-btn .s{font-size:12.5px;color:var(--muted);margin-top:3px}
+.adv-btn.on{background:var(--cm-blue);border-color:var(--cm-blue)}
+.adv-btn.on .t{color:#fff}.adv-btn.on .s{color:#D3DEF0}
+.held{background:var(--surface);border:1px solid var(--border);border-top:6px solid var(--cm-gold);
+  border-radius:12px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+.held .who{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--cm-gold-d);margin-bottom:6px}
+.held h3{font-size:20px;font-weight:900;margin-bottom:10px}
+.held .quote{border-left:4px solid var(--cm-gold);padding:6px 0 6px 14px;font-size:15px;
+  line-height:1.55;font-style:italic;margin-bottom:12px}
+.held .arg{font-size:14.5px;line-height:1.6;margin-bottom:12px}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.facts div{background:#F7F9FC;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:12.5px;line-height:1.4}
+.facts b{display:block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.facts .cant{grid-column:1 / -1;background:#FFF6E0;border-color:#F0DBA6}
+.stop{background:var(--cm-ink);color:#fff;border-radius:12px;padding:18px 20px;margin:6px 0 16px;
+  border-left:6px solid var(--cm-gold)}
+.stop .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2.5px;color:var(--cm-gold);display:block;margin-bottom:6px}
+.stop p{font-size:15px;line-height:1.55}
+.src-card{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 14px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px;transition:all .12s}
+.src-card:hover{border-color:var(--cm-blue)}
+.src-card .t{font-size:15px;font-weight:800}
+.src-card .m{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+.src-card.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.src-card.on .m{color:#D3DEF0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.yn-row{display:flex;gap:10px;margin:8px 0 12px}
+.yn-row .call-btn{flex:1}
+.back-to-1{background:#FFF1C9;border:1px solid #C9962B;border-radius:10px;padding:14px 16px;
+  font-size:15px;line-height:1.55;margin-bottom:14px;display:none}
+.back-to-1.show{display:block}
+.back-to-1 b{color:#7A4F00}
+@media(max-width:680px){.adv-grid,.grid2{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}}
+</style>
+<style>/* ── definitions panel (from the W10.1 chassis) ── */
+.defs{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px}
+.defs summary{cursor:pointer;font-weight:800;font-size:14px;color:var(--cm-blue)}
+.defs dl{margin-top:10px;display:grid;grid-template-columns:170px 1fr;gap:6px 12px;font-size:13.5px;line-height:1.45}
+.defs dt{font-weight:800}
+@media(max-width:680px){.defs dl{grid-template-columns:1fr}}
+</style>
+
+<style>/* ── W11.2 Run Costco, role version (rebuilt 2026-10-27) ── */
+.dash{background:var(--cm-ink);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:16px;border-left:6px solid var(--cm-gold)}
+.dash .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:2px;color:#FFB3C0;display:block;margin-bottom:8px}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.dash-grid div{background:rgba(255,255,255,.07);border-radius:8px;padding:8px 10px}
+.dash-grid b{display:block;font-family:'Space Mono',monospace;font-size:16px;color:#fff}
+.dash-grid span{font-size:11.5px;color:#C9D6EA;line-height:1.35;display:block;margin-top:2px}
+.dash-grid .chg b{color:#FFD24A}
+.todo{background:#EAF2FB;border:2px solid var(--cm-blue);border-radius:12px;padding:14px 18px;margin-bottom:16px}
+.todo .cap{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--cm-blue);margin-bottom:8px;text-transform:uppercase}
+.todo .who{background:var(--cm-blue);color:#fff;border-radius:999px;padding:3px 10px;letter-spacing:1px}
+.todo .who.group{background:var(--cm-gold)}
+.todo ol{margin:0 0 0 20px}
+.todo li{font-size:15px;line-height:1.5;margin-bottom:6px}
+.todo li b{color:var(--cm-ink)}
+.role-badge{position:sticky;top:0;z-index:50;background:var(--cm-ink);color:#fff;font-size:13.5px;font-weight:700;padding:9px 16px;text-align:center;display:none}
+.role-badge.on{display:block}
+.role-badge b{color:#FFD24A}
+.role-pick{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;transition:all .12s}
+.role-pick:hover{border-color:var(--cm-blue)}
+.role-pick .num{display:inline-block;width:34px;height:34px;border-radius:50%;background:var(--cm-blue);color:#fff;font-weight:900;font-size:18px;text-align:center;line-height:34px;margin-right:10px;vertical-align:middle}
+.role-pick .t{font-size:17px;font-weight:900;vertical-align:middle}
+.role-pick .req{display:inline-block;margin-left:8px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;border-radius:6px;padding:3px 8px;vertical-align:middle;background:#E7F3EC;color:#14512F}
+.role-pick .req.opt{background:#FFF1C9;color:#7A4F00}
+.role-pick .m{font-size:13.5px;color:#3A3A3A;margin-top:6px;line-height:1.5}
+.role-pick.on{border-color:var(--cm-blue);background:#EAF2FB}
+.confirm{background:#FFF6E0;border:2px solid #C9962B;border-radius:12px;padding:16px 18px;margin:6px 0 14px;display:none}
+.confirm.show{display:block}
+.confirm p{font-size:16px;line-height:1.5;margin-bottom:10px}
+.evid{background:#fff;border:1px solid var(--border);border-left:5px solid var(--cm-blue);border-radius:10px;padding:12px 16px;margin-bottom:10px}
+.evid .k{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
+.evid .v{font-size:15px;line-height:1.55}
+.goal{background:var(--cm-ink);color:#fff;border-radius:12px;padding:14px 18px;margin:12px 0 16px}
+.goal .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:#FFD24A;display:block;margin-bottom:5px}
+.goal p{font-size:15.5px;line-height:1.55}
+.lever{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.lever .t{font-size:15px;font-weight:900;margin-bottom:8px}
+.lever .call-row .call-btn{flex:1;min-width:150px}
+.planbox{background:var(--cm-blue);color:#fff;border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:15px;line-height:1.7}
+.planbox b{color:#FFD24A}
+.planbox .warn{color:#FFD5DC;font-weight:700}
+.event{background:#FFF6E0;border:1px solid #F0DBA6;border-left:6px solid #C9962B;border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:15px;line-height:1.6}
+.event .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:#8A6100;display:block;margin-bottom:6px}
+.sign{background:#fff;border:3px solid var(--cm-ink);border-radius:6px;padding:16px;margin-bottom:14px}
+.sign .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--cm-gold-d);display:block;margin-bottom:8px}
+.sign textarea{border-style:dashed}
+.ask-q{font-size:15.5px;font-weight:800;line-height:1.5;color:var(--cm-ink);background:#F7F9FC;border:1px solid var(--border);border-left:4px solid var(--cm-blue);border-radius:10px;padding:12px 14px;margin:6px 0 10px}
+.door-card{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;transition:all .12s}
+.door-card:hover{border-color:var(--cm-blue)}
+.door-card .t{font-size:16px;font-weight:900;color:var(--text)}
+.door-card .m{font-size:13.5px;color:#3A3A3A;margin-top:5px;line-height:1.5}
+.door-card.on{background:var(--cm-blue);border-color:var(--cm-blue)}
+.door-card.on .t,.door-card.on .m{color:#fff}
+@media(max-width:680px){.dash-grid{grid-template-columns:1fr 1fr}}
+</style>
+<style>/* ── W14 River Pools overrides (built 2026-11-12) ── */
+.pw-box p,.ladder .pl{color:#D6ECF5}
+.pw-input{background:#06384B;border-color:#5FA8C4}
+.pw-input::placeholder{color:#9CCBDD}
+.btn-go:hover:not(:disabled){box-shadow:0 4px 18px rgba(11,92,122,.35)}
+.todo{background:#E8F4F9}
+.todo .who.group{color:var(--cm-ink)}
+.adv-btn.on .s,.src-card.on .m{color:#D6ECF5}
+.stage-btn:hover{box-shadow:0 6px 18px rgba(11,92,122,.3)}
+.funnel{background:var(--cm-ink);border-radius:12px;padding:14px 16px;margin-bottom:14px;position:sticky;top:0;z-index:40;border-left:6px solid var(--cm-gold)}
+body.has-credit-banner .funnel{top:58px}
+.funnel .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:2px;color:#FFC83D;display:block;margin-bottom:8px;text-transform:uppercase}
+.fn-row{display:grid;grid-template-columns:118px 1fr 150px;gap:10px;align-items:center;margin:6px 0;color:#fff;font-size:13px;font-weight:700}
+.fn-bar{height:16px;background:rgba(255,255,255,.14);border-radius:8px;overflow:hidden}
+.fn-fill{height:100%;background:var(--cm-gold);width:0;transition:width .25s}
+.fn-n{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:#C9E4F2;text-align:right}
+.fn-row.empty .fn-n{color:#FFB4A8}
+.piece{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--cm-blue);border-radius:12px;padding:13px 15px;margin-bottom:10px}
+.piece .t{font-size:15.5px;font-weight:800;line-height:1.35}
+.piece .m{font-size:13px;color:#3A3A3A;line-height:1.45;margin:3px 0 9px}
+.guess{display:inline-block;background:#E8F4F9;border:1px solid #A9D3E8;color:var(--cm-ink);font-size:13.5px;font-weight:700;padding:8px 14px;border-radius:20px;margin:0 6px 10px 0}
+.qsheet{background:#FFFDF5;border:1px solid #E8DFC0;border-left:5px solid var(--cm-gold);border-radius:6px;padding:16px 20px;margin-bottom:16px;font-size:14.5px;line-height:1.75;box-shadow:var(--shadow)}
+.qsheet .cap{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cm-gold-d);display:block;margin-bottom:6px}
+.qsheet ol{margin:0 0 0 22px}
+.changed{background:#E8F4F9;border:1px solid #A9D3E8;border-radius:8px;padding:10px 14px;font-size:13.5px;font-weight:700;color:var(--cm-ink);margin:0 0 14px}
+.part-h{font-size:17px;font-weight:900;margin:18px 0 4px}
+.part-s{font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+@media(max-width:680px){.fn-row{grid-template-columns:92px 1fr 96px;font-size:12px}}
+
+/* ── W14.2 Switch Sides ── */
+.side-card{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;transition:all .12s}
+.side-card:hover{border-color:var(--cm-blue)}
+.side-card .k{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cm-gold-d)}
+.side-card .t{font-size:17px;font-weight:900;margin-top:3px;color:var(--text)}
+.side-card .m{font-size:13.5px;color:#3A3A3A;margin-top:5px;line-height:1.5}
+.side-card.on{border-color:var(--cm-blue);background:#E8F4F9}
+.banner{background:var(--cm-blue);color:#fff;border-radius:12px;border-left:6px solid var(--cm-gold);padding:16px 18px;margin-bottom:14px}
+.banner .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cm-gold);display:block;margin-bottom:5px}
+.banner .t{font-size:19px;font-weight:900;line-height:1.3}
+.banner .m{font-size:13.5px;color:#D6ECF5;margin-top:5px;line-height:1.5}
+.switch{background:var(--cm-ink);color:#fff;border-radius:14px;border-bottom:6px solid var(--cm-gold);padding:30px 22px;text-align:center;margin-bottom:16px}
+.switch .big{font-size:34px;font-weight:900;letter-spacing:.5px;color:var(--cm-gold)}
+.switch p{font-size:15.5px;line-height:1.55;margin-top:10px;color:#E6F3FA}
+.fact{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;line-height:1.5;color:var(--text);margin-bottom:8px;transition:all .12s}
+.fact:hover{border-color:var(--cm-blue)}
+.fact .l{font-family:'Space Mono',monospace;font-weight:700;color:var(--cm-gold-d);flex:0 0 auto}
+.fact.on{background:var(--cm-blue);border-color:var(--cm-blue);color:#fff}
+.fact.on .l{color:var(--cm-gold)}
+.tally-grid{display:grid;grid-template-columns:1fr;gap:9px;margin-bottom:14px}
+.tally-btn{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;background:var(--cm-blue);color:#fff;border:none;border-radius:10px;padding:14px 16px;cursor:pointer;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;line-height:1.35}
+.tally-btn:active{transform:scale(.985)}
+.tally-btn .n{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--cm-gold);min-width:34px;text-align:right}
+.undo{background:transparent;border:0;color:var(--cm-blue);font-size:12.5px;font-weight:700;text-decoration:underline;cursor:pointer;padding:2px 0 12px;font-family:'Inter',sans-serif}
+.rules{background:#FFF6E0;border:1px solid #F0DBA6;border-left:6px solid #C9962B;border-radius:12px;padding:14px 18px;margin-bottom:14px;font-size:15px;line-height:1.6}
+.rules .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:#8A6100;display:block;margin-bottom:6px;text-transform:uppercase}
+.rules ol{margin:0 0 0 20px}
+.corner{background:var(--cm-ink);color:#fff;border-radius:12px;border-left:6px solid var(--cm-gold);padding:16px 18px;margin-bottom:18px}
+.corner .cap{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cm-gold);display:block;margin-bottom:5px}
+.corner .t{font-size:18px;font-weight:900;line-height:1.35}
+.corner .m{font-size:13.5px;color:#C9E4F2;margin-top:5px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ PASSWORD ═══════════════════════ -->
+<div id="pw-screen" class="screen active">
+  <div class="pw-box">
+    <div class="lockup">MKTG 2080 · Week 14.2</div>
+    <h1>Switch <span class="g">Sides</span></h1>
+    <p>Enter today's password, given in class. It records your participation for class credit.</p>
+    <input id="pw-input" class="pw-input" type="text" placeholder="PASSWORD"
+           autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+    <div id="pw-err" class="pw-err"></div>
+    <button class="btn btn-go" onclick="checkPw()">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ JOIN ═══════════════════════ -->
+<div id="join-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('pw-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · River Pools</div>
+    <div class="screen-title">Get set up</div>
+    <div class="screen-sub">Warsaw, Virginia, the first week of March 2009. There is no $250,000 this spring. There is money for one thing, and the two owners at the desk do not agree on what. Today the whole room argues it, from both sides.</div>
+    <div class="card">
+      <div class="field">
+        <label for="j-name">Your name</label>
+        <input id="j-name" type="text" placeholder="First and last" autocomplete="off" oninput="onJoin()">
+      </div>
+      <div class="field">
+        <label for="j-email">UC email</label>
+        <input id="j-email" type="email" placeholder="you@mail.uc.edu" autocomplete="off" oninput="onJoin()">
+        <div class="hint">Use your @mail.uc.edu address, the same one Canvas uses. Credit is matched on it.</div>
+      </div>
+      <div class="field">
+        <label for="j-group">Your group</label>
+        <select id="j-group" onchange="onJoin()">
+          <option value="">Pick your group…</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+        </select>
+        <div class="hint">Your usual group number. Today the whole room works as two sides, but credit still needs your group.</div>
+      </div>
+      <button class="btn btn-go" id="join-btn" onclick="joinVerify()" disabled>Let's go →</button>
+      <div id="join-err" class="join-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BRIEF ═══════════════════════ -->
+<div id="brief-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('join-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · How this works</div>
+    <div class="screen-title">One room. Two sides. Then you switch.</div>
+    <div class="screen-sub">Read this whole screen before you tap anything.</div>
+    <div class="ladder">
+      <div class="row"><span class="n">0</span><span><span class="nm">Vote first</span><span class="pl">On your own, before anyone argues. One tap and one sentence. About 1 minute.</span></span></div>
+      <div class="row"><span class="n">1</span><span><span class="nm">Argue your side</span><span class="pl">Professor Hudnall gives you a side. Type your case, then the room debates. About 6 minutes.</span></span></div>
+      <div class="row"><span class="n">2</span><span><span class="nm">Switch sides</span><span class="pl">You now argue the side you were just against. About 6 minutes.</span></span></div>
+      <div class="row"><span class="n">3</span><span><span class="nm">Sides off</span><span class="pl">Vote again, three short answers, submit. About 5 minutes.</span></span></div>
+    </div>
+    <div class="mission"><b>Three rules for the room.</b> Type before you talk. Nobody speaks twice until everyone on their side has spoken once. Every point needs a fact from the case.</div>
+    <button class="btn btn-go" style="margin-top:6px" onclick="renderVote0(); show('vote0-screen')">Start: vote first →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ STEP 0: FIRST VOTE ═══════════════════════ -->
+<div id="vote0-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('brief-screen')">← Back</button>
+    <div class="week-tag">Step 0 · Vote first</div>
+    <div class="screen-title">Before anyone argues, vote.</div>
+    <div class="todo">
+      <div class="cap"><span class="who">On your own</span> About 1 minute. No talking yet.</div>
+      <ol>
+        <li><b>Tap one</b> of the case's four ways to spend the spring. Nothing here is graded.</li>
+        <li><b>Type one sentence</b> on why.</li>
+      </ol>
+    </div>
+    <div class="ask-q" id="q-vote0"></div>
+    <div id="vote0-list"></div>
+    <div class="ask-q" id="q-why0"></div>
+    <textarea id="t-why0" style="min-height:80px" placeholder="I would put it there because…" oninput="onVote0()"></textarea>
+    <div class="char-count" id="t-why0-count">0 / 20 minimum</div>
+    <button class="btn btn-go" id="vote0-btn" style="margin-top:14px" onclick="renderSide(); show('side-screen')" disabled>Next: get your side →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SIDE ASSIGNMENT ═══════════════════════ -->
+<div id="side-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="renderVote0(); show('vote0-screen')">← Back</button>
+    <div class="week-tag">Round 1 · Your side</div>
+    <div class="screen-title">Which side did Professor Hudnall give you?</div>
+    <div class="todo">
+      <div class="cap"><span class="who">On your own</span> Wait for the split</div>
+      <ol>
+        <li><b>Professor Hudnall splits the room in two.</b> You do not choose. Your side is the half of the room you are sitting in.</li>
+        <li><b>Tap the side you were given.</b> It does not matter how you voted. You will argue both before the end.</li>
+      </ol>
+    </div>
+    <div class="ask-q" id="q-side"></div>
+    <div id="side-list"></div>
+    <button class="btn btn-go" id="side-btn" style="margin-top:6px" onclick="renderPrep(1); show('prep1-screen')" disabled>Round 1: build your case →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 1: PREP ═══════════════════════ -->
+<div id="prep1-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="renderSide(); show('side-screen')">← Back</button>
+    <div class="week-tag">Round 1 · Build your case</div>
+    <div class="screen-title">Type before you talk.</div>
+    <div class="banner" id="banner1"></div>
+    <div class="todo">
+      <div class="cap"><span class="who">On your own</span> About 2 minutes. Quiet.</div>
+      <ol>
+        <li><b>Read the six facts.</b> Every one is from the case.</li>
+        <li><b>Tap the two</b> your side should lead with.</li>
+        <li><b>Type your side's case</b> in two sentences.</li>
+      </ol>
+    </div>
+    <div class="ask-q" id="q-facts1"></div>
+    <div id="facts1"></div>
+    <div class="ask-q" id="q-arg1"></div>
+    <textarea id="t-arg1" placeholder="The last money should go to… because…" oninput="onPrep(1)"></textarea>
+    <div class="char-count" id="t-arg1-count">0 / 60 minimum</div>
+    <button class="btn btn-go" id="prep1-btn" style="margin-top:14px" onclick="renderDebate(1); show('debate1-screen')" disabled>I am ready to debate →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 1: DEBATE ═══════════════════════ -->
+<div id="debate1-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="renderPrep(1); show('prep1-screen')">← Back</button>
+    <div class="week-tag">Round 1 · The room debates</div>
+    <div class="screen-title">Listen with your thumbs.</div>
+    <div class="banner" id="banner1b"></div>
+    <div class="rules"><span class="cap">The whole room · about 4 minutes</span>
+      <ol>
+        <li><b>Stand or raise a hand to speak.</b> Read from what you typed if you want to.</li>
+        <li><b>Nobody speaks twice</b> until everyone on their side has spoken once.</li>
+        <li><b>While the OTHER side talks,</b> tap a button below each time you hear that kind of point.</li>
+      </ol>
+    </div>
+    <div class="step-label" id="q-tally1"></div>
+    <div class="tally-grid" id="tally1"></div>
+    <button class="undo" type="button" onclick="undoTally(1)">Undo my last tap</button>
+    <div class="ask-q" id="q-heard"></div>
+    <textarea id="t-heard" style="min-height:90px" placeholder="The best point I heard from the other side was…" oninput="onDebate1()"></textarea>
+    <div class="char-count" id="t-heard-count">0 / 30 minimum</div>
+    <div class="rule-out"><b>Wait for Professor Hudnall to say “switch.”</b> Do not tap ahead.</div>
+    <button class="btn btn-go" id="debate1-btn" onclick="renderPrep(2); show('switch-screen')" disabled>Professor Hudnall said switch →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SWITCH ═══════════════════════ -->
+<div id="switch-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="renderDebate(1); show('debate1-screen')">← Back</button>
+    <div class="week-tag">Round 2 · Switch sides</div>
+    <div class="switch"><div class="big">SWITCH SIDES</div><p>You now argue the side you were just against. Stay in your seat. The side moved, you did not.</p></div>
+    <div class="banner" id="banner2"></div>
+    <div class="todo">
+      <div class="cap"><span class="who">On your own</span> About 2 minutes. Quiet.</div>
+      <ol>
+        <li><b>Read your new side's six facts.</b></li>
+        <li><b>Tap the two</b> your new side should lead with.</li>
+        <li><b>Type the new case</b> in two sentences. Mean it.</li>
+      </ol>
+    </div>
+    <div class="ask-q" id="q-facts2"></div>
+    <div id="facts2"></div>
+    <div class="ask-q" id="q-arg2"></div>
+    <textarea id="t-arg2" placeholder="The last money should go to… because…" oninput="onPrep(2)"></textarea>
+    <div class="char-count" id="t-arg2-count">0 / 60 minimum</div>
+    <button class="btn btn-go" id="prep2-btn" style="margin-top:14px" onclick="renderDebate(2); show('debate2-screen')" disabled>I am ready to debate →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ROUND 2: DEBATE ═══════════════════════ -->
+<div id="debate2-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="renderPrep(2); show('switch-screen')">← Back</button>
+    <div class="week-tag">Round 2 · The room debates again</div>
+    <div class="screen-title">Same rules. New side.</div>
+    <div class="banner" id="banner2b"></div>
+    <div class="rules"><span class="cap">The whole room · about 4 minutes</span>
+      <ol>
+        <li><b>If you spoke in Round 1, wait.</b> Someone who has not spoken goes first.</li>
+        <li><b>Use a fact the room has not heard yet.</b></li>
+        <li><b>While the OTHER side talks,</b> keep tapping.</li>
+      </ol>
+    </div>
+    <div class="step-label" id="q-tally2"></div>
+    <div class="tally-grid" id="tally2"></div>
+    <button class="undo" type="button" onclick="undoTally(2)">Undo my last tap</button>
+    <div class="rule-out"><b>Wait for Professor Hudnall to say “sides off.”</b> Do not tap ahead.</div>
+    <button class="btn btn-go" id="debate2-btn" onclick="renderFinal(); show('final-screen')">Professor Hudnall said sides off →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SIDES OFF ═══════════════════════ -->
+<div id="final-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="renderDebate(2); show('debate2-screen')">← Back</button>
+    <div class="week-tag">Sides off · Your own call</div>
+    <div class="screen-title">Now decide for yourself.</div>
+    <div class="todo">
+      <div class="cap"><span class="who">On your own</span> About 5 minutes. Quiet.</div>
+      <ol>
+        <li><b>Vote again.</b> You may land anywhere, including where you started.</li>
+        <li><b>Type three answers.</b> Use a number or a name from the case.</li>
+        <li><b>Press Submit.</b> Then keep your summary open.</li>
+      </ol>
+    </div>
+    <div class="ask-q" id="q-vote1"></div>
+    <div id="vote1-list"></div>
+
+    <div class="gate-q" id="q-close" style="margin-top:14px"></div>
+    <textarea id="t-close" placeholder="The one job is… because a family deciding on a $50,000 pool…" oninput="onFinal()"></textarea>
+    <div class="char-count" id="t-close-count">0 / 40 minimum</div>
+
+    <div class="gate-q" id="q-giveup" style="margin-top:14px"></div>
+    <textarea id="t-giveup" placeholder="By spending it there River Pools gives up…" oninput="onFinal()"></textarea>
+    <div class="char-count" id="t-giveup-count">0 / 40 minimum</div>
+
+    <div id="guess-row" style="margin-top:16px"></div>
+    <div class="gate-q" id="q-moved"></div>
+    <textarea id="t-moved" style="min-height:90px" placeholder="I started at… I ended at… What moved me (or held me) was…" oninput="onFinal()"></textarea>
+    <div class="char-count" id="t-moved-count">0 / 30 minimum</div>
+
+    <button class="btn btn-go" id="submit-btn" style="margin-top:14px" onclick="submitAll()" disabled>Submit for credit →</button>
+    <div class="submit-note">One submission per student. Your own answers, your own name.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SUMMARY ═══════════════════════ -->
+<div id="summary-screen" class="screen">
+  <div class="page-wrap">
+    <button class="back-btn" onclick="show('final-screen')">← Back</button>
+    <div class="week-tag">Week 14.2 · Summary</div>
+    <div class="screen-title">Both sides, then yours</div>
+    <div class="confirm-pill credit-claim">✓ Participation recorded, you're all set</div>
+    <div class="student-tag" id="student-tag"></div>
+
+    <div class="callout-restored" id="restored-note" style="display:none;background:#EEF2FB;border:1px solid #C7D2F0;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:14px">You already submitted. This is your summary for the debrief. Nothing more to do.</div>
+
+    <div class="corner" id="corner"></div>
+
+    <div class="section-label">Step 0 · Your first vote</div>
+    <div class="answer-box" id="sum-vote0"></div>
+
+    <div class="section-label">Round 1 · Your side</div>
+    <div class="answer-box" id="sum-r1"></div>
+
+    <div class="section-label">Round 2 · The other side</div>
+    <div class="answer-box" id="sum-r2"></div>
+
+    <div class="section-label">Sides off · Your own call</div>
+    <div class="answer-box" id="sum-final"></div>
+
+    <div class="debrief-box">
+      <h3>Bring to the debrief</h3>
+      <ol id="debrief-list"></ol>
+    </div>
+  </div>
+</div>
+
+<script>
+
+function ucEmailOk(e){ return /^[^\s@]+@([a-z0-9-]+\.)*uc\.edu$/i.test(String(e||'').trim()); }
+
+/* The class code is NOT stored here. It ships to a PUBLIC repo.
+   The student types it; the Logic App checks it against Key Vault. */
+var PW = '';
+
+const CREDIT_ENDPOINT = 'https://prod-45.eastus2.logic.azure.com:443/workflows/1188d52c49104897a65cfb4af9737d35/triggers/exercise_submission/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fexercise_submission%2Frun&sv=1.0&sig=l05k1Oc2rHNBjofYCf6eNHmswODOBxXZXhgbQPY04KQ';
+
+/* ── DRY-RUN PASSTHROUGH ───────────────────────────────────────────────────
+   ?testKey=... on the URL turns this page into a dry run: the workflow skips
+   the class-window gate and answers on the join branch, so no grade is ever
+   written. Absent the parameter this is '' — which matches no secret — and the
+   page behaves exactly as it does for a student. ── */
+var TEST_KEY = (function(){
+  try { return new URLSearchParams(location.search).get('testKey') || ''; }
+  catch(e){ return ''; }
+})();
+
+/* ── participation credit (Logic App contract) ───────────────────────── */
+function creditAnswers(src){
+  const skip=['email','name','week','session','exerciseId','password','group','points','answers','timestamp','submittedAt','exercise'];
+  return Object.entries(src||{}).filter(([k])=>!skip.includes(k))
+    .map(([,v])=>typeof v==='string'?v:JSON.stringify(v))
+    .filter(x=>x&&x!=='{}'&&x!=='[]'&&x!=='""');
+}
+function creditFields(src){
+  var skip = ['email','name','week','session','exerciseId','password','group',
+              'points','answers','fields','timestamp','submittedAt','exercise'];
+  var out = {};
+  Object.keys(src || {}).forEach(function(k){
+    if (skip.indexOf(k) !== -1) return;
+    var v = src[k];
+    if (v === undefined || v === null) return;
+    out[k] = v;
+  });
+  return out;
+}
+async function postForCredit(c){
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)) return;
+  if(TEST_KEY) c.testKey = TEST_KEY;
+  const set=(bg,bd,fg,html)=>{
+    let el=document.getElementById('credit-status');
+    if(!el){el=document.createElement('div');el.id='credit-status';}
+    var _anchor=document.querySelector('.confirm-pill,.credit-claim');
+    var _host=(_anchor&&_anchor.parentElement)||document.getElementById('summary-screen')
+      ||document.getElementById('sum-screen')||document.querySelector('.screen.active')||document.body;
+    if(el.parentElement!==_host){
+      if(_anchor&&_anchor.parentElement===_host) _host.insertBefore(el,_anchor.nextSibling);
+      else _host.appendChild(el);
+    }
+    el.style.cssText='margin:18px auto;max-width:760px;padding:14px 16px;border-radius:8px;'+
+      'font-size:15px;line-height:1.45;text-align:left;background:'+bg+';border:1px solid '+bd+';color:'+fg;
+    el.innerHTML=html;
+  };
+  document.body.classList.add('awaiting-credit');
+  set('#eef2f7','#cbd5e1','#33475b','Recording your credit&hellip;');
+  try{
+    const res=await fetch(CREDIT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
+    const d=await res.json();
+    if(d.code==='DRY_RUN_OK'){
+      document.body.classList.remove('awaiting-credit');
+      set('#eef4ff','#c3d4f7','#1e3a8a','<strong>Dry run.</strong> Every gate passed and the roster matched — '+
+        'nothing was written to Canvas. Remove ?testKey from the URL to run for real.');
+    } else if(d.accepted){
+      document.body.classList.remove('awaiting-credit');
+      set('#e8f5ec','#bcdfc8','#1b5e35','<strong>&#10003; Recorded.</strong> '+d.points+' points for '+d.assignment+
+        '<br><span style="opacity:.75;font-size:13px">Confirmed '+new Date(d.recordedAtUTC).toLocaleTimeString()+'. You may close this page.</span>');
+    } else {
+      set('#fdf1e7','#f0cfae','#8a4b12','<strong>Not recorded.</strong> '+d.message+
+        (d.runId?'<br><span style="opacity:.75;font-size:13px">Reference: '+d.runId+'</span>':''));
+    }
+  }catch(e){
+    set('#fdf1e7','#f0cfae','#8a4b12','<strong>Could not reach the server.</strong> Show this screen to Professor Hudnall before you leave. Do not resubmit.');
+  }
+}
+
+function el(tag, cls, text){ const e = document.createElement(tag); if(cls) e.className = cls; if(text!=null) e.textContent = text; return e; }
+function counter(id, n, min){ const c = document.getElementById(id); c.textContent = n + ' / ' + min + ' minimum'; c.classList.toggle('ok', n >= min); }
+function qa(parent, q, a, tag){
+  const d = el('div'); d.style.cssText = 'margin-bottom:14px';
+  const qq = el('div', null, (tag ? tag + ' · ' : '') + q);
+  qq.style.cssText = 'font-size:13px;font-weight:700;color:#475569;line-height:1.45;margin-bottom:4px';
+  const aa = el('div', null, a || '(no answer)');
+  aa.style.cssText = 'font-size:15px;line-height:1.5;white-space:pre-wrap';
+  d.appendChild(qq); d.appendChild(aa); parent.appendChild(d);
+}
+
+
+/* ── EXERCISE METADATA ──
+   EX_ID reuses the Spring W14.2 vault key on purpose (Exercise-Build Commandment 6):
+   it inherits a working class code and the W14.2 Case Participation routing.
+   Join probe run 2026-11-12 returned DRY_RUN_OK. The page itself is new. ── */
+const EX_WEEK = 14, EX_SESSION = 2, EX_ID = 'W14b-content-map', EX_POINTS = 12;
+
+/* ── W14.2 Switch Sides. Built 2026-11-12 from Week 14, River Pools - CASE.docx.
+   The whole room is two sides. Each student argues one side, then the other, then decides alone.
+   Every fact is a line the case prints. NOTHING HERE IS GRADED AND NO ANSWER SHIPS:
+   options are listed unmarked, the tally only counts the student's own taps.
+   Change a fact here and change the key and the 14.2 deck the same day. ── */
+const OPTIONS = [
+  { k:'o1', t:'Buy the spring the way River Pools has always bought it.' },
+  { k:'o2', t:'Write the answers down, starting with the price.' },
+  { k:'o3', t:'Give people a pool they can stand next to.' },
+  { k:'o4', t:'Keep the families River Pools has already built for.' }
+];
+const SIDES = {
+  A: { k:'A', tag:'Side A', t:'Buy the spring the way River Pools has always bought it.',
+       who:'Jason Hughes has the show contracts and the radio order in front of him.',
+       facts:[
+         'In the good years River Pools spent $250,000 a year on radio, television, the shows, the phone book and search ads. It kept the phone ringing from March through July.',
+         'This is the buy that put a salesman in more than 230 living rooms in 2007. About 75 of those families bought a pool.',
+         'No one had ever bought a pool from the website. The pool got sold at a kitchen table, by a person, with photographs.',
+         'About half of the site’s 1,500 visits a month were bought with search ads. Stop paying and the audience for anything River Pools writes is cut in half overnight.',
+         'Spring is when pools get bought in Virginia. The show contracts and the radio order have to be signed or dropped inside two weeks.',
+         'Publish the number and a competitor beats it by a thousand dollars over the phone, having seen no yard and promised nothing.'
+       ] },
+  B: { k:'B', tag:'Side B', t:'Write the answers down, starting with the price.',
+       who:'Marcus Sheridan has the question list.',
+       facts:[
+         'The first question at the table is the price. Sheridan: “This is literally the first question everybody wants to know.”',
+         'Two out of every three families who let a salesman into the house did not buy one, and no one at River Pools can say where in the evening they were lost.',
+         'A family had no way to learn the number before the evening was booked, because it is not written down anywhere they could go and look.',
+         'River Pools already owns the site and the laptop. The cost of answering is about $30 a month and the evenings Sheridan has after the crews go home.',
+         'A family that reads the number and calls anyway is a family that has already agreed to it.',
+         'There is no $250,000 this spring. There is money for one thing.'
+       ] }
+};
+const TALLY = [
+  { k:'stuck',  t:'A point about what the family is stuck on' },
+  { k:'afford', t:'A point about what River Pools can afford' },
+  { k:'number', t:'A number from the case' }
+];
+
+/* Every question, once. The summary page, the key and the deck use these exact words. */
+const Q_VOTE0  = 'Before anyone argues: River Pools has money for one thing this spring. Where would you put it?';
+const Q_WHY0   = 'Why? One sentence.';
+const Q_SIDE   = 'Which side did Professor Hudnall give you to start?';
+const Q_FACTS1 = 'Tap the two facts your side should lead with.';
+const Q_ARG1   = 'Make your side’s case in two sentences. Use a number from the case.';
+const Q_TALLY  = 'While the other side talks, tap each kind of point you hear.';
+const Q_HEARD  = 'What was the best point the other side made?';
+const Q_FACTS2 = 'You have switched. Tap the two facts your new side should lead with.';
+const Q_ARG2   = 'Make your new side’s case in two sentences. Use a number you have not used yet.';
+const Q_VOTE1  = 'Sides are off. River Pools has money for one thing this spring. Where does it go?';
+const Q_CLOSE  = 'River Pools has one spring of money left. What is the one job that money has to do?';
+const Q_GIVEUP = 'What is River Pools giving up by spending it there? Name it with a number from the case.';
+const Q_MOVED  = 'Look at your first vote. Did you move? Say what moved you, or what held you in place.';
+
+let state = { name:'', email:'', groupNum:'', vote0:null, why0:'', side:null,
+              lead1:[], arg1:'', tally1:{stuck:0,afford:0,number:0}, taps1:[], heard:'',
+              lead2:[], arg2:'', tally2:{stuck:0,afford:0,number:0}, taps2:[],
+              vote1:null, close:'', giveup:'', moved:'' };
+
+function optText(k){ const o = OPTIONS.find(x => x.k === k); return o ? o.t : ''; }
+function optNum(k){ return OPTIONS.findIndex(x => x.k === k) + 1; }
+function sideOf(round){ if (!state.side) return null; return round === 1 ? SIDES[state.side] : SIDES[state.side === 'A' ? 'B' : 'A']; }
+function tallyText(t){ return TALLY.map(x => x.t + ': ' + (t[x.k] || 0)).join(' | '); }
+
+/* ── STEP 0: first vote ── */
+function optList(id, picked, onPick){
+  const box = document.getElementById(id); box.innerHTML = '';
+  OPTIONS.forEach((o, i) => {
+    const b = el('button', 'opt-btn' + (picked === o.k ? ' on' : '')); b.type = 'button';
+    b.appendChild(el('span', 'l', String(i + 1))); b.appendChild(el('span', null, o.t));
+    b.onclick = () => onPick(o.k); box.appendChild(b);
+  });
+}
+function renderVote0(){
+  document.getElementById('q-vote0').textContent = Q_VOTE0;
+  document.getElementById('q-why0').textContent = Q_WHY0;
+  optList('vote0-list', state.vote0, k => { state.vote0 = k; renderVote0(); });
+  document.getElementById('t-why0').value = state.why0;
+  onVote0();
+}
+function onVote0(){
+  state.why0 = document.getElementById('t-why0').value.trim();
+  counter('t-why0-count', state.why0.length, 20);
+  document.getElementById('vote0-btn').disabled = !(state.vote0 && state.why0.length >= 20);
+}
+
+/* ── side assignment (the professor splits the room; the student records it) ── */
+function renderSide(){
+  document.getElementById('q-side').textContent = Q_SIDE;
+  const box = document.getElementById('side-list'); box.innerHTML = '';
+  ['A', 'B'].forEach(k => {
+    const s = SIDES[k];
+    const b = el('button', 'side-card' + (state.side === k ? ' on' : '')); b.type = 'button';
+    b.appendChild(el('div', 'k', s.tag)); b.appendChild(el('div', 't', s.t)); b.appendChild(el('div', 'm', s.who));
+    b.onclick = () => {
+      if (state.side && state.side !== k){ state.lead1 = []; state.lead2 = []; }   /* facts belong to a side */
+      state.side = k; renderSide();
+    };
+    box.appendChild(b);
+  });
+  document.getElementById('side-btn').disabled = !state.side;
+}
+
+function banner(id, round, cap){
+  const s = sideOf(round); const b = document.getElementById(id); b.innerHTML = '';
+  b.appendChild(el('span', 'cap', cap + ' · ' + s.tag));
+  b.appendChild(el('div', 't', s.t)); b.appendChild(el('div', 'm', s.who));
+}
+
+/* ── PREP: six facts, tap two, type the case ── */
+function renderPrep(round){
+  const s = sideOf(round); const lead = round === 1 ? state.lead1 : state.lead2;
+  banner(round === 1 ? 'banner1' : 'banner2', round, round === 1 ? 'You are arguing' : 'You are now arguing');
+  document.getElementById('q-facts' + round).textContent = round === 1 ? Q_FACTS1 : Q_FACTS2;
+  document.getElementById('q-arg' + round).textContent = round === 1 ? Q_ARG1 : Q_ARG2;
+  const box = document.getElementById('facts' + round); box.innerHTML = '';
+  s.facts.forEach((f, i) => {
+    const on = lead.indexOf(i) !== -1;
+    const b = el('button', 'fact' + (on ? ' on' : '')); b.type = 'button';
+    b.appendChild(el('span', 'l', String(i + 1))); b.appendChild(el('span', null, f));
+    b.onclick = () => {
+      const at = lead.indexOf(i);
+      if (at !== -1) lead.splice(at, 1);
+      else { if (lead.length >= 2) lead.shift(); lead.push(i); }
+      renderPrep(round);
+    };
+    box.appendChild(b);
+  });
+  document.getElementById('t-arg' + round).value = round === 1 ? state.arg1 : state.arg2;
+  onPrep(round);
+}
+function onPrep(round){
+  const v = document.getElementById('t-arg' + round).value.trim();
+  if (round === 1) state.arg1 = v; else state.arg2 = v;
+  counter('t-arg' + round + '-count', v.length, 60);
+  const lead = round === 1 ? state.lead1 : state.lead2;
+  document.getElementById('prep' + round + '-btn').disabled = !(lead.length === 2 && v.length >= 60);
+}
+
+/* ── DEBATE: the listening tally. It counts the student's own taps and nothing else. ── */
+function renderDebate(round){
+  banner(round === 1 ? 'banner1b' : 'banner2b', round, 'You are arguing');
+  document.getElementById('q-tally' + round).textContent = Q_TALLY;
+  const t = round === 1 ? state.tally1 : state.tally2; const taps = round === 1 ? state.taps1 : state.taps2;
+  const g = document.getElementById('tally' + round); g.innerHTML = '';
+  TALLY.forEach(x => {
+    const b = el('button', 'tally-btn'); b.type = 'button';
+    b.appendChild(el('span', null, x.t)); b.appendChild(el('span', 'n', String(t[x.k] || 0)));
+    b.onclick = () => { t[x.k] = (t[x.k] || 0) + 1; taps.push(x.k); renderDebate(round); };
+    g.appendChild(b);
+  });
+  if (round === 1){
+    document.getElementById('q-heard').textContent = Q_HEARD;
+    document.getElementById('t-heard').value = state.heard;
+    onDebate1();
+  }
+}
+function undoTally(round){
+  const t = round === 1 ? state.tally1 : state.tally2; const taps = round === 1 ? state.taps1 : state.taps2;
+  const k = taps.pop(); if (k && t[k] > 0) t[k] -= 1;
+  renderDebate(round);
+}
+function onDebate1(){
+  state.heard = document.getElementById('t-heard').value.trim();
+  counter('t-heard-count', state.heard.length, 30);
+  document.getElementById('debate1-btn').disabled = !(state.heard.length >= 30);
+}
+
+/* ── SIDES OFF ── */
+function renderFinal(){
+  document.getElementById('q-vote1').textContent = Q_VOTE1;
+  document.getElementById('q-close').textContent = Q_CLOSE;
+  document.getElementById('q-giveup').textContent = Q_GIVEUP;
+  document.getElementById('q-moved').textContent = Q_MOVED;
+  optList('vote1-list', state.vote1, k => { state.vote1 = k; renderFinal(); });
+  const g = document.getElementById('guess-row'); g.innerHTML = '';
+  g.appendChild(el('span', 'guess', 'Your first vote · ' + optNum(state.vote0) + '. ' + optText(state.vote0)));
+  document.getElementById('t-close').value = state.close;
+  document.getElementById('t-giveup').value = state.giveup;
+  document.getElementById('t-moved').value = state.moved;
+  onFinal();
+}
+function onFinal(){
+  state.close = document.getElementById('t-close').value.trim();
+  state.giveup = document.getElementById('t-giveup').value.trim();
+  state.moved = document.getElementById('t-moved').value.trim();
+  counter('t-close-count', state.close.length, 40);
+  counter('t-giveup-count', state.giveup.length, 40);
+  counter('t-moved-count', state.moved.length, 30);
+  const btn = document.getElementById('submit-btn');
+  if (btn.dataset.sent === '1') return;
+  btn.disabled = !(state.vote1 && state.close.length >= 40 && state.giveup.length >= 40 && state.moved.length >= 30);
+}
+
+/* ── SUBMIT ── */
+function leadText(round){
+  const s = sideOf(round); const lead = (round === 1 ? state.lead1 : state.lead2).slice().sort();
+  return lead.map(i => (i + 1) + '. ' + s.facts[i]).join('  |  ');
+}
+function submitAll(){
+  const btn = document.getElementById('submit-btn');
+  if (btn.disabled || btn.dataset.sent === '1') return;           // no double submits
+  btn.disabled = true; btn.dataset.sent = '1'; btn.textContent = 'Submitting…';
+  const payload = {
+    exercise: 'W14.2-switch-sides',
+    week: '14.2',
+    submittedAt: new Date().toISOString(),
+    name: state.name, email: state.email, group: state.groupNum
+  };
+  payload.vote_first = optNum(state.vote0) + '. ' + optText(state.vote0);
+  payload.vote_first_why = state.why0;
+  payload.r1_side = sideOf(1).tag + ': ' + sideOf(1).t;
+  payload.r1_lead_facts = leadText(1);
+  payload.r1_case = state.arg1;
+  payload.r1_heard_tally = tallyText(state.tally1);
+  payload.r1_best_point_other_side = state.heard;
+  payload.r2_side = sideOf(2).tag + ': ' + sideOf(2).t;
+  payload.r2_lead_facts = leadText(2);
+  payload.r2_case = state.arg2;
+  payload.r2_heard_tally = tallyText(state.tally2);
+  payload.vote_final = optNum(state.vote1) + '. ' + optText(state.vote1);
+  payload.vote_moved = state.vote0 === state.vote1 ? 'stayed' : 'moved';
+  payload.q_case_close = state.close;
+  payload.q_giving_up = state.giveup;
+  payload.q_what_moved_me = state.moved;
+
+  try{
+    if(/^https?:\/\//i.test(CREDIT_ENDPOINT)){
+      postForCredit({
+        email: state.email, name: state.name,
+        week: EX_WEEK, session: EX_SESSION, exerciseId: EX_ID,
+        password: PW, group: String(state.groupNum||''), points: EX_POINTS,
+        fields: creditFields(payload),
+        answers: creditAnswers(payload)
+      });
+    }
+  }catch(e){
+    console.warn('Credit POST error (non-blocking):', e);
+  }
+
+  buildSummary();
+  saveSummary();
+  show('summary-screen');
+}
+
+/* ── SUMMARY (Commandment 10): every on-screen question, word for word, then the
+   student's answer, in exercise order. The deck and the key use the same words. ── */
+function buildSummary(){
+  document.getElementById('student-tag').textContent = state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
+  const c = document.getElementById('corner'); c.innerHTML = '';
+  c.appendChild(el('span', 'cap', 'When Professor Hudnall says go, stand at corner ' + optNum(state.vote1)));
+  c.appendChild(el('div', 't', optText(state.vote1)));
+  c.appendChild(el('div', 'm', state.vote0 === state.vote1 ? 'You ended where you started.' : 'You started at ' + optNum(state.vote0) + ' and moved to ' + optNum(state.vote1) + '.'));
+  const s0 = document.getElementById('sum-vote0'); s0.innerHTML = '';
+  qa(s0, Q_VOTE0, optNum(state.vote0) + '. ' + optText(state.vote0));
+  qa(s0, Q_WHY0, state.why0);
+  const s1 = document.getElementById('sum-r1'); s1.innerHTML = '';
+  qa(s1, Q_SIDE, sideOf(1).tag + ' · ' + sideOf(1).t);
+  qa(s1, Q_FACTS1, leadText(1));
+  qa(s1, Q_ARG1, state.arg1);
+  qa(s1, Q_TALLY, tallyText(state.tally1));
+  qa(s1, Q_HEARD, state.heard, 'Debrief Q1');
+  const s2 = document.getElementById('sum-r2'); s2.innerHTML = '';
+  qa(s2, Q_FACTS2, leadText(2));
+  qa(s2, Q_ARG2, state.arg2);
+  qa(s2, Q_TALLY, tallyText(state.tally2));
+  const s3 = document.getElementById('sum-final'); s3.innerHTML = '';
+  qa(s3, Q_VOTE1, optNum(state.vote1) + '. ' + optText(state.vote1));
+  qa(s3, Q_CLOSE, state.close, 'Debrief Q2');
+  qa(s3, Q_GIVEUP, state.giveup, 'Debrief Q3');
+  qa(s3, Q_MOVED, state.moved, 'Debrief Q4');
+  const dl = document.getElementById('debrief-list'); dl.innerHTML = '';
+  [Q_HEARD, Q_CLOSE, Q_GIVEUP, Q_MOVED].forEach(q => dl.appendChild(el('li', null, q)));
+}
+
+
+var SAVE_KEY = 'mktg2080-' + EX_ID + '-summary';
+function saveSummary(){
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ v:1, at:Date.now(), state:state })); } catch(e){}
+}
+function restoreSummary(){
+  var raw = null;
+  try { raw = localStorage.getItem(SAVE_KEY); } catch(e){ return; }
+  if (!raw) return;
+  try {
+    var d = JSON.parse(raw);
+    if (!d || !d.state || (Date.now() - (d.at || 0)) > 1000*60*60*14) return;   /* same class day only */
+    state = Object.assign(state, d.state);
+    var btn = document.getElementById('submit-btn');
+    if (btn){ btn.disabled = true; btn.dataset.sent = '1'; btn.textContent = 'Submitted'; }
+    buildSummary();
+    document.querySelectorAll('.confirm-pill,.credit-claim').forEach(function(x){ x.style.display = 'none'; });
+    document.getElementById('restored-note').style.display = 'block';
+    show('summary-screen');
+  } catch(e){}
+}
+
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function checkPw(){
+  var val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val.length >= 4){
+    PW = val;                       /* verified server-side at the join step */
+    document.getElementById('pw-err').textContent = '';
+    show('join-screen');
+  } else {
+    var box = document.querySelector('.pw-box');
+    if(box){ box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
+    document.getElementById('pw-err').textContent = "Enter today's class code.";
+  }
+}
+
+function onJoin(){
+  const name  = document.getElementById('j-name').value.trim();
+  const email = document.getElementById('j-email').value.trim().toLowerCase();
+  const group = document.getElementById('j-group').value;
+  const emailOk = ucEmailOk(email);
+  state.name = name; state.email = email; state.groupNum = group;
+  document.getElementById('join-btn').disabled = !(name.length >= 3 && emailOk && group);
+}
+
+/* ── ROSTER GATE ─────────────────────────────────────────────────────────
+   The Logic App verifies enrollment server-side via mode:"join". EVERY
+   failure is a hard stop: nobody enters the exercise unverified, because a
+   student who walks in past a failed check gets no credit and does not find
+   out until the gradebook. ── */
+var JOIN_VERIFY_MS = 12000;
+function __joinNext(){ show('brief-screen'); }
+function __joinField(id, fallback){
+  var el = document.getElementById(id);
+  return (el && el.value != null) ? String(el.value).trim() : (fallback || '');
+}
+async function joinVerify(){
+  var btn = document.getElementById('join-btn');
+  if(!btn || btn.disabled) return;
+  var orig = btn.textContent;
+  var release = function(){ btn.disabled = false; btn.textContent = orig; };
+  var email = __joinField('j-email', (window.state && state.email));
+  var name  = __joinField('j-name',  (window.state && state.name));
+  var group = __joinField('j-group', (window.state && (state.groupNum || state.group)));
+
+  /* local/unwired copy only — the published file always has a real endpoint */
+  if(!/^https?:\/\//i.test(CREDIT_ENDPOINT)){ __joinNext(); return; }
+
+  btn.disabled = true; btn.textContent = 'Checking…';
+  var ctl = (window.AbortController ? new AbortController() : null);
+  var timer = setTimeout(function(){ if(ctl) ctl.abort(); }, JOIN_VERIFY_MS);
+  var code = 'NO_ANSWER';
+  try{
+    var res = await fetch(CREDIT_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ mode:'join', email:email, name:name, testKey:TEST_KEY,
+        week:EX_WEEK, session:EX_SESSION, exerciseId:EX_ID,
+        password:PW, group:group })
+    });
+    clearTimeout(timer);
+    var d = await res.json().catch(function(){ return null; });
+    code = (d && d.code) || ('HTTP_' + res.status);
+  }catch(e){
+    clearTimeout(timer); code = 'NO_ANSWER';
+  }
+  release();
+
+  if(code === 'JOIN_OK' || code === 'DRY_RUN_OK'){
+    if(code === 'DRY_RUN_OK'){
+      creditBanner('warn', 'DRY RUN — test key active. Every gate is being checked for real, but nothing will be written to Canvas.', 'retry');
+    } else {
+      creditBanner('clear');
+    }
+    __joinNext(); return;
+  }
+
+  if(code === 'NOT_ENROLLED'){
+    creditBanner('bad', 'That email is not on the class roster, so you cannot be given credit. Check it for a typo — it is your @mail.uc.edu address, the one Canvas uses. If it is correct, see Professor Hudnall now.', 'retry');
+  } else if(code === 'BAD_PASSWORD'){
+    creditBanner('bad', 'That is not today\'s class code. Get it from Professor Hudnall and enter it again.', 'pw');
+  } else if(code === 'WINDOW_CLOSED'){
+    creditBanner('bad', 'This exercise is only open during class.', 'retry');
+  } else {
+    creditBanner('warn', 'Could not reach the roster check (' + code + '). Try again. If it keeps failing, Professor Hudnall will tell the class what to do.', 'retry');
+  }
+}
+
+/* ── PERSISTENT BANNER ────────────────────────────────────────────────────
+   Lives on <body>, not inside a screen, so it survives every show() call.
+   It is the message on a BLOCKED screen — never a permission to continue. ── */
+function creditBanner(kind, text, action){
+  var el = document.getElementById('credit-banner');
+  if(kind === 'clear'){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    document.body.classList.remove('has-credit-banner');
+    return;
+  }
+  if(!el){ el = document.createElement('div'); el.id = 'credit-banner'; document.body.appendChild(el); }
+  el.className = kind;
+  el.innerHTML = '';
+  var span = document.createElement('span'); span.textContent = text; el.appendChild(span);
+  var toPw = (action === 'pw') && document.getElementById('pw-screen');
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cb-fix';
+  b.textContent = toPw ? 'Re-enter the code' : 'Try again';
+  b.onclick = function(){ if(toPw){ show('pw-screen'); } else { joinVerify(); } };
+  el.appendChild(b);
+  document.body.classList.add('has-credit-banner');
+}
+
+/* restore a submitted summary after a reload */
+try { restoreSummary(); } catch(e) {}
+</script>
+</body>
+</html>
