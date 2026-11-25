@@ -491,7 +491,7 @@ body.has-credit-banner .funnel{top:58px}
     <button class="back-btn" onclick="show('pw-screen')">← Back</button>
     <div class="week-tag">Week 14.2 · River Pools</div>
     <div class="screen-title">Get set up</div>
-    <div class="screen-sub">Warsaw, Virginia, the first week of March 2009. There is no $250,000 this spring. There is money for one thing, and the two owners at the desk do not agree on what. Today the whole room argues it, from both sides.</div>
+    <div class="screen-sub">Warsaw, Virginia, the first week of March 2009. There is no $250,000 this spring. There is about $20,000. Both owners want the salesman at a kitchen table, and they do not agree on where his leads should come from. Today the whole room argues it, from both sides.</div>
     <div class="card">
       <div class="field">
         <label for="j-name">Your name</label>
@@ -530,7 +530,7 @@ body.has-credit-banner .funnel{top:58px}
       <div class="row"><span class="n">2</span><span><span class="nm">Switch sides</span><span class="pl">You now argue the side you were just against. About 6 minutes.</span></span></div>
       <div class="row"><span class="n">3</span><span><span class="nm">Sides off</span><span class="pl">Vote again, three short answers, submit. About 5 minutes.</span></span></div>
     </div>
-    <div class="mission"><b>Three rules for the room.</b> Type before you talk. Nobody speaks twice until everyone on their side has spoken once. Every point needs a fact from the case.</div>
+    <div class="mission"><b>Both sides keep the salesman.</b> The pool still gets sold at a kitchen table. You are arguing about where his leads come from, and what they cost. <b>Three rules for the room.</b> Go after the idea, never the person. Nobody speaks twice until everyone on their side has spoken once. Every point needs a fact from the case.</div>
     <button class="btn btn-go" style="margin-top:6px" onclick="renderVote0(); show('vote0-screen')">Start: vote first →</button>
   </div>
 </div>
@@ -544,14 +544,14 @@ body.has-credit-banner .funnel{top:58px}
     <div class="todo">
       <div class="cap"><span class="who">On your own</span> About 1 minute. No talking yet.</div>
       <ol>
-        <li><b>Tap one</b> of the case's four ways to spend the spring. Nothing here is graded.</li>
+        <li><b>Tap one.</b> Traditional or digital. Nothing here is graded.</li>
         <li><b>Type one sentence</b> on why.</li>
       </ol>
     </div>
     <div class="ask-q" id="q-vote0"></div>
     <div id="vote0-list"></div>
     <div class="ask-q" id="q-why0"></div>
-    <textarea id="t-why0" style="min-height:80px" placeholder="I would put it there because…" oninput="onVote0()"></textarea>
+    <textarea id="t-why0" style="min-height:80px" placeholder="The leads should come from there because…" oninput="onVote0()"></textarea>
     <div class="char-count" id="t-why0-count">0 / 20 minimum</div>
     <button class="btn btn-go" id="vote0-btn" style="margin-top:14px" onclick="renderSide(); show('side-screen')" disabled>Next: get your side →</button>
   </div>
@@ -586,7 +586,7 @@ body.has-credit-banner .funnel{top:58px}
     <div class="todo">
       <div class="cap"><span class="who">On your own</span> About 2 minutes. Quiet.</div>
       <ol>
-        <li><b>Read the six facts.</b> Every one is from the case.</li>
+        <li><b>Read the six facts.</b> Every one is from the case, costs included.</li>
         <li><b>Tap the two</b> your side should lead with.</li>
         <li><b>Type your side's case</b> in two sentences.</li>
       </ol>
@@ -594,7 +594,7 @@ body.has-credit-banner .funnel{top:58px}
     <div class="ask-q" id="q-facts1"></div>
     <div id="facts1"></div>
     <div class="ask-q" id="q-arg1"></div>
-    <textarea id="t-arg1" placeholder="The last money should go to… because…" oninput="onPrep(1)"></textarea>
+    <textarea id="t-arg1" placeholder="This side gets the salesman leads by… It costs…" oninput="onPrep(1)"></textarea>
     <div class="char-count" id="t-arg1-count">0 / 60 minimum</div>
     <button class="btn btn-go" id="prep1-btn" style="margin-top:14px" onclick="renderDebate(1); show('debate1-screen')" disabled>I am ready to debate →</button>
   </div>
@@ -643,7 +643,7 @@ body.has-credit-banner .funnel{top:58px}
     <div class="ask-q" id="q-facts2"></div>
     <div id="facts2"></div>
     <div class="ask-q" id="q-arg2"></div>
-    <textarea id="t-arg2" placeholder="The last money should go to… because…" oninput="onPrep(2)"></textarea>
+    <textarea id="t-arg2" placeholder="This side gets the salesman leads by… It costs…" oninput="onPrep(2)"></textarea>
     <div class="char-count" id="t-arg2-count">0 / 60 minimum</div>
     <button class="btn btn-go" id="prep2-btn" style="margin-top:14px" onclick="renderDebate(2); show('debate2-screen')" disabled>I am ready to debate →</button>
   </div>
@@ -680,7 +680,7 @@ body.has-credit-banner .funnel{top:58px}
     <div class="todo">
       <div class="cap"><span class="who">On your own</span> About 5 minutes. Quiet.</div>
       <ol>
-        <li><b>Vote again.</b> You may land anywhere, including where you started.</li>
+        <li><b>Vote again.</b> You may land on either side, including where you started.</li>
         <li><b>Type three answers.</b> Use a number or a name from the case.</li>
         <li><b>Press Submit.</b> Then keep your summary open.</li>
       </ol>
@@ -834,56 +834,56 @@ function qa(parent, q, a, tag){
    Join probe run 2026-11-12 returned DRY_RUN_OK. The page itself is new. ── */
 const EX_WEEK = 14, EX_SESSION = 2, EX_ID = 'W14b-content-map', EX_POINTS = 12;
 
-/* ── W14.2 Switch Sides. Built 2026-11-12 from Week 14, River Pools - CASE.docx.
+/* ── W14.2 Switch Sides. Built 2026-11-12, reworked 2026-11-25 from Week 14, River Pools - CASE.docx.
+   The debate is TRADITIONAL vs DIGITAL. Both sides keep the salesman: the pool is still sold at a
+   kitchen table. The argument is where his leads come from, and what each source costs.
    The whole room is two sides. Each student argues one side, then the other, then decides alone.
-   Every fact is a line the case prints. NOTHING HERE IS GRADED AND NO ANSWER SHIPS:
+   Every fact and every cost is a line the case prints. NOTHING HERE IS GRADED AND NO ANSWER SHIPS:
    options are listed unmarked, the tally only counts the student's own taps.
    Change a fact here and change the key and the 14.2 deck the same day. ── */
 const OPTIONS = [
-  { k:'o1', t:'Buy more leads. Spend the spring getting the salesman into more living rooms.' },
-  { k:'o2', t:'Close more of the leads we have. Answer the questions that stall the sale, starting with the price.' },
-  { k:'o3', t:'Give people a pool they can stand next to.' },
-  { k:'o4', t:'Keep the families River Pools has already built for.' }
+  { k:'o1', name:'Traditional', t:'Traditional. The shows, the radio and the phone book.' },
+  { k:'o2', name:'Digital',     t:'Digital. Owned, earned and paid media online.' }
 ];
 const SIDES = {
-  A: { k:'A', tag:'Side A', t:'Buy more leads. Spend the spring getting the salesman into more living rooms.',
+  A: { k:'A', tag:'Side A · Traditional', t:'Get the salesman his leads the traditional way: the shows, the radio and the phone book.',
        who:'Jason Hughes has the show contracts and the radio order in front of him.',
        facts:[
          'In the good years River Pools spent $250,000 a year on radio, television, the shows, the phone book and search ads. It kept the phone ringing from March through July.',
-         'This is the buy that put a salesman in more than 230 living rooms in 2007. About 75 of those families bought a pool.',
-         'No one had ever bought a pool from the website. The pool got sold at a kitchen table, by a person, with photographs.',
-         'About half of the site’s 1,500 visits a month were bought with search ads. Stop paying and the audience for anything River Pools writes is cut in half overnight.',
-         'Spring is when pools get bought in Virginia. The show contracts and the radio order have to be signed or dropped inside two weeks.',
-         'Publish the number and a competitor beats it by a thousand dollars over the phone, having seen no yard and promised nothing.'
+         'That buy put a salesman in more than 230 living rooms in 2007, and about 75 of those families bought a pool. That is about $1,090 a living room and about $3,330 a pool.',
+         'The spring is priced. About $1,800 a show, plus three people for four days. About $6,000 for the radio season. About $9,000 for the year in the phone book.',
+         'Spring is when pools get bought in Virginia. The show contracts and the radio order have to be signed or dropped inside two weeks, and a builder who misses the shows has no spring at all.',
+         'About 1,500 people a month come to the website and about 30 of them call. No one has ever bought a pool from the website.',
+         'Publish the price online and a competitor beats it by a thousand dollars over the phone, having seen no yard and promised nothing.'
        ] },
-  B: { k:'B', tag:'Side B', t:'Close more of the leads we have. Answer the questions that stall the sale, starting with the price.',
-       who:'Marcus Sheridan has the question list.',
+  B: { k:'B', tag:'Side B · Digital', t:'Get the salesman his leads the digital way: owned, earned and paid media online.',
+       who:'Marcus Sheridan has the question list and the website.',
        facts:[
-         'The first question at the table is the price. Sheridan: “This is literally the first question everybody wants to know.”',
-         'Two out of every three families who let a salesman into the house did not buy one, and no one at River Pools can say where in the evening they were lost.',
-         'A family had no way to learn the number before the evening was booked, because it is not written down anywhere they could go and look.',
-         'River Pools already owns the site and the laptop. The cost of answering is about $30 a month and the evenings Sheridan has after the crews go home.',
-         'A family that reads the number and calls anyway is a family that has already agreed to it.',
-         'There is no $250,000 this spring. There is money for one thing.'
+         'Owned. River Pools already owns the site. Writing the answers costs about $30 a month, about $200 for a camcorder and a tripod, and the evenings Sheridan has after the crews go home.',
+         'Paid. Search ads are bought by the click, at about $1.50 a click. About half of the site’s 1,500 visits a month come that way, which is about $1,100 a month.',
+         'Earned. Eight years of owners have pools their neighbors can see from the road. An email list of past buyers costs about $30 a month, and a bonus for sending a neighbor about $500 a pool.',
+         'The site already brings about 30 calls a month. The first question at every table is the price, and it is not written down anywhere a family could go and look.',
+         'Two out of every three families who let a salesman into the house did not buy. A family that reads the number and calls anyway is a family that has already agreed to it.',
+         'There is no $250,000 this spring. There is about $20,000, and television took the largest share of the old budget.'
        ] }
 };
 const TALLY = [
-  { k:'stuck',  t:'A point about what the family is stuck on' },
-  { k:'afford', t:'A point about what River Pools can afford' },
+  { k:'stuck',  t:'A point about leads: how many, or how good' },
+  { k:'afford', t:'A point about what it costs' },
   { k:'number', t:'A number from the case' }
 ];
 
 /* Every question, once. The summary page, the key and the deck use these exact words. */
-const Q_VOTE0  = 'Before anyone argues: River Pools has money for one thing this spring. Where would you put it?';
+const Q_VOTE0  = 'Before anyone argues: River Pools has about $20,000 this spring. Where should the salesman’s leads come from?';
 const Q_WHY0   = 'Why? One sentence.';
 const Q_SIDE   = 'Which side did Professor Hudnall give you to start?';
 const Q_FACTS1 = 'Tap the two facts your side should lead with.';
-const Q_ARG1   = 'Make your side’s case in two sentences. Use a number from the case.';
+const Q_ARG1   = 'Make your side’s case in two sentences. Say how it gets the salesman leads, and use a cost from the case.';
 const Q_TALLY  = 'While the other side talks, tap each kind of point you hear.';
 const Q_HEARD  = 'What was the best point the other side made?';
 const Q_FACTS2 = 'You have switched. Tap the two facts your new side should lead with.';
-const Q_ARG2   = 'Make your new side’s case in two sentences. Use a number you have not used yet.';
-const Q_VOTE1  = 'Sides are off. River Pools has money for one thing this spring. Where does it go?';
+const Q_ARG2   = 'Make your new side’s case in two sentences. Use a cost or a number you have not used yet.';
+const Q_VOTE1  = 'Sides are off. River Pools has about $20,000 this spring. Where should the salesman’s leads come from?';
 const Q_CLOSE  = 'River Pools has one spring of money left. What is the one job that money has to do?';
 const Q_GIVEUP = 'What is River Pools giving up by spending it there? Name it with a number from the case.';
 const Q_MOVED  = 'Look at your first vote. Did you move? Say what moved you, or what held you in place.';
@@ -895,6 +895,7 @@ let state = { name:'', email:'', groupNum:'', vote0:null, why0:'', side:null,
 
 function optText(k){ const o = OPTIONS.find(x => x.k === k); return o ? o.t : ''; }
 function optNum(k){ return OPTIONS.findIndex(x => x.k === k) + 1; }
+function optName(k){ const o = OPTIONS.find(x => x.k === k); return o ? o.name : ''; }
 function sideOf(round){ if (!state.side) return null; return round === 1 ? SIDES[state.side] : SIDES[state.side === 'A' ? 'B' : 'A']; }
 function tallyText(t){ return TALLY.map(x => x.t + ': ' + (t[x.k] || 0)).join(' | '); }
 
@@ -1084,9 +1085,9 @@ function submitAll(){
 function buildSummary(){
   document.getElementById('student-tag').textContent = state.name + ' · Group ' + state.groupNum + ' · ' + state.email;
   const c = document.getElementById('corner'); c.innerHTML = '';
-  c.appendChild(el('span', 'cap', 'When Professor Hudnall says go, stand at corner ' + optNum(state.vote1)));
+  c.appendChild(el('span', 'cap', 'When Professor Hudnall says go, stand on the ' + optName(state.vote1) + ' side of the room'));
   c.appendChild(el('div', 't', optText(state.vote1)));
-  c.appendChild(el('div', 'm', state.vote0 === state.vote1 ? 'You ended where you started.' : 'You started at ' + optNum(state.vote0) + ' and moved to ' + optNum(state.vote1) + '.'));
+  c.appendChild(el('div', 'm', state.vote0 === state.vote1 ? 'You ended where you started.' : 'You started at ' + optName(state.vote0) + ' and moved to ' + optName(state.vote1) + '.'));
   const s0 = document.getElementById('sum-vote0'); s0.innerHTML = '';
   qa(s0, Q_VOTE0, optNum(state.vote0) + '. ' + optText(state.vote0));
   qa(s0, Q_WHY0, state.why0);
@@ -1110,7 +1111,7 @@ function buildSummary(){
 }
 
 
-var SAVE_KEY = 'mktg2080-' + EX_ID + '-summary';
+var SAVE_KEY = 'mktg2080-' + EX_ID + '-summary-v2';
 function saveSummary(){
   try { localStorage.setItem(SAVE_KEY, JSON.stringify({ v:1, at:Date.now(), state:state })); } catch(e){}
 }
